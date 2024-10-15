@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react'
 import TextEditor from './TextEditor'
 import Footer from './Footer'
-import TextEditorDashboard from './TextEditorDashboard'
 
 interface WritingPageProps {
   timeLimit: number
@@ -10,7 +9,7 @@ interface WritingPageProps {
   selectedPrompt: string
 }
 
-export default function WritingPage({ timeLimit, wordCount, generatePrompt, selectedPrompt }: WritingPageProps) {
+export default function WritingPage({ timeLimit, wordCount, selectedPrompt }: WritingPageProps) {
   const [currentWords, setCurrentWords] = useState(0)
   const [timeLeft, setTimeLeft] = useState(timeLimit * 60)
   const [isTimeUp, setIsTimeUp] = useState(false)
@@ -38,7 +37,6 @@ export default function WritingPage({ timeLimit, wordCount, generatePrompt, sele
 
   return (
     <div className="container mx-auto px-4 py-8">
-      {/* <TextEditorDashboard /> */}
       <TextEditor
         ref={textAreaRef}
         onChange={handleTextChange}
