@@ -59,7 +59,7 @@ export default function HowItWorksSection() {
                       <CardTitle>Grow Your Skills</CardTitle>
                     </CardHeader>
                     <CardContent>
-                      As you write and complete challenges, you'll level up your writing abilities, unlocking new features and opportunities.
+                      As you write and complete challenges, you will level up your writing abilities, unlocking new features and opportunities.
                     </CardContent>
                   </Card>
                 </TabsContent>

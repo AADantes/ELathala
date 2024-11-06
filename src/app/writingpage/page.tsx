@@ -6,7 +6,7 @@ import WritingPage from '@/app/writingpage/components/WritingPage'
 import Header from '@/app/writingpage/components/Header'
 import Sidebar from '@/app/writingpage/components/Sidebar'
 
-export default function writingpage() {
+export default function Writingpage() {
     const [isWriting, setIsWriting] = useState(false)
     const [timeLimit, setTimeLimit] = useState(0)
     const [wordCount, setWordCount] = useState(0)
