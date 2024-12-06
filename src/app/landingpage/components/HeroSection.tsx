@@ -11,20 +11,20 @@ export default function HeroSection() {
   const [password, setPassword] = useState('')
   const [message, setMessage] = useState('') // For success or error messages
 
-  const handleRegister = async (e) => {
+  const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault()
 
     // Call Supabase's signUp method
-    const { data, error } = await supabase.auth.signUp({
+    const { error } = await supabase.auth.signUp({
       email,  
       password,
     })
-
+    
     if (error) {
       console.error('Error during registration:', error.message)
       setMessage(`Error: ${error.message}`)
     } else {
-      console.log('Registration successful:', data)
+      console.log('Registration successful')
       setMessage('Registration successful! Please check your email to confirm your account.')
     }
 
