@@ -8,24 +8,28 @@ import { Button } from "@/app/landingpage/ui/button"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/app/landingpage/ui/dialog"
 import { Input } from "@/app/landingpage/ui/input"
 import { Label } from "@/app/landingpage/ui/label"
+import  supabase  from "../../../../config/supabaseClient"
 
 export default function Header() {
   const [loginEmail, setLoginEmail] = useState('')
   const [loginPassword, setLoginPassword] = useState('')
-  const router = useRouter() // Initialize useRouter
+  const [errorMessage, setErrorMessage] = useState('')
+  const router = useRouter()
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
 
-    // Replace these with the actual credentials
-    const correctEmail = 'user@example.com'
-    const correctPassword = 'password123'
+    // Use Supabase's signInWithPassword method
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email: loginEmail,
+      password: loginPassword,
+    })
 
-    if (loginEmail === correctEmail && loginPassword === correctPassword) {
+    if (error) {
+      setErrorMessage(error.message) // Show error message on failure
+    } else {
       // Redirect to another page on successful login
       router.push('/homepage') // Adjust the path as needed
-    } else {
-      alert('Incorrect email or password')
     }
 
     // Reset form fields
@@ -75,6 +79,9 @@ export default function Header() {
                 required
               />
             </div>
+            {errorMessage && (
+              <p className="text-red-500 text-sm">{errorMessage}</p>
+            )}
             <Button type="submit" className="w-full">Log In</Button>
           </form>
         </DialogContent>

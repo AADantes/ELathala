@@ -4,9 +4,34 @@ import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { Button } from "@/app/landingpage/ui/button"
 import { Input } from "@/app/landingpage/ui/input"
+import supabase from '../../../../config/supabaseClient'
 
 export default function HeroSection() {
   const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [message, setMessage] = useState('') // For success or error messages
+
+  const handleRegister = async (e) => {
+    e.preventDefault()
+
+    // Call Supabase's signUp method
+    const { data, error } = await supabase.auth.signUp({
+      email,  
+      password,
+    })
+
+    if (error) {
+      console.error('Error during registration:', error.message)
+      setMessage(`Error: ${error.message}`)
+    } else {
+      console.log('Registration successful:', data)
+      setMessage('Registration successful! Please check your email to confirm your account.')
+    }
+
+    // Clear form fields
+    setEmail('')
+    setPassword('')
+  }
 
   return (
     <section className="w-full py-12 md:py-24 lg:py-32 xl:py-48">
@@ -31,16 +56,26 @@ export default function HeroSection() {
             transition={{ duration: 0.5, delay: 0.2 }}
             className="w-full max-w-sm space-y-2"
           >
-            <form className="flex space-x-2 mb-4">
+            <form onSubmit={handleRegister} className="space-y-2">
               <Input
                 type="email"
                 placeholder="Enter your email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="flex-1"
+                className="w-full"
+                required
               />
-              <Button type="submit">Get Started</Button>
+              <Input
+                type="password"
+                placeholder="Enter your password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="w-full"
+                required
+              />
+              <Button type="submit" className="w-full">Sign Up</Button>
             </form>
+            {message && <p className="text-sm text-muted-foreground">{message}</p>}
           </motion.div>
         </div>
       </div>
