@@ -38,7 +38,7 @@ export default function Writingpage() {
             />
           )}
           {!isWriting && (
-            <div className="absolute inset-0 bg-orange-200 opacity-50" style={{ zIndex: 10 }}></div>
+            <div className="absolute inset-0 bg-blue-200 opacity-50" style={{ zIndex: 10 }}></div>
           )}
         </div>
       </div>

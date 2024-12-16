@@ -30,12 +30,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
         <nav>
           <ul className="space-y-2">
             <li>
-              <Link href="/login" className="block py-2 hover:text-blue-500">
-                Login / Register
-              </Link>
-            </li>
-            <li>
-              <Link href="/" className="block py-2 hover:text-blue-500">
+              <Link href="/homepage" className="block py-2 hover:text-blue-500">
                 Home
               </Link>
             </li>

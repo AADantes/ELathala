@@ -38,7 +38,7 @@ export default function Header() {
   }
 
   return (
-    <header className="px-4 lg:px-6 h-16 flex items-center">
+    <header className="px-4 lg:px-6 h-16 flex items-center border border-gray-300">
       <Link className="flex items-center justify-center" href="#">
         <Pen className="h-6 w-6 mr-2 text-primary" />
         <span className="font-bold text-2xl bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary-foreground">Elathala</span>

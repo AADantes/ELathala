@@ -11,6 +11,7 @@ const config: Config = {
       colors: {
         background: "var(--background)",
         foreground: "var(--foreground)",
+        fadingBgLandingPage:{ DEFAULT: '#a1d0ff', 80: 'rgba(161, 208, 255, 0.8)'},
       },
     },
   },
