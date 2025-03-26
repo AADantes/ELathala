@@ -13,14 +13,14 @@ const TextEditor = forwardRef<HTMLTextAreaElement, TextEditorProps>(
     }
 
     return (
-      <div className="mb-4">
+      <div className="mb-4 p-4 bg-[#F5FDF8] rounded-xl shadow-lg">
         <textarea
           ref={ref}
-          className="w-full h-64 p-2 text-base font-arial bg-transparent resize-none focus:outline-none"
+          className="w-full h-96 p-4 text-lg font-mono text-black bg-white resize-none focus:outline-none rounded-lg shadow-inner"
           onChange={onChange}
           disabled={disabled}
           placeholder={placeholder}
-          style={{ minHeight: '400px' }}
+          style={{ minHeight: '290px', overflow: 'hidden' }}
           onCopy={handleCopyPaste}
           onCut={handleCopyPaste}
           onPaste={handleCopyPaste}
