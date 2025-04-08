@@ -1,6 +1,13 @@
 "use client"
 
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/app/components/ui/admintable"
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/app/components/ui/admintable"
 
 interface DataTableProps {
   columns: string[]
@@ -9,14 +16,24 @@ interface DataTableProps {
   onRowClick: (row: any) => void
 }
 
-export default function DataTable({ columns, data, selectedRow, onRowClick }: DataTableProps) {
+export default function DataTable({
+  columns,
+  data,
+  selectedRow,
+  onRowClick,
+}: DataTableProps) {
   return (
-    <div className="rounded-md border">
-      <Table>
+    <div className="overflow-x-auto rounded-md border border-gray-200 shadow-sm bg-white">
+      <Table className="min-w-full">
         <TableHeader>
-          <TableRow>
+          <TableRow className="bg-gray-100 border-b border-gray-200">
             {columns.map((column) => (
-              <TableHead key={column}>{column}</TableHead>
+              <TableHead
+                key={column}
+                className="text-left p-2 font-semibold text-gray-700 tracking-wide"
+              >
+                {column}
+              </TableHead>
             ))}
           </TableRow>
         </TableHeader>
@@ -25,10 +42,18 @@ export default function DataTable({ columns, data, selectedRow, onRowClick }: Da
             <TableRow
               key={index}
               onClick={() => onRowClick(row)}
-              className={selectedRow?.id === row.id ? "bg-muted" : "cursor-pointer hover:bg-muted/50"}
+              className={`cursor-pointer transition-colors duration-200 ${
+                selectedRow?.id === row.id
+                  ? "bg-blue-50 border-l-4 border-blue-500"
+                  : index % 2 === 0
+                  ? "bg-white"
+                  : "bg-gray-50"
+              } hover:bg-blue-100`}
             >
               {columns.map((column) => (
-                <TableCell key={column}>{row[column]?.toString()}</TableCell>
+                <TableCell key={column} className="p-2 text-sm text-gray-800">
+                  {row[column]?.toString()}
+                </TableCell>
               ))}
             </TableRow>
           ))}
@@ -37,4 +62,3 @@ export default function DataTable({ columns, data, selectedRow, onRowClick }: Da
     </div>
   )
 }
-

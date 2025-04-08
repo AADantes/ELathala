@@ -1,73 +1,264 @@
-import React, { useState, useEffect, useRef } from 'react'
-import Footer from './Footer'
-import { useRouter } from 'next/navigation'
-import { Button } from '@/app/writingpage/ui/Button'
+'use client';
+
+import React, { useState, useEffect, useRef } from 'react';
+import axios from 'axios';
+import Footer from './Footer';
+import { useRouter } from 'next/navigation';
+import { Button } from '@/app/writingpage/ui/Button';
 
 interface WritingPageProps {
-  timeLimit: number
-  wordCount: number
-  generatePrompt: boolean
-  selectedPrompt: string
+  timeLimit: number;
+  wordCount: number;
+  generatePrompt: boolean;
+  selectedPrompt: string;
 }
 
 export default function WritingPage({ timeLimit, wordCount, selectedPrompt }: WritingPageProps) {
-  const [currentWords, setCurrentWords] = useState(0)
-  const [timeLeft, setTimeLeft] = useState(timeLimit * 60)
-  const [isTimeUp, setIsTimeUp] = useState(false)
-  const textAreaRef = useRef<HTMLTextAreaElement>(null)
-  const router = useRouter()
+  const [currentWords, setCurrentWords] = useState(0);
+  const [timeLeft, setTimeLeft] = useState(timeLimit * 60);
+  const [isTimeUp, setIsTimeUp] = useState(false);
+  const [isTyping, setIsTyping] = useState(true);
+  const [text, setText] = useState('');
+  const [isIdle, setIsIdle] = useState(false);
+  const [idleWarning, setIdleWarning] = useState(false);
+  const [grammarErrors, setGrammarErrors] = useState<any[]>([]);
+  const [language, setLanguage] = useState('en-US');
+  const [fontStyle, setFontStyle] = useState('Arial');
+  const [fontSize, setFontSize] = useState(16);
+  const [deletedWords, setDeletedWords] = useState<string[]>([]);
+  const [warning, setWarning] = useState<string | null>(null);
+  const [shakeEffect, setShakeEffect] = useState(false);
+  const textAreaRef = useRef<HTMLTextAreaElement>(null);
+  const router = useRouter();
+
+  const idleTimeLimit = 30000; // 30 seconds
+  const warningTimeLimit = 2500; // 2.5 seconds
 
   useEffect(() => {
     const timer = setInterval(() => {
       setTimeLeft((prevTime) => {
         if (prevTime <= 1) {
-          clearInterval(timer)
-          setIsTimeUp(true)
-          return 0
+          clearInterval(timer);
+          setIsTimeUp(true);
+          return 0;
         }
-        return prevTime - 1
-      })
-    }, 1000)
+        return prevTime - 1;
+      });
+    }, 1000);
+    return () => clearInterval(timer);
+  }, [timeLimit]);
 
-    return () => clearInterval(timer)
-  }, [timeLimit])
+  useEffect(() => {
+    const typingTimer = setTimeout(() => {
+      if (!isTyping && currentWords > 0 && !idleWarning && currentWords < wordCount && !isTimeUp) {
+        setIdleWarning(true);
+        const wordArray = text.trim().split(/\s+/);
+        wordArray.pop();
+        setText(wordArray.join(' '));
+        setCurrentWords(wordArray.length);
+        setIsIdle(true);
+      } else if (isTyping || currentWords >= wordCount || isTimeUp) {
+        setIdleWarning(false);
+      }
+    }, idleTimeLimit);
+
+    return () => {
+      clearTimeout(typingTimer);
+      setIsIdle(false);
+      setIdleWarning(false);
+    };
+  }, [text, isTyping, currentWords, idleWarning, wordCount, isTimeUp]);
+
+  const checkGrammar = async (text: string, language: string) => {
+    try {
+      const response = await axios.post('https://api.languagetool.org/v2/check', null, {
+        params: { text: text, language: language },
+      });
+      setGrammarErrors(response.data.matches);
+    } catch (error) {
+      console.error('Grammar check failed:', error);
+    }
+  };
+
+  useEffect(() => {
+    if (text.trim()) {
+      checkGrammar(text, language);
+    }
+  }, [text, language]);
 
   const handleTextChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    const text = e.target.value
-    setCurrentWords(text.trim().split(/\s+/).length)
-  }
+    const newText = e.target.value;
+    const prevText = text;
+    setText(newText);
+    setCurrentWords(newText.trim().split(/\s+/).length);
+    setIsTyping(true);
+
+    if (currentWords >= wordCount) return; // Stop word deletion tracking when target word count is reached
+
+    const prevWords = prevText.trim().split(/\s+/);
+    const newWords = newText.trim().split(/\s+/);
+
+    if (newWords.length < prevWords.length) {
+      const deletedWord = prevWords[prevWords.length - 1];
+      setDeletedWords((prev) => [...prev, deletedWord]);
+      setWarning(`Oops! You deleted "${deletedWord}".`);
+      setShakeEffect(true);
+
+      setTimeout(() => {
+        setWarning(null);
+        setShakeEffect(false);
+      }, 2000);
+    }
+  };
+
+  const handleKeyPress = () => setIsTyping(true);
+  const handleKeyUp = () => setIsTyping(false);
+
+  const splitTextWithEffects = () => {
+    return text.split(/\s+/).map((word, index) => {
+      const isDeleted = deletedWords.includes(word);
+      const error = grammarErrors.find((err) =>
+        err.context.text.includes(word)
+      );
+      return (
+        <span
+          key={index}
+          className={`${isDeleted ? 'blink-text text-red-500' : ''} ${error ? 'bg-yellow-200' : ''} ${shakeEffect ? 'animate-shake' : ''}`}
+          style={{ marginRight: '0.5rem' }}
+        >
+          {word}
+        </span>
+      );
+    });
+  };
 
   if (isTimeUp) {
     return (
       <div className="fixed inset-0 flex items-center justify-center bg-white text-black z-50">
         <div className="text-center">
-          <h1 className="text-4xl font-bold mb-4">Your Time is Up!</h1>
+          <h1 className="text-4xl font-bold mb-4 text-dark-blue">Your Time is Up!</h1>
           <Button
             onClick={() => router.push('/homepage')}
-            className="bg-white hover:bg-gray-200 text-black px-6 py-3 text-lg rounded"
+            className="bg-dark-blue hover:bg-blue-700 text-white px-6 py-3 text-lg rounded"
           >
             Go to Homepage
           </Button>
         </div>
       </div>
-    )
+    );
   }
 
   return (
-    <div className="container mx-auto px-4 py-4 bg-white text-black h-screen flex flex-col">
-      <textarea
-        ref={textAreaRef}
-        onChange={handleTextChange}
-        disabled={isTimeUp}
-        placeholder={selectedPrompt || 'Start writing here...'}
-        style={{ 
-          height: '20vh', 
-          resize: 'none',          // Prevent resizing
-          overflow: 'hidden'       // Prevent scrolling
-        }}
-        className="w-full p-4 focus:outline-none focus:ring-0"
-      />
-      <Footer currentWords={currentWords} targetWords={wordCount} timeLeft={timeLeft} />
+    <div className="container mx-auto px-6 py-8 bg-white text-black min-h-screen flex flex-col relative pb-24">
+      <div className="flex justify-between items-center mb-6">
+        <div className="flex gap-4 items-center">
+          <select
+            value={language}
+            onChange={(e) => setLanguage(e.target.value)}
+            className="p-3 border border-skyblue rounded-lg bg-white shadow-md text-black"
+          >
+            <option value="en-US">English (US)</option>
+            <option value="en-GB">English (GB)</option>
+            <option value="es">Spanish</option>
+            <option value="fr">French</option>
+            <option value="de">German</option>
+            <option value="it">Italian</option>
+            <option value="tl">Filipino (Tagalog)</option>
+          </select>
+
+          <select
+            value={fontStyle}
+            onChange={(e) => setFontStyle(e.target.value)}
+            className="p-3 border border-skyblue rounded-lg bg-white shadow-md text-black"
+          >
+            <option value="Arial">Arial</option>
+            <option value="Georgia">Georgia</option>
+            <option value="Times New Roman">Times New Roman</option>
+            <option value="Courier New">Courier New</option>
+            <option value="Verdana">Verdana</option>
+          </select>
+
+          <select
+            value={fontSize}
+            onChange={(e) => setFontSize(parseInt(e.target.value))}
+            className="p-3 border border-skyblue rounded-lg bg-white shadow-md text-black"
+          >
+            <option value={12}>12px</option>
+            <option value={14}>14px</option>
+            <option value={16}>16px</option>
+            <option value={18}>18px</option>
+            <option value={20}>20px</option>
+            <option value={22}>22px</option>
+            <option value={24}>24px</option>
+          </select>
+        </div>
+      </div>
+
+      <div className="flex flex-grow gap-8">
+        <div className="w-full md:w-2/3 bg-white p-6 border rounded-lg shadow-lg flex flex-col">
+          <textarea
+            ref={textAreaRef}
+            onChange={handleTextChange}
+            onKeyPress={handleKeyPress}
+            onKeyUp={handleKeyUp}
+            disabled={isTimeUp}
+            placeholder={selectedPrompt || 'Start writing here...'}
+            value={text}
+            style={{
+              fontFamily: fontStyle,
+              fontSize: `${fontSize}px`,
+              height: '40vh',
+              resize: 'none',
+              overflow: 'auto',
+            }}
+            className="w-full p-4 focus:outline-none focus:ring-2 border-2 border-skyblue rounded-lg shadow-md bg-white text-black"
+          />
+
+          <div
+            className="mt-4 text-lg overflow-y-auto h-[160px] break-words whitespace-pre-wrap p-4 border border-gray-300 rounded-lg shadow-inner bg-gray-50"
+            style={{
+              fontSize: `${fontSize}px`,
+              overflowWrap: 'break-word',
+              wordWrap: 'break-word',
+              whiteSpace: 'normal',
+            }}
+          >
+            {splitTextWithEffects()}
+          </div>
+
+          {warning && (
+            <div className="mt-4 text-yellow-500 text-center font-semibold">
+              {warning}
+            </div>
+          )}
+        </div>
+
+        <div className="w-full md:w-1/3 bg-skyblue p-6 border-l-2 border-skyblue h-[500px] overflow-auto rounded-lg shadow-lg">
+          <div className="mb-6">
+            <h4 className="text-xl font-semibold mb-2 text-dark-blue">Grammar Suggestions</h4>
+            {grammarErrors.length > 0 ? (
+              <ul className="space-y-2">
+                {grammarErrors.map((error, index) => (
+                  <li key={index} className="p-3 bg-white rounded-lg shadow-sm hover:bg-gray-200 transition">
+                    <div className="text-sm font-bold text-red-600">{error.message}</div>
+                    <div className="text-sm text-gray-800">
+                      Suggested Correction:{' '}
+                      {error.replacements?.map((replacement: any) => replacement.value).join(', ')}
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p>No grammar errors found!</p>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Footer - Fixed at bottom */}
+      <div className="fixed bottom-0 w-full bg-white text-center z-50 shadow-md py-4">
+        <Footer currentWords={currentWords} targetWords={wordCount} timeLeft={timeLeft} />
+      </div>
     </div>
-  )
+  );
 }

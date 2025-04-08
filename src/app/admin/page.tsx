@@ -27,7 +27,7 @@ export default function AdminPage() {
       if (error) {
         console.error("Error fetching tables:", error)
       } else {
-        console.log("Tables fetched successfully:", data) // Debugging
+        console.log("Tables fetched successfully:", data)
         setTables(data.map((table: { name: string }) => table.name)) // Extract names
       }
     }
@@ -89,32 +89,53 @@ export default function AdminPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-blue-50">
       <AdminHeader onLogout={handleLogout} />
-      <main className="container py-6">
+  
+      <main className="pt-6 pb-6 px-2 sm:px-4 md:px-6">
         <div className="grid gap-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Database Management</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <TableSelector tables={tables} selectedTable={selectedTable} onSelectTable={setSelectedTable} />
-              <div className="mt-6">
-                <DataTable columns={columns} data={tableData} selectedRow={selectedRow} onRowClick={handleRowClick} />
-              </div>
-            </CardContent>
-          </Card>
-
-          <RecordForm
-            columns={columns}
-            formValues={formValues}
-            selectedColumn={selectedColumn}
-            onInputChange={handleInputChange}
-            onSelectColumn={setSelectedColumn}
-            onAdd={handleAdd}
-            onUpdate={handleUpdate}
-            onDelete={handleDelete}
-          />
+          <div>
+            <Card className="bg-white w-full">
+              <CardHeader>
+                <CardTitle>Database Management</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <TableSelector
+                  tables={tables}
+                  selectedTable={selectedTable}
+                  onSelectTable={setSelectedTable}
+                />
+                <div className="mt-6 overflow-auto">
+                  <DataTable
+                    columns={columns}
+                    data={tableData}
+                    selectedRow={selectedRow}
+                    onRowClick={handleRowClick}
+                  />
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+  
+          <div>
+            <Card className="bg-white w-full">
+              <CardHeader>
+                <CardTitle>Edit Record</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <RecordForm
+                  columns={columns}
+                  formValues={formValues}
+                  selectedColumn={selectedColumn}
+                  onInputChange={handleInputChange}
+                  onSelectColumn={setSelectedColumn}
+                  onAdd={handleAdd}
+                  onUpdate={handleUpdate}
+                  onDelete={handleDelete}
+                />
+              </CardContent>
+            </Card>
+          </div>
         </div>
       </main>
     </div>
