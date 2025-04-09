@@ -23,12 +23,12 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
         isOpen ? 'translate-x-0' : '-translate-x-full'
       } transition-transform duration-300 ease-in-out z-50`}
     >
-      <div className="p-6 text-white">
+      <div className="p-4 text-white">
         <Button
           variant="ghost"
           size="icon"
           onClick={onClose}
-          className="mb-4 hover:bg-[#55B4ED] rounded-full transition-transform duration-300 ease-in-out transform hover:scale-110"
+          className="mb-4 hover:bg-[#55B4ED] rounded-full transition-all duration-300 ease-in-out transform hover:scale-110"
         >
           <X className="h-6 w-6 text-white" />
         </Button>
@@ -47,58 +47,70 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
         <nav>
           <ul className="space-y-2">
             <li>
-              <Link 
-                href="/homepage" 
-                className="group flex items-center space-x-4 py-3 px-4 rounded-lg bg-white shadow-md shadow-black/30 transition-all duration-300 hover:scale-105 hover:bg-blue-500"
+              <Link
+                href="/homepage"
+                className="flex items-center space-x-4 py-3 px-4 rounded-lg bg-white shadow-md shadow-black/30 transition-all duration-500 ease-in-out transform hover:scale-105 hover:bg-gradient-to-r hover:from-[#00C6FF] hover:to-[#0072FF] hover:text-white group"
               >
-                <Home className="h-5 w-5 text-[#005B88] group-hover:text-white" />
-                <span className="text-black font-bold group-hover:text-white">Home</span>
+                <Home className="h-5 w-5 text-[#005B88] transition-all duration-300 group-hover:text-white group-hover:scale-110" />
+                <span className="text-black font-bold transition-all duration-300 group-hover:text-white group-hover:scale-110">
+                  Home
+                </span>
               </Link>
             </li>
             <li>
-              <Link 
-                href="/works" 
-                className="group flex items-center space-x-4 py-3 px-4 rounded-lg bg-white shadow-md shadow-black/30 transition-all duration-300 hover:scale-105 hover:bg-blue-500"
+              <Link
+                href="/works"
+                className="flex items-center space-x-4 py-3 px-4 rounded-lg bg-white shadow-md shadow-black/30 transition-all duration-500 ease-in-out transform hover:scale-105 hover:bg-gradient-to-r hover:from-[#00C6FF] hover:to-[#0072FF] hover:text-white group"
               >
-                <BookOpen className="h-5 w-5 text-[#9D79FF] group-hover:text-white" />
-                <span className="text-black font-bold group-hover:text-white">Works</span>
+                <BookOpen className="h-5 w-5 text-[#9D79FF] transition-all duration-300 group-hover:text-white group-hover:scale-110" />
+                <span className="text-black font-bold transition-all duration-300 group-hover:text-white group-hover:scale-110">
+                  Works
+                </span>
               </Link>
             </li>
             <li>
-              <Link 
-                href="/profile" 
-                className="group flex items-center space-x-4 py-3 px-4 rounded-lg bg-white shadow-md shadow-black/30 transition-all duration-300 hover:scale-105 hover:bg-blue-500"
+              <Link
+                href="/profile"
+                className="flex items-center space-x-4 py-3 px-4 rounded-lg bg-white shadow-md shadow-black/30 transition-all duration-500 ease-in-out transform hover:scale-105 hover:bg-gradient-to-r hover:from-[#00C6FF] hover:to-[#0072FF] hover:text-white group"
               >
-                <User className="h-5 w-5 text-[#00FF85] group-hover:text-white" />
-                <span className="text-black font-bold group-hover:text-white">Profile</span>
+                <User className="h-5 w-5 text-[#00FF85] transition-all duration-300 group-hover:text-white group-hover:scale-110" />
+                <span className="text-black font-bold transition-all duration-300 group-hover:text-white group-hover:scale-110">
+                  Profile
+                </span>
               </Link>
             </li>
             <li>
-              <Link 
-                href="/levels-rewards" 
-                className="group flex items-center space-x-4 py-3 px-4 rounded-lg bg-white shadow-md shadow-black/30 transition-all duration-300 hover:scale-105 hover:bg-blue-500"
+              <Link
+                href="/levels-rewards"
+                className="flex items-center space-x-4 py-3 px-4 rounded-lg bg-white shadow-md shadow-black/30 transition-all duration-500 ease-in-out transform hover:scale-105 hover:bg-gradient-to-r hover:from-[#00C6FF] hover:to-[#0072FF] hover:text-white group"
               >
-                <Star className="h-5 w-5 text-[#FFD700] group-hover:text-white" />
-                <span className="text-black font-bold group-hover:text-white">Levels and Rewards</span>
+                <Star className="h-5 w-5 text-[#FFD700] transition-all duration-300 group-hover:text-white group-hover:scale-110" />
+                <span className="text-black font-bold transition-all duration-300 group-hover:text-white group-hover:scale-110">
+                  Levels and Rewards
+                </span>
               </Link>
             </li>
             <li>
-              <Link 
-                href="/help" 
-                className="group flex items-center space-x-4 py-3 px-4 rounded-lg bg-white shadow-md shadow-black/30 transition-all duration-300 hover:scale-105 hover:bg-blue-500"
+              <Link
+                href="/help"
+                className="flex items-center space-x-4 py-3 px-4 rounded-lg bg-white shadow-md shadow-black/30 transition-all duration-500 ease-in-out transform hover:scale-105 hover:bg-gradient-to-r hover:from-[#00C6FF] hover:to-[#0072FF] hover:text-white group"
               >
-                <HelpCircle className="h-5 w-5 text-[#FF6B6B] group-hover:text-white" />
-                <span className="text-black font-bold group-hover:text-white">Help</span>
+                <HelpCircle className="h-5 w-5 text-[#FF6B6B] transition-all duration-300 group-hover:text-white group-hover:scale-110" />
+                <span className="text-black font-bold transition-all duration-300 group-hover:text-white group-hover:scale-110">
+                  Help
+                </span>
               </Link>
             </li>
             <li>
-            <Button 
-  variant="ghost" 
-  className="group w-full flex items-center space-x-4 justify-start py-3 px-4 rounded-lg text-left text-red-500 bg-white shadow-md shadow-black/30 transition-all duration-300 hover:scale-105 hover:bg-red-500"
->
-  <LogOut className="h-5 w-5 text-[#FF6B6B] group-hover:text-white" />
-  <span className="text-black font-bold group-hover:text-white">Logout</span>
-</Button>
+              <Button
+                variant="ghost"
+                className="w-full flex items-center space-x-4 justify-start py-5 px-4 rounded-lg text-left text-red-500 bg-white shadow-sm shadow-black/20 transition-all duration-500 ease-in-out transform hover:bg-gradient-to-r hover:from-[#FF6B6B] hover:to-[#FF4C4C] hover:scale-105 hover:shadow-sm hover:shadow-[#FF4C4C] hover:text-white group"
+              >
+                <LogOut className="h-5 w-5 text-[#FF6B6B] transition-all duration-300 group-hover:text-white group-hover:scale-110 group-hover:drop-shadow-sm" />
+                <span className="text-red-500 font-bold transition-all duration-300 group-hover:text-white group-hover:scale-110 group-hover:drop-shadow-sm">
+                  Logout
+                </span>
+              </Button>
             </li>
           </ul>
         </nav>

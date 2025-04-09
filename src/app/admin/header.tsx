@@ -20,7 +20,7 @@ export default function AdminHeader({ onLogout }: AdminHeaderProps) {
         <Button
           variant="ghost"
           onClick={onLogout}
-          className="text-white flex items-center px-6 py-3 rounded-lg border border-white transition-all duration-300 ease-in-out transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-4 focus:ring-sky-400 bg-[#4F8FB7] hover:bg-[#4F8FB7] active:bg-[#4F8FB7] text-lg font-semibold"
+          className="text-white flex items-center justify-center px-6 py-3 rounded-lg border-2 border-white transition-all duration-300 ease-in-out transform hover:bg-[#3E7D99] active:bg-[#2F5B71] focus:outline-none focus:ring-4 focus:ring-sky-400 bg-[#4F8FB7] hover:scale-105 active:scale-95 text-lg font-semibold"
         >
           <LogoutIcon className="mr-2 h-5 w-5 text-white" />
           <span className="text-sm font-bold">Log out</span>

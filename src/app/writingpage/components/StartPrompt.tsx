@@ -1,13 +1,15 @@
+'use client';
+
 import React, { useState } from 'react';
 import { Button } from '@/app/writingpage/ui/Button';
 import { Input } from '@/app/writingpage/ui/Input';
 import { Checkbox } from '@/app/writingpage/ui/CheckBox';
 import { useRouter } from 'next/navigation';
 
-// New Professional Icons
-import { HiOutlineClock } from 'react-icons/hi';
-import { TbWriting } from 'react-icons/tb';
-import { Edit } from 'react-feather'; // Importing Feather Edit icon
+// Updated icons
+import { RiTimerLine } from 'react-icons/ri';
+import { BsPencilSquare } from 'react-icons/bs';
+import { FiPlayCircle } from 'react-icons/fi';
 
 interface StartPromptProps {
   onStart: (time: number, words: number, prompt: boolean, selectedPrompt: string) => void;
@@ -29,14 +31,17 @@ export default function StartPrompt({ onStart }: StartPromptProps) {
   const router = useRouter();
 
   const handleStart = () => {
-    if (Number(timeLimit) < 1 || Number(wordCount) < 50) return;
+    const time = Number(timeLimit);
+    const words = Number(wordCount);
+    if (time < 1 || time > 60 || words < 50) return;
+
     const finalPrompt = generatePrompt
       ? prompts[Math.floor(Math.random() * prompts.length)]
       : '';
-    onStart(Number(timeLimit), Number(wordCount), generatePrompt, finalPrompt);
+    onStart(time, words, generatePrompt, finalPrompt);
     setTimeout(() => {
       setTimeIsUp(true);
-    }, Number(timeLimit) * 60 * 1000);
+    }, time * 60 * 1000);
   };
 
   if (timeIsUp) {
@@ -55,23 +60,25 @@ export default function StartPrompt({ onStart }: StartPromptProps) {
     );
   }
 
-  const isStartDisabled = !timeLimit || !wordCount || Number(timeLimit) < 1 || Number(wordCount) < 50;
+  const isStartDisabled =
+    !timeLimit ||
+    !wordCount ||
+    Number(timeLimit) < 1 ||
+    Number(timeLimit) > 60 ||
+    Number(wordCount) < 50;
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-      <div className="bg-white p-10 rounded-3xl shadow-2xl w-96 transition-transform transform hover:scale-105">
-        <h2
-          className="text-3xl font-bold mb-8 text-center text-[#0077b6]"
-          style={{ fontFamily: "'Poppins', sans-serif" }}
-        >
+      <div className="bg-white p-10 rounded-3xl shadow-2xl w-96 border-2 border-[#0077b6] transition-transform transform hover:scale-105">
+        <h2 className="text-3xl font-bold mb-8 text-center text-[#0077b6] font-poppins">
           Start Writing
         </h2>
 
         <div className="space-y-8">
-          {/* Time Limit Section */}
+          {/* Time Limit Input */}
           <div>
             <label htmlFor="timeLimit" className="block text-sm font-semibold text-[#0077b6] flex items-center">
-              <HiOutlineClock className="text-[#0077b6] mr-2" /> Time Limit (minutes)
+              <RiTimerLine className="text-[#0077b6] mr-2" /> Time Limit (1–60 minutes)
             </label>
             <Input
               type="number"
@@ -80,13 +87,19 @@ export default function StartPrompt({ onStart }: StartPromptProps) {
               onChange={(e) => setTimeLimit(e.target.value)}
               className="mt-2 p-4 border-2 border-[#0077b6] rounded-xl w-full shadow-md focus:ring-2 focus:ring-[#0077b6] focus:outline-none transition-all duration-300"
               min={1}
+              max={60}
             />
+            {Number(timeLimit) > 60 && (
+              <p className="text-red-500 text-sm font-semibold mt-2">
+                Maximum is 60 minutes only!
+              </p>
+            )}
           </div>
 
-          {/* Word Count Section */}
+          {/* Word Count Input */}
           <div>
             <label htmlFor="wordCount" className="block text-sm font-semibold text-[#0077b6] flex items-center">
-              <TbWriting className="text-[#0077b6] mr-2" /> Word Count
+              <BsPencilSquare className="text-[#0077b6] mr-2" /> Word Count
             </label>
             <Input
               type="number"
@@ -103,7 +116,7 @@ export default function StartPrompt({ onStart }: StartPromptProps) {
             )}
           </div>
 
-          {/* Checkbox Section */}
+          {/* Prompt Checkbox */}
           <div className="flex items-center">
             <Checkbox
               id="generatePrompt"
@@ -115,7 +128,7 @@ export default function StartPrompt({ onStart }: StartPromptProps) {
             </label>
           </div>
 
-          {/* Start Button with Feather Icon */}
+          {/* Start Button */}
           <Button
             onClick={handleStart}
             disabled={isStartDisabled}
@@ -125,7 +138,7 @@ export default function StartPrompt({ onStart }: StartPromptProps) {
                 : 'bg-[#0077b6] hover:bg-[#005f73] text-white shadow-lg hover:shadow-xl'
             }`}
           >
-            <Edit className="mr-2 text-white transform hover:scale-110 transition-all duration-200" size={20} />
+            <FiPlayCircle className="mr-2 text-white transform hover:scale-110 transition-all duration-200" size={20} />
             Start Writing
           </Button>
         </div>

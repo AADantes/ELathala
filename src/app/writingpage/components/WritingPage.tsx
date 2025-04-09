@@ -132,6 +132,11 @@ export default function WritingPage({ timeLimit, wordCount, selectedPrompt }: Wr
     });
   };
 
+  // Disable copy-paste actions in the textarea
+  const handleCopy = (e: React.ClipboardEvent<HTMLTextAreaElement>) => e.preventDefault();
+  const handlePaste = (e: React.ClipboardEvent<HTMLTextAreaElement>) => e.preventDefault();
+  const handleCut = (e: React.ClipboardEvent<HTMLTextAreaElement>) => e.preventDefault();
+
   if (isTimeUp) {
     return (
       <div className="fixed inset-0 flex items-center justify-center bg-white text-black z-50">
@@ -147,6 +152,10 @@ export default function WritingPage({ timeLimit, wordCount, selectedPrompt }: Wr
       </div>
     );
   }
+
+  // Calculate timeProgress like a battery
+  const totalTime = timeLimit * 60; // Total time in seconds
+  const timeProgress = Math.min(Math.max(((totalTime - timeLeft) / totalTime) * 100, 0), 100);
 
   return (
     <div className="container mx-auto px-6 py-8 bg-white text-black min-h-screen flex flex-col relative pb-24">
@@ -194,13 +203,17 @@ export default function WritingPage({ timeLimit, wordCount, selectedPrompt }: Wr
         </div>
       </div>
 
-      <div className="flex flex-grow gap-8">
+      <div className="flex gap-8">
+        {/* Main Content Area */}
         <div className="w-full md:w-2/3 bg-white p-6 border rounded-lg shadow-lg flex flex-col">
           <textarea
             ref={textAreaRef}
             onChange={handleTextChange}
             onKeyPress={handleKeyPress}
             onKeyUp={handleKeyUp}
+            onCopy={handleCopy}
+            onPaste={handlePaste}
+            onCut={handleCut}
             disabled={isTimeUp}
             placeholder={selectedPrompt || 'Start writing here...'}
             value={text}
@@ -233,13 +246,14 @@ export default function WritingPage({ timeLimit, wordCount, selectedPrompt }: Wr
           )}
         </div>
 
-        <div className="w-full md:w-1/3 bg-skyblue p-6 border-l-2 border-skyblue h-[500px] overflow-auto rounded-lg shadow-lg">
+        {/* Sidebar */}
+        <div className="w-full md:w-1/3 bg-gradient-to-b from-skyblue to-blue-700 text-white p-6 border-l-2 border-skyblue h-[500px] overflow-auto rounded-lg shadow-lg">
           <div className="mb-6">
-            <h4 className="text-xl font-semibold mb-2 text-dark-blue">Grammar Suggestions</h4>
+            <h4 className="text-xl font-semibold mb-2">Grammar Suggestions</h4>
             {grammarErrors.length > 0 ? (
               <ul className="space-y-2">
                 {grammarErrors.map((error, index) => (
-                  <li key={index} className="p-3 bg-white rounded-lg shadow-sm hover:bg-gray-200 transition">
+                  <li key={index} className="p-3 bg-white text-black rounded-lg shadow-sm hover:bg-gray-200 transition">
                     <div className="text-sm font-bold text-red-600">{error.message}</div>
                     <div className="text-sm text-gray-800">
                       Suggested Correction:{' '}
@@ -256,7 +270,7 @@ export default function WritingPage({ timeLimit, wordCount, selectedPrompt }: Wr
       </div>
 
       {/* Footer - Fixed at bottom */}
-      <div className="fixed bottom-0 w-full bg-white text-center z-50 shadow-md py-4">
+      <div className="fixed bottom-0 w-full bg-white text-center z-10 shadow-md py-4">
         <Footer currentWords={currentWords} targetWords={wordCount} timeLeft={timeLeft} />
       </div>
     </div>
