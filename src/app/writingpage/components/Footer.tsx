@@ -11,7 +11,6 @@ export default function Footer({ currentWords, targetWords, timeLeft }: FooterPr
   const minutes = Math.floor(timeLeft / 60)
   const seconds = timeLeft % 60
 
-  // Clamp progress between 0 and 100
   const wordProgress = Math.min(Math.max((currentWords / targetWords) * 100, 0), 100)
   const totalTime = 60 * 60 // assuming 1 hour session
   const timeProgress = Math.min(Math.max((timeLeft / totalTime) * 100, 0), 100)
@@ -24,7 +23,6 @@ export default function Footer({ currentWords, targetWords, timeLeft }: FooterPr
     return "Let's get writing!"
   }
 
-  // Display the timer based on whether it's above or below 1 hour
   const timeDisplay = timeLeft >= 3600 
     ? "1 hour"
     : `${minutes}m ${seconds.toString().padStart(2, '0')}s`
@@ -49,7 +47,7 @@ export default function Footer({ currentWords, targetWords, timeLeft }: FooterPr
         </div>
       </div>
 
-      {/* Motivation Section (Updated Medal Icon to Sky Blue and Bold Text) */}
+      {/* Motivation Section */}
       <div className="flex flex-col items-center w-1/3 space-y-1 text-center">
         <Medal className="w-6 h-6 text-sky-400 animate-bounce hover:scale-110 transition-transform" />
         <span className="font-mono text-md text-gray-600 font-bold">{getMotivation()}</span>

@@ -24,6 +24,7 @@ export default function WritingPage({ timeLimit, wordCount, selectedPrompt }: Wr
   const [language, setLanguage] = useState('en-US');
   const [fontStyle, setFontStyle] = useState('Arial');
   const [fontSize, setFontSize] = useState(16);
+  const [textColor, setTextColor] = useState('black'); // Added state for text color
   const [deletedWords, setDeletedWords] = useState<string[]>([]);
   const [warning, setWarning] = useState<string | null>(null);
   const [shakeEffect, setShakeEffect] = useState(false);
@@ -98,11 +99,21 @@ export default function WritingPage({ timeLimit, wordCount, selectedPrompt }: Wr
   const handleTextChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const newText = e.target.value;
     const prevText = text;
+
     setText(newText);
-    setCurrentWords(newText.trim().split(/\s+/).length);
+
+    // Count words
+    const wordCount = newText.trim().split(/\s+/).length;
+    setCurrentWords(wordCount);
+
     setIsTyping(true);
 
-    if (currentWords >= wordCount) return;
+    // Reset word count to 0 if the text is completely deleted
+    if (newText.trim() === '') {
+      setCurrentWords(0);
+    }
+
+    if (wordCount >= wordCount) return;
 
     const prevWords = prevText.trim().split(/\s+/);
     const newWords = newText.trim().split(/\s+/);
@@ -133,7 +144,7 @@ export default function WritingPage({ timeLimit, wordCount, selectedPrompt }: Wr
         <span
           key={index}
           className={`${isDeleted ? 'blink-text text-red-500' : ''} ${error ? 'bg-yellow-300 text-black p-1 rounded' : ''} ${shakeEffect ? 'animate-shake' : ''}`}
-          style={{ marginRight: '0.5rem' }}
+          style={{ marginRight: '0.5rem', color: textColor }}  // Apply selected text color here
         >
           {word}
         </span>
@@ -153,6 +164,10 @@ export default function WritingPage({ timeLimit, wordCount, selectedPrompt }: Wr
   const handleCopy = (e: React.ClipboardEvent<HTMLTextAreaElement>) => e.preventDefault();
   const handlePaste = (e: React.ClipboardEvent<HTMLTextAreaElement>) => e.preventDefault();
   const handleCut = (e: React.ClipboardEvent<HTMLTextAreaElement>) => e.preventDefault();
+
+  const handleColorChange = (color: string) => {
+    setTextColor(color);  // Update the text color state
+  };
 
   if (isTimeUp) {
     return (
@@ -216,6 +231,15 @@ export default function WritingPage({ timeLimit, wordCount, selectedPrompt }: Wr
             <option value={22}>22px</option>
             <option value={24}>24px</option>
           </select>
+
+          {/* Color Picker for Text */}
+          <input
+            type="color"
+            value={textColor}
+            onChange={(e) => handleColorChange(e.target.value)}
+            title="Select Text Color"
+            className="w-12 h-12 rounded-lg cursor-pointer"
+          />
         </div>
       </div>
 
@@ -239,6 +263,7 @@ export default function WritingPage({ timeLimit, wordCount, selectedPrompt }: Wr
               height: '40vh',
               resize: 'none',
               overflow: 'auto',
+              color: textColor, // Apply the selected text color here
             }}
             className="w-full p-4 focus:outline-none focus:ring-2 border-2 border-skyblue rounded-lg shadow-md bg-white text-black"
           />
@@ -250,6 +275,7 @@ export default function WritingPage({ timeLimit, wordCount, selectedPrompt }: Wr
               overflowWrap: 'break-word',
               wordWrap: 'break-word',
               whiteSpace: 'normal',
+              color: textColor, // Apply color to preview area
             }}
           >
             {splitTextWithEffects()}
@@ -276,7 +302,7 @@ export default function WritingPage({ timeLimit, wordCount, selectedPrompt }: Wr
                       {error.replacements?.map((replacement: any) => (
                         <button
                           key={replacement.value}
-                          className="text-black"  // Removed link style here
+                          className="text-black"
                           onClick={() => applyCorrection(index, replacement.value)}
                         >
                           {replacement.value}
