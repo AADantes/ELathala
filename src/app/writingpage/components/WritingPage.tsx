@@ -1,5 +1,3 @@
-'use client';
-
 import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import Footer from './Footer';
@@ -22,6 +20,7 @@ export default function WritingPage({ timeLimit, wordCount, selectedPrompt }: Wr
   const [isIdle, setIsIdle] = useState(false);
   const [idleWarning, setIdleWarning] = useState(false);
   const [grammarErrors, setGrammarErrors] = useState<any[]>([]);
+  const [paraphrasingSuggestions, setParaphrasingSuggestions] = useState<string[]>([]);
   const [language, setLanguage] = useState('en-US');
   const [fontStyle, setFontStyle] = useState('Arial');
   const [fontSize, setFontSize] = useState(16);
@@ -31,8 +30,8 @@ export default function WritingPage({ timeLimit, wordCount, selectedPrompt }: Wr
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
   const router = useRouter();
 
-  const idleTimeLimit = 30000; // 30 seconds
-  const warningTimeLimit = 2500; // 2.5 seconds
+  const idleTimeLimit = 30000;
+  const warningTimeLimit = 2500;
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -80,9 +79,19 @@ export default function WritingPage({ timeLimit, wordCount, selectedPrompt }: Wr
     }
   };
 
+  const getParaphrasingSuggestions = async (text: string) => {
+    try {
+      const response = await axios.post('https://paraphrasing-api.com/api/v1/paraphrase', { text });
+      setParaphrasingSuggestions(response.data.suggestions);
+    } catch (error) {
+      console.error('Paraphrasing failed:', error);
+    }
+  };
+
   useEffect(() => {
     if (text.trim()) {
       checkGrammar(text, language);
+      getParaphrasingSuggestions(text);
     }
   }, [text, language]);
 
@@ -93,7 +102,7 @@ export default function WritingPage({ timeLimit, wordCount, selectedPrompt }: Wr
     setCurrentWords(newText.trim().split(/\s+/).length);
     setIsTyping(true);
 
-    if (currentWords >= wordCount) return; // Stop word deletion tracking when target word count is reached
+    if (currentWords >= wordCount) return;
 
     const prevWords = prevText.trim().split(/\s+/);
     const newWords = newText.trim().split(/\s+/);
@@ -123,7 +132,7 @@ export default function WritingPage({ timeLimit, wordCount, selectedPrompt }: Wr
       return (
         <span
           key={index}
-          className={`${isDeleted ? 'blink-text text-red-500' : ''} ${error ? 'bg-yellow-200' : ''} ${shakeEffect ? 'animate-shake' : ''}`}
+          className={`${isDeleted ? 'blink-text text-red-500' : ''} ${error ? 'bg-yellow-300 text-black p-1 rounded' : ''} ${shakeEffect ? 'animate-shake' : ''}`}
           style={{ marginRight: '0.5rem' }}
         >
           {word}
@@ -132,7 +141,15 @@ export default function WritingPage({ timeLimit, wordCount, selectedPrompt }: Wr
     });
   };
 
-  // Disable copy-paste actions in the textarea
+  const applyCorrection = (index: number, suggestion: string) => {
+    const newText = text.slice(0, grammarErrors[index].offset) + suggestion + text.slice(grammarErrors[index].offset + grammarErrors[index].length);
+    setText(newText);
+  };
+
+  const applyParaphrase = (suggestion: string) => {
+    setText(suggestion);
+  };
+
   const handleCopy = (e: React.ClipboardEvent<HTMLTextAreaElement>) => e.preventDefault();
   const handlePaste = (e: React.ClipboardEvent<HTMLTextAreaElement>) => e.preventDefault();
   const handleCut = (e: React.ClipboardEvent<HTMLTextAreaElement>) => e.preventDefault();
@@ -153,8 +170,7 @@ export default function WritingPage({ timeLimit, wordCount, selectedPrompt }: Wr
     );
   }
 
-  // Calculate timeProgress like a battery
-  const totalTime = timeLimit * 60; // Total time in seconds
+  const totalTime = timeLimit * 60;
   const timeProgress = Math.min(Math.max(((totalTime - timeLeft) / totalTime) * 100, 0), 100);
 
   return (
@@ -240,7 +256,7 @@ export default function WritingPage({ timeLimit, wordCount, selectedPrompt }: Wr
           </div>
 
           {warning && (
-            <div className="mt-4 text-yellow-500 text-center font-semibold">
+            <div className="mt-4 text-red-500 text-center font-semibold">
               {warning}
             </div>
           )}
@@ -249,27 +265,58 @@ export default function WritingPage({ timeLimit, wordCount, selectedPrompt }: Wr
         {/* Sidebar */}
         <div className="w-full md:w-1/3 bg-gradient-to-b from-skyblue to-blue-700 text-white p-6 border-l-2 border-skyblue h-[500px] overflow-auto rounded-lg shadow-lg">
           <div className="mb-6">
-            <h4 className="text-xl font-semibold mb-2">Grammar Suggestions</h4>
+            <h4 className="text-xl font-semibold mb-2 text-sky-700">Grammar Suggestions</h4>
             {grammarErrors.length > 0 ? (
               <ul className="space-y-2">
                 {grammarErrors.map((error, index) => (
                   <li key={index} className="p-3 bg-white text-black rounded-lg shadow-sm hover:bg-gray-200 transition">
-                    <div className="text-sm font-bold text-red-600">{error.message}</div>
-                    <div className="text-sm text-gray-800">
+                    <div className="text-sm font-bold text-black">{error.message}</div>
+                    <div className="text-sm text-black">
                       Suggested Correction:{' '}
-                      {error.replacements?.map((replacement: any) => replacement.value).join(', ')}
+                      {error.replacements?.map((replacement: any) => (
+                        <button
+                          key={replacement.value}
+                          className="text-black"  // Removed link style here
+                          onClick={() => applyCorrection(index, replacement.value)}
+                        >
+                          {replacement.value}
+                        </button>
+                      ))}
+                    </div>
+                    <div className="text-sm text-black">
+                      <em>{error.context.text}</em>
                     </div>
                   </li>
                 ))}
               </ul>
             ) : (
-              <p>No grammar errors found!</p>
+              <p className="text-black">No grammar errors found!</p>
+            )}
+          </div>
+
+          <div className="mb-6">
+            <h4 className="text-xl font-semibold mb-2 text-sky-700">Paraphrasing Suggestions</h4>
+            {paraphrasingSuggestions.length > 0 ? (
+              <ul className="space-y-2">
+                {paraphrasingSuggestions.map((suggestion, index) => (
+                  <li key={index} className="p-3 bg-white text-black rounded-lg shadow-sm hover:bg-gray-200 transition">
+                    <button
+                      className="text-blue-600 underline"
+                      onClick={() => applyParaphrase(suggestion)}
+                    >
+                      {suggestion}
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="text-black">No paraphrasing suggestions found!</p>
             )}
           </div>
         </div>
       </div>
 
-      {/* Footer - Fixed at bottom */}
+      {/* Footer */}
       <div className="fixed bottom-0 w-full bg-white text-center z-10 shadow-md py-4">
         <Footer currentWords={currentWords} targetWords={wordCount} timeLeft={timeLeft} />
       </div>

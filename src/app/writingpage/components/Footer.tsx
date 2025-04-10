@@ -53,6 +53,11 @@ export default function Footer({ currentWords, targetWords, timeLeft }: FooterPr
       <div className="flex flex-col items-center w-1/3 space-y-1 text-center">
         <Medal className="w-6 h-6 text-sky-400 animate-bounce hover:scale-110 transition-transform" />
         <span className="font-mono text-md text-gray-600 font-bold">{getMotivation()}</span>
+        {wordProgress === 100 && (
+          <div className="text-green-400 font-mono text-lg mt-2 animate-bounce">
+            <span>🎉 You did it! 🎉</span>
+          </div>
+        )}
       </div>
 
       {/* Word Count Section */}
