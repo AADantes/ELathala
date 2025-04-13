@@ -1,19 +1,18 @@
 import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
-import Footer from './Footer';
 import { useRouter } from 'next/navigation';
-import { Button } from '@/app/writingpage/ui/Button';
+import { Button } from '@/app/writingpage/ui/Button'; // Check if this import is correct
+import Footer from './Footer'; // Ensure Footer is correctly imported from the right path
 
 interface WritingPageProps {
   timeLimit: number;
   wordCount: number;
-  generatePrompt: boolean;
   selectedPrompt: string;
 }
 
 export default function WritingPage({ timeLimit, wordCount, selectedPrompt }: WritingPageProps) {
   const [currentWords, setCurrentWords] = useState(0);
-  const [timeLeft, setTimeLeft] = useState(timeLimit * 60);
+  const [timeLeft, setTimeLeft] = useState(timeLimit * 60); // Total time in seconds
   const [isTimeUp, setIsTimeUp] = useState(false);
   const [isTyping, setIsTyping] = useState(true);
   const [text, setText] = useState('');
@@ -24,7 +23,7 @@ export default function WritingPage({ timeLimit, wordCount, selectedPrompt }: Wr
   const [language, setLanguage] = useState('en-US');
   const [fontStyle, setFontStyle] = useState('Arial');
   const [fontSize, setFontSize] = useState(16);
-  const [textColor, setTextColor] = useState('black'); // Added state for text color
+  const [textColor, setTextColor] = useState('black');
   const [deletedWords, setDeletedWords] = useState<string[]>([]);
   const [warning, setWarning] = useState<string | null>(null);
   const [shakeEffect, setShakeEffect] = useState(false);
@@ -34,6 +33,11 @@ export default function WritingPage({ timeLimit, wordCount, selectedPrompt }: Wr
   const idleTimeLimit = 30000;
   const warningTimeLimit = 2500;
 
+  useEffect(() => {
+    setTimeLeft(timeLimit * 60); // Reset the time left whenever the timeLimit prop changes
+  }, [timeLimit]);
+
+  // Start the timer and control the progress bar
   useEffect(() => {
     const timer = setInterval(() => {
       setTimeLeft((prevTime) => {
@@ -45,6 +49,7 @@ export default function WritingPage({ timeLimit, wordCount, selectedPrompt }: Wr
         return prevTime - 1;
       });
     }, 1000);
+
     return () => clearInterval(timer);
   }, [timeLimit]);
 
@@ -169,6 +174,10 @@ export default function WritingPage({ timeLimit, wordCount, selectedPrompt }: Wr
     setTextColor(color);  // Update the text color state
   };
 
+  // Calculate the progress bar width
+  const totalTimeInSeconds = timeLimit * 60;
+  const timeProgress = Math.min(Math.max(((totalTimeInSeconds - timeLeft) / totalTimeInSeconds) * 100, 0), 100);
+
   if (isTimeUp) {
     return (
       <div className="fixed inset-0 flex items-center justify-center bg-white text-black z-50">
@@ -184,9 +193,6 @@ export default function WritingPage({ timeLimit, wordCount, selectedPrompt }: Wr
       </div>
     );
   }
-
-  const totalTime = timeLimit * 60;
-  const timeProgress = Math.min(Math.max(((totalTime - timeLeft) / totalTime) * 100, 0), 100);
 
   return (
     <div className="container mx-auto px-6 py-8 bg-white text-black min-h-screen flex flex-col relative pb-24">
@@ -263,7 +269,7 @@ export default function WritingPage({ timeLimit, wordCount, selectedPrompt }: Wr
               height: '40vh',
               resize: 'none',
               overflow: 'auto',
-              color: textColor, // Apply the selected text color here
+              color: textColor, // Apply selected text color here
             }}
             className="w-full p-4 focus:outline-none focus:ring-2 border-2 border-skyblue rounded-lg shadow-md bg-white text-black"
           />

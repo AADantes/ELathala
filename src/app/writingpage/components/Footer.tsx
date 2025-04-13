@@ -12,8 +12,11 @@ export default function Footer({ currentWords, targetWords, timeLeft }: FooterPr
   const seconds = timeLeft % 60
 
   const wordProgress = Math.min(Math.max((currentWords / targetWords) * 100, 0), 100)
+  
   const totalTime = 60 * 60 // assuming 1 hour session
-  const timeProgress = Math.min(Math.max((timeLeft / totalTime) * 100, 0), 100)
+
+  // For time progress: start at 100% and decrease as time runs out
+  const timeProgress = Math.min(Math.max(((totalTime - timeLeft) / totalTime) * 100, 0), 100)
 
   const getMotivation = () => {
     if (wordProgress === 100) return "Mission Accomplished!"
@@ -39,7 +42,7 @@ export default function Footer({ currentWords, targetWords, timeLeft }: FooterPr
           <div
             className="h-full transition-all duration-500"
             style={{
-              width: `${timeProgress}%`,
+              width: `${100 - timeProgress}%`, // Decrease from 100% as time progresses
               backgroundColor:
                 timeProgress > 66 ? '#38BDF8' : timeProgress > 33 ? '#0EA5E9' : '#0284C7',
             }}
