@@ -1,7 +1,8 @@
+'use client';
+
 import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import Footer from './Footer';
-import { useRouter } from 'next/navigation';
 import { Button } from '@/app/writingpage/ui/Button';
 
 interface WritingPageProps {
@@ -11,7 +12,11 @@ interface WritingPageProps {
   selectedPrompt: string;
 }
 
-export default function WritingPage({ timeLimit, wordCount, selectedPrompt }: WritingPageProps) {
+export default function WritingPage({
+  timeLimit,
+  wordCount,
+  selectedPrompt,
+}: WritingPageProps) {
   const [currentWords, setCurrentWords] = useState(0);
   const [timeLeft, setTimeLeft] = useState(timeLimit * 60);
   const [isTimeUp, setIsTimeUp] = useState(false);
@@ -24,15 +29,21 @@ export default function WritingPage({ timeLimit, wordCount, selectedPrompt }: Wr
   const [language, setLanguage] = useState('en-US');
   const [fontStyle, setFontStyle] = useState('Arial');
   const [fontSize, setFontSize] = useState(16);
-  const [textColor, setTextColor] = useState('black'); // Added state for text color
+  const [textColor, setTextColor] = useState('black');
   const [deletedWords, setDeletedWords] = useState<string[]>([]);
   const [warning, setWarning] = useState<string | null>(null);
   const [shakeEffect, setShakeEffect] = useState(false);
+  const [badWordDetected, setBadWordDetected] = useState<string | null>(null);
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
-  const router = useRouter();
 
   const idleTimeLimit = 30000;
-  const warningTimeLimit = 2500;
+
+  const badWords = ['fuck', 'shit', 'bitch', 'asshole', 'damn', 'crap']; // Extend as needed
+
+  const containsBadWords = (text: string): string | null => {
+    const words = text.toLowerCase().split(/\s+/);
+    return words.find((word) => badWords.includes(word)) || null;
+  };
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -102,22 +113,18 @@ export default function WritingPage({ timeLimit, wordCount, selectedPrompt }: Wr
 
     setText(newText);
 
-    // Count words
-    const wordCount = newText.trim().split(/\s+/).length;
-    setCurrentWords(wordCount);
-
+    const newWords = newText.trim().split(/\s+/);
+    setCurrentWords(newText.trim() === '' ? 0 : newWords.length);
     setIsTyping(true);
 
-    // Reset word count to 0 if the text is completely deleted
-    if (newText.trim() === '') {
-      setCurrentWords(0);
+    const foundBadWord = containsBadWords(newText);
+    if (foundBadWord) {
+      setBadWordDetected(foundBadWord);
+    } else {
+      setBadWordDetected(null);
     }
 
-    if (wordCount >= wordCount) return;
-
     const prevWords = prevText.trim().split(/\s+/);
-    const newWords = newText.trim().split(/\s+/);
-
     if (newWords.length < prevWords.length) {
       const deletedWord = prevWords[prevWords.length - 1];
       setDeletedWords((prev) => [...prev, deletedWord]);
@@ -133,18 +140,20 @@ export default function WritingPage({ timeLimit, wordCount, selectedPrompt }: Wr
 
   const handleKeyPress = () => setIsTyping(true);
   const handleKeyUp = () => setIsTyping(false);
+  const handleCopy = (e: React.ClipboardEvent<HTMLTextAreaElement>) => e.preventDefault();
+  const handlePaste = (e: React.ClipboardEvent<HTMLTextAreaElement>) => e.preventDefault();
+  const handleCut = (e: React.ClipboardEvent<HTMLTextAreaElement>) => e.preventDefault();
+  const handleColorChange = (color: string) => setTextColor(color);
 
   const splitTextWithEffects = () => {
     return text.split(/\s+/).map((word, index) => {
       const isDeleted = deletedWords.includes(word);
-      const error = grammarErrors.find((err) =>
-        err.context.text.includes(word)
-      );
+      const error = grammarErrors.find((err) => err.context.text.includes(word));
       return (
         <span
           key={index}
           className={`${isDeleted ? 'blink-text text-red-500' : ''} ${error ? 'bg-yellow-300 text-black p-1 rounded' : ''} ${shakeEffect ? 'animate-shake' : ''}`}
-          style={{ marginRight: '0.5rem', color: textColor }}  // Apply selected text color here
+          style={{ marginRight: '0.5rem', color: textColor }}
         >
           {word}
         </span>
@@ -153,50 +162,49 @@ export default function WritingPage({ timeLimit, wordCount, selectedPrompt }: Wr
   };
 
   const applyCorrection = (index: number, suggestion: string) => {
-    const newText = text.slice(0, grammarErrors[index].offset) + suggestion + text.slice(grammarErrors[index].offset + grammarErrors[index].length);
+    const newText =
+      text.slice(0, grammarErrors[index].offset) +
+      suggestion +
+      text.slice(grammarErrors[index].offset + grammarErrors[index].length);
     setText(newText);
   };
 
-  const applyParaphrase = (suggestion: string) => {
-    setText(suggestion);
-  };
+  const applyParaphrase = (suggestion: string) => setText(suggestion);
 
-  const handleCopy = (e: React.ClipboardEvent<HTMLTextAreaElement>) => e.preventDefault();
-  const handlePaste = (e: React.ClipboardEvent<HTMLTextAreaElement>) => e.preventDefault();
-  const handleCut = (e: React.ClipboardEvent<HTMLTextAreaElement>) => e.preventDefault();
-
-  const handleColorChange = (color: string) => {
-    setTextColor(color);  // Update the text color state
-  };
+  const isGoalMet = currentWords >= wordCount;
 
   if (isTimeUp) {
     return (
-      <div className="fixed inset-0 flex items-center justify-center bg-white text-black z-50">
-        <div className="text-center">
-          <h1 className="text-4xl font-bold mb-4 text-dark-blue">Your Time is Up!</h1>
-          <Button
-            onClick={() => router.push('/homepage')}
-            className="bg-dark-blue hover:bg-blue-700 text-white px-6 py-3 text-lg rounded"
-          >
-            Go to Homepage
-          </Button>
+      <div className="fixed inset-0 flex items-center justify-center bg-gradient-to-br from-sky-100 to-sky-300 z-50 p-6">
+        <div className="text-center bg-white rounded-xl shadow-2xl p-10 max-w-md w-full animate-fadeIn">
+          <div className="text-5xl mb-4">{isGoalMet ? '🎉' : '⏰'}</div>
+          <h1 className={`text-3xl font-bold mb-4 ${isGoalMet ? 'text-green-600' : 'text-red-600'}`}>
+            {isGoalMet ? "You're Done Writing!" : 'Your Time is Up!'}
+          </h1>
+          <p className="text-gray-700">
+            {isGoalMet
+              ? 'Nice work! You’ve reached your word goal.'
+              : 'Time’s up! You can still review your writing.'}
+          </p>
+          {!isGoalMet && (
+            <Button
+              onClick={() => setIsTimeUp(false)}
+              className="bg-gray-700 hover:bg-gray-900 text-white px-6 py-3 text-lg rounded mt-6"
+            >
+              Review Writing
+            </Button>
+          )}
         </div>
       </div>
     );
   }
 
-  const totalTime = timeLimit * 60;
-  const timeProgress = Math.min(Math.max(((totalTime - timeLeft) / totalTime) * 100, 0), 100);
-
   return (
     <div className="container mx-auto px-6 py-8 bg-white text-black min-h-screen flex flex-col relative pb-24">
+      {/* Toolbar */}
       <div className="flex justify-between items-center mb-6">
         <div className="flex gap-4 items-center">
-          <select
-            value={language}
-            onChange={(e) => setLanguage(e.target.value)}
-            className="p-3 border border-skyblue rounded-lg bg-white shadow-md text-black"
-          >
+          <select value={language} onChange={(e) => setLanguage(e.target.value)} className="p-3 border border-skyblue rounded-lg bg-white shadow-md text-black">
             <option value="en-US">English (US)</option>
             <option value="en-GB">English (GB)</option>
             <option value="es">Spanish</option>
@@ -206,11 +214,7 @@ export default function WritingPage({ timeLimit, wordCount, selectedPrompt }: Wr
             <option value="tl">Filipino (Tagalog)</option>
           </select>
 
-          <select
-            value={fontStyle}
-            onChange={(e) => setFontStyle(e.target.value)}
-            className="p-3 border border-skyblue rounded-lg bg-white shadow-md text-black"
-          >
+          <select value={fontStyle} onChange={(e) => setFontStyle(e.target.value)} className="p-3 border border-skyblue rounded-lg bg-white shadow-md text-black">
             <option value="Arial">Arial</option>
             <option value="Georgia">Georgia</option>
             <option value="Times New Roman">Times New Roman</option>
@@ -218,33 +222,18 @@ export default function WritingPage({ timeLimit, wordCount, selectedPrompt }: Wr
             <option value="Verdana">Verdana</option>
           </select>
 
-          <select
-            value={fontSize}
-            onChange={(e) => setFontSize(parseInt(e.target.value))}
-            className="p-3 border border-skyblue rounded-lg bg-white shadow-md text-black"
-          >
-            <option value={12}>12px</option>
-            <option value={14}>14px</option>
-            <option value={16}>16px</option>
-            <option value={18}>18px</option>
-            <option value={20}>20px</option>
-            <option value={22}>22px</option>
-            <option value={24}>24px</option>
+          <select value={fontSize} onChange={(e) => setFontSize(parseInt(e.target.value))} className="p-3 border border-skyblue rounded-lg bg-white shadow-md text-black">
+            {[12, 14, 16, 18, 20, 22, 24].map((size) => (
+              <option key={size} value={size}>{size}px</option>
+            ))}
           </select>
 
-          {/* Color Picker for Text */}
-          <input
-            type="color"
-            value={textColor}
-            onChange={(e) => handleColorChange(e.target.value)}
-            title="Select Text Color"
-            className="w-12 h-12 rounded-lg cursor-pointer"
-          />
+          <input type="color" value={textColor} onChange={(e) => handleColorChange(e.target.value)} className="w-12 h-12 rounded-lg cursor-pointer" />
         </div>
       </div>
 
+      {/* Main Area */}
       <div className="flex gap-8">
-        {/* Main Content Area */}
         <div className="w-full md:w-2/3 bg-white p-6 border rounded-lg shadow-lg flex flex-col">
           <textarea
             ref={textAreaRef}
@@ -263,55 +252,40 @@ export default function WritingPage({ timeLimit, wordCount, selectedPrompt }: Wr
               height: '40vh',
               resize: 'none',
               overflow: 'auto',
-              color: textColor, // Apply the selected text color here
+              color: textColor,
             }}
-            className="w-full p-4 focus:outline-none focus:ring-2 border-2 border-skyblue rounded-lg shadow-md bg-white text-black"
+            className="w-full p-4 focus:outline-none border-2 border-skyblue rounded-lg shadow-md bg-white"
           />
 
-          <div
-            className="mt-4 text-lg overflow-y-auto h-[160px] break-words whitespace-pre-wrap p-4 border border-gray-300 rounded-lg shadow-inner bg-gray-50"
-            style={{
-              fontSize: `${fontSize}px`,
-              overflowWrap: 'break-word',
-              wordWrap: 'break-word',
-              whiteSpace: 'normal',
-              color: textColor, // Apply color to preview area
-            }}
-          >
+          <div className="mt-4 text-lg overflow-y-auto h-[160px] break-words whitespace-pre-wrap p-4 border border-gray-300 rounded-lg bg-gray-50" style={{ fontSize: `${fontSize}px`, color: textColor }}>
             {splitTextWithEffects()}
           </div>
 
-          {warning && (
-            <div className="mt-4 text-red-500 text-center font-semibold">
-              {warning}
+          {warning && <div className="mt-4 text-red-500 text-center font-semibold">{warning}</div>}
+          {badWordDetected && (
+            <div className="mt-4 text-red-600 text-center font-semibold">
+              ⚠️ Please avoid using inappropriate words like: <strong>{badWordDetected}</strong>
             </div>
           )}
         </div>
 
         {/* Sidebar */}
-        <div className="w-full md:w-1/3 bg-gradient-to-b from-skyblue to-blue-700 text-white p-6 border-l-2 border-skyblue h-[500px] overflow-auto rounded-lg shadow-lg">
+        <div className="w-full md:w-1/3 bg-gradient-to-b from-skyblue to-blue-700 text-white p-6 border-l-2 h-[500px] overflow-auto rounded-lg shadow-lg">
           <div className="mb-6">
             <h4 className="text-xl font-semibold mb-2 text-sky-700">Grammar Suggestions</h4>
             {grammarErrors.length > 0 ? (
               <ul className="space-y-2">
                 {grammarErrors.map((error, index) => (
-                  <li key={index} className="p-3 bg-white text-black rounded-lg shadow-sm hover:bg-gray-200 transition">
-                    <div className="text-sm font-bold text-black">{error.message}</div>
-                    <div className="text-sm text-black">
-                      Suggested Correction:{' '}
-                      {error.replacements?.map((replacement: any) => (
-                        <button
-                          key={replacement.value}
-                          className="text-black"
-                          onClick={() => applyCorrection(index, replacement.value)}
-                        >
-                          {replacement.value}
+                  <li key={index} className="p-3 bg-white text-black rounded-lg shadow-sm hover:bg-gray-200">
+                    <div className="font-bold">{error.message}</div>
+                    <div className="text-sm">
+                      {error.replacements?.map((r: any) => (
+                        <button key={r.value} onClick={() => applyCorrection(index, r.value)} className="underline text-blue-600">
+                          {r.value}
                         </button>
                       ))}
                     </div>
-                    <div className="text-sm text-black">
-                      <em>{error.context.text}</em>
-                    </div>
+                    <em className="text-xs text-gray-600">{error.context.text}</em>
                   </li>
                 ))}
               </ul>
@@ -320,17 +294,14 @@ export default function WritingPage({ timeLimit, wordCount, selectedPrompt }: Wr
             )}
           </div>
 
-          <div className="mb-6">
+          <div>
             <h4 className="text-xl font-semibold mb-2 text-sky-700">Paraphrasing Suggestions</h4>
             {paraphrasingSuggestions.length > 0 ? (
               <ul className="space-y-2">
-                {paraphrasingSuggestions.map((suggestion, index) => (
-                  <li key={index} className="p-3 bg-white text-black rounded-lg shadow-sm hover:bg-gray-200 transition">
-                    <button
-                      className="text-blue-600 underline"
-                      onClick={() => applyParaphrase(suggestion)}
-                    >
-                      {suggestion}
+                {paraphrasingSuggestions.map((s, i) => (
+                  <li key={i} className="p-3 bg-white text-black rounded-lg hover:bg-gray-200">
+                    <button className="text-blue-600 underline" onClick={() => applyParaphrase(s)}>
+                      {s}
                     </button>
                   </li>
                 ))}
