@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import Footer from './Footer';
 import { Button } from '@/app/writingpage/ui/Button';
@@ -8,14 +8,15 @@ import { Button } from '@/app/writingpage/ui/Button';
 interface WritingPageProps {
   timeLimit: number;
   wordCount: number;
-  generatePrompt: boolean;
   selectedPrompt: string;
+  generatePrompt: boolean; // ✅ Added this line
 }
 
 export default function WritingPage({
   timeLimit,
   wordCount,
   selectedPrompt,
+  generatePrompt, // ✅ Destructure it too
 }: WritingPageProps) {
   const [currentWords, setCurrentWords] = useState(0);
   const [timeLeft, setTimeLeft] = useState(timeLimit * 60);
@@ -26,23 +27,27 @@ export default function WritingPage({
   const [idleWarning, setIdleWarning] = useState(false);
   const [grammarErrors, setGrammarErrors] = useState<any[]>([]);
   const [paraphrasingSuggestions, setParaphrasingSuggestions] = useState<string[]>([]);
-  const [language, setLanguage] = useState('en-US');
   const [fontStyle, setFontStyle] = useState('Arial');
   const [fontSize, setFontSize] = useState(16);
   const [textColor, setTextColor] = useState('black');
   const [deletedWords, setDeletedWords] = useState<string[]>([]);
   const [warning, setWarning] = useState<string | null>(null);
   const [shakeEffect, setShakeEffect] = useState(false);
-  const [badWordDetected, setBadWordDetected] = useState<string | null>(null);
+  const [blurredWords, setBlurredWords] = useState<string[]>([]);
+
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
 
   const idleTimeLimit = 30000;
+  const badWords = ['fuck', 'shit', 'bitch', 'asshole', 'damn', 'crap'];
 
-  const badWords = ['fuck', 'shit', 'bitch', 'asshole', 'damn', 'crap']; // Extend as needed
-
-  const containsBadWords = (text: string): string | null => {
+  const containsBadWords = (text: string): string[] => {
     const words = text.toLowerCase().split(/\s+/);
-    return words.find((word) => badWords.includes(word)) || null;
+    return words.filter((word) => badWords.includes(word));
+  };
+
+  const blurCensoredWords = (text: string) => {
+    const censoredWords = containsBadWords(text);
+    setBlurredWords(censoredWords);
   };
 
   useEffect(() => {
@@ -80,10 +85,10 @@ export default function WritingPage({
     };
   }, [text, isTyping, currentWords, idleWarning, wordCount, isTimeUp]);
 
-  const checkGrammar = async (text: string, language: string) => {
+  const checkGrammar = async (text: string) => {
     try {
       const response = await axios.post('https://api.languagetool.org/v2/check', null, {
-        params: { text: text, language: language },
+        params: { text: text },
       });
       setGrammarErrors(response.data.matches);
     } catch (error) {
@@ -102,10 +107,11 @@ export default function WritingPage({
 
   useEffect(() => {
     if (text.trim()) {
-      checkGrammar(text, language);
+      checkGrammar(text);
       getParaphrasingSuggestions(text);
+      blurCensoredWords(text);
     }
-  }, [text, language]);
+  }, [text]);
 
   const handleTextChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const newText = e.target.value;
@@ -117,11 +123,11 @@ export default function WritingPage({
     setCurrentWords(newText.trim() === '' ? 0 : newWords.length);
     setIsTyping(true);
 
-    const foundBadWord = containsBadWords(newText);
-    if (foundBadWord) {
-      setBadWordDetected(foundBadWord);
+    const foundBadWords = containsBadWords(newText);
+    if (foundBadWords.length > 0) {
+      setWarning(`⚠️ Please avoid using inappropriate words like: ${foundBadWords.join(', ')}`);
     } else {
-      setBadWordDetected(null);
+      setWarning(null);
     }
 
     const prevWords = prevText.trim().split(/\s+/);
@@ -145,15 +151,32 @@ export default function WritingPage({
   const handleCut = (e: React.ClipboardEvent<HTMLTextAreaElement>) => e.preventDefault();
   const handleColorChange = (color: string) => setTextColor(color);
 
+  const toggleBlurEffect = (word: string) => {
+    setBlurredWords((prev) => {
+      if (prev.includes(word)) {
+        return prev.filter((w) => w !== word);
+      } else {
+        return [...prev, word];
+      }
+    });
+  };
+
   const splitTextWithEffects = () => {
     return text.split(/\s+/).map((word, index) => {
       const isDeleted = deletedWords.includes(word);
-      const error = grammarErrors.find((err) => err.context.text.includes(word));
+      const isBlurred = blurredWords.includes(word);
+
       return (
         <span
           key={index}
-          className={`${isDeleted ? 'blink-text text-red-500' : ''} ${error ? 'bg-yellow-300 text-black p-1 rounded' : ''} ${shakeEffect ? 'animate-shake' : ''}`}
-          style={{ marginRight: '0.5rem', color: textColor }}
+          onClick={() => toggleBlurEffect(word)}
+          className={`${isDeleted ? 'blink-text text-red-500' : ''} ${shakeEffect ? 'animate-shake' : ''}`}
+          style={{
+            marginRight: '0.5rem',
+            color: textColor,
+            filter: isBlurred ? 'blur(5px)' : 'none',
+            cursor: 'pointer',
+          }}
         >
           {word}
         </span>
@@ -172,6 +195,7 @@ export default function WritingPage({
   const applyParaphrase = (suggestion: string) => setText(suggestion);
 
   const isGoalMet = currentWords >= wordCount;
+  const disabled = true; // Suggestions are locked
 
   if (isTimeUp) {
     return (
@@ -204,36 +228,56 @@ export default function WritingPage({
       {/* Toolbar */}
       <div className="flex justify-between items-center mb-6">
         <div className="flex gap-4 items-center">
-          <select value={language} onChange={(e) => setLanguage(e.target.value)} className="p-3 border border-skyblue rounded-lg bg-white shadow-md text-black">
-            <option value="en-US">English (US)</option>
-            <option value="en-GB">English (GB)</option>
-            <option value="es">Spanish</option>
-            <option value="fr">French</option>
-            <option value="de">German</option>
-            <option value="it">Italian</option>
-            <option value="tl">Filipino (Tagalog)</option>
-          </select>
+          {/* Font style */}
+          <div className="relative">
+            <select
+              value={fontStyle}
+              onChange={(e) => setFontStyle(e.target.value)}
+              disabled
+              className="p-3 border rounded-lg shadow-md bg-gray-100 text-gray-400 border-gray-300 cursor-not-allowed"
+            >
+              <option value="Arial">Arial</option>
+              <option value="Georgia">Georgia</option>
+              <option value="Times New Roman">Times New Roman</option>
+              <option value="Courier New">Courier New</option>
+              <option value="Verdana">Verdana</option>
+            </select>
+            <div className="absolute top-2 right-2 text-gray-500 text-xl pointer-events-none">🔒</div>
+          </div>
 
-          <select value={fontStyle} onChange={(e) => setFontStyle(e.target.value)} className="p-3 border border-skyblue rounded-lg bg-white shadow-md text-black">
-            <option value="Arial">Arial</option>
-            <option value="Georgia">Georgia</option>
-            <option value="Times New Roman">Times New Roman</option>
-            <option value="Courier New">Courier New</option>
-            <option value="Verdana">Verdana</option>
-          </select>
+          {/* Font size */}
+          <div className="relative">
+            <select
+              value={fontSize}
+              onChange={(e) => setFontSize(parseInt(e.target.value))}
+              disabled
+              className="p-3 border rounded-lg shadow-md bg-gray-100 text-gray-400 border-gray-300 cursor-not-allowed"
+            >
+              {[12, 14, 16, 18, 20, 22, 24].map((size) => (
+                <option key={size} value={size}>
+                  {size}px
+                </option>
+              ))}
+            </select>
+            <div className="absolute top-2 right-2 text-gray-500 text-xl pointer-events-none">🔒</div>
+          </div>
 
-          <select value={fontSize} onChange={(e) => setFontSize(parseInt(e.target.value))} className="p-3 border border-skyblue rounded-lg bg-white shadow-md text-black">
-            {[12, 14, 16, 18, 20, 22, 24].map((size) => (
-              <option key={size} value={size}>{size}px</option>
-            ))}
-          </select>
-
-          <input type="color" value={textColor} onChange={(e) => handleColorChange(e.target.value)} className="w-12 h-12 rounded-lg cursor-pointer" />
+          {/* Color picker */}
+          <div className="relative">
+            <input
+              type="color"
+              value={textColor}
+              onChange={(e) => handleColorChange(e.target.value)}
+              disabled
+              className="w-12 h-12 rounded-lg cursor-pointer bg-gray-100 opacity-60 cursor-not-allowed"
+            />
+            <div className="absolute top-1 right-1 text-gray-500 text-xl pointer-events-none">🔒</div>
+          </div>
         </div>
       </div>
 
       {/* Main Area */}
-      <div className="flex gap-8">
+      <div className="flex gap-8 flex-grow">
         <div className="w-full md:w-2/3 bg-white p-6 border rounded-lg shadow-lg flex flex-col">
           <textarea
             ref={textAreaRef}
@@ -249,6 +293,7 @@ export default function WritingPage({
             style={{
               fontFamily: fontStyle,
               fontSize: `${fontSize}px`,
+              minHeight: '40vh',
               height: '40vh',
               resize: 'none',
               overflow: 'auto',
@@ -257,58 +302,30 @@ export default function WritingPage({
             className="w-full p-4 focus:outline-none border-2 border-skyblue rounded-lg shadow-md bg-white"
           />
 
-          <div className="mt-4 text-lg overflow-y-auto h-[160px] break-words whitespace-pre-wrap p-4 border border-gray-300 rounded-lg bg-gray-50" style={{ fontSize: `${fontSize}px`, color: textColor }}>
+          <div
+            className="mt-4 text-lg overflow-y-auto h-[160px] break-words whitespace-pre-wrap p-4 border border-gray-300 rounded-lg bg-gray-50"
+            style={{ fontSize: `${fontSize}px`, color: textColor }}
+          >
             {splitTextWithEffects()}
           </div>
 
           {warning && <div className="mt-4 text-red-500 text-center font-semibold">{warning}</div>}
-          {badWordDetected && (
-            <div className="mt-4 text-red-600 text-center font-semibold">
-              ⚠️ Please avoid using inappropriate words like: <strong>{badWordDetected}</strong>
-            </div>
-          )}
         </div>
 
         {/* Sidebar */}
         <div className="w-full md:w-1/3 bg-gradient-to-b from-skyblue to-blue-700 text-white p-6 border-l-2 h-[500px] overflow-auto rounded-lg shadow-lg">
           <div className="mb-6">
-            <h4 className="text-xl font-semibold mb-2 text-sky-700">Grammar Suggestions</h4>
-            {grammarErrors.length > 0 ? (
-              <ul className="space-y-2">
-                {grammarErrors.map((error, index) => (
-                  <li key={index} className="p-3 bg-white text-black rounded-lg shadow-sm hover:bg-gray-200">
-                    <div className="font-bold">{error.message}</div>
-                    <div className="text-sm">
-                      {error.replacements?.map((r: any) => (
-                        <button key={r.value} onClick={() => applyCorrection(index, r.value)} className="underline text-blue-600">
-                          {r.value}
-                        </button>
-                      ))}
-                    </div>
-                    <em className="text-xs text-gray-600">{error.context.text}</em>
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <p className="text-black">No grammar errors found!</p>
-            )}
+            <h4 className="text-xl font-semibold mb-2 text-sky-700">
+              Grammar Suggestions <span className="text-gray-500">🔒</span>
+            </h4>
+            <p className="text-black">Grammar Suggestions are locked.</p>
           </div>
 
           <div>
-            <h4 className="text-xl font-semibold mb-2 text-sky-700">Paraphrasing Suggestions</h4>
-            {paraphrasingSuggestions.length > 0 ? (
-              <ul className="space-y-2">
-                {paraphrasingSuggestions.map((s, i) => (
-                  <li key={i} className="p-3 bg-white text-black rounded-lg hover:bg-gray-200">
-                    <button className="text-blue-600 underline" onClick={() => applyParaphrase(s)}>
-                      {s}
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <p className="text-black">No paraphrasing suggestions found!</p>
-            )}
+            <h4 className="text-xl font-semibold mb-2 text-sky-700">
+              Paraphrasing Suggestions <span className="text-gray-500">🔒</span>
+            </h4>
+            <p className="text-black">Paraphrasing Suggestions are locked.</p>
           </div>
         </div>
       </div>
