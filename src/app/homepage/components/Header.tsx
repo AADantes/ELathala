@@ -62,20 +62,6 @@ export function Header() {
           <span className={`font-bold text-3xl text-white ${bebasNeue.className}`}>E-LATHALA</span>
         </div>
 
-        {/* Navigation */}
-        <nav>
-          <ul className="flex space-x-8">
-            {["home", "explore", "community"].map((item) => (
-              <li key={item} className="group">
-                <Link href={`/${item}`} className="text-white hover:text-sky-950 transition-colors relative font-bold">
-                  {item.charAt(0).toUpperCase() + item.slice(1)}
-                  <span className="absolute left-0 -bottom-1 w-0 group-hover:w-full h-[2px] bg-sky-400 transition-all duration-300"></span>
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </nav>
-
         {/* Settings Dropdown */}
         <div className="relative">
           <button onClick={() => setShowDropdown(!showDropdown)} className="text-white hover:text-sky-950">

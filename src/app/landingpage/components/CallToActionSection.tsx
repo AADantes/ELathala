@@ -25,7 +25,7 @@ export default function CallToActionSection() {
             </h2>
 
             <p className="mx-auto max-w-[600px] text-gray-700 md:text-xl mb-6">
-              Join Elathala today and start your journey to becoming a master wordsmith.
+              Join E-lathala today and start your journey to becoming a master wordsmith.
             </p>
           </motion.div>
 
