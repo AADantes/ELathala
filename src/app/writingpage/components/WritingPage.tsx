@@ -199,12 +199,12 @@ export default function WritingPage({
 
   if (isTimeUp && currentWords >= wordCount) {
     return (
-      <div className="fixed inset-0 flex items-center justify-center bg-[#f0f7fe] z-50 p-6">
-        <div className="text-center bg-white rounded-2xl shadow-xl p-10 max-w-md w-full border border-gray-200 animate-fadeIn">
+      <div className="fixed inset-0 flex items-center justify-center bg-gradient-to-br from-[#e0f7fa] to-[#f0f7fe] z-50 p-6">
+        <div className="text-center bg-white rounded-3xl shadow-xl p-12 max-w-lg w-full border border-gray-200 animate-fadeIn">
           {/* Glowing Check Icon */}
-          <div className="mx-auto mb-6 w-16 h-16 bg-gradient-to-br from-[#60a5fa] to-[#3b82f6] rounded-full flex items-center justify-center shadow-lg animate-pop">
+          <div className="mx-auto mb-8 w-20 h-20 bg-gradient-to-br from-[#60a5fa] to-[#3b82f6] rounded-full flex items-center justify-center shadow-xl animate-pop">
             <svg
-              className="w-8 h-8 text-white"
+              className="w-10 h-10 text-white"
               viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"
@@ -216,22 +216,23 @@ export default function WritingPage({
             </svg>
           </div>
   
-          <h1 className="text-2xl md:text-3xl font-semibold text-gray-900 mb-2">
+          <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
             You’re done writing!
           </h1>
-          <p className="text-gray-600 mb-6">Your progress has been saved.</p>
+          <p className="text-lg text-gray-600 mb-8">Your progress has been saved.</p>
   
           <Button
             onClick={() => window.location.href = '/'}
-            className="bg-[#0c4a6e] hover:bg-[#0369a1] text-white px-6 py-3 text-md rounded-full mb-8 transition-all duration-300 transform hover:scale-105 hover:shadow-lg"
+            className="bg-[#0c4a6e] hover:bg-[#0369a1] text-white px-8 py-4 text-lg rounded-full mb-8 transition-all duration-300 transform hover:scale-105 hover:shadow-2xl"
           >
             Back to Home
           </Button>
   
-          <div className="flex justify-center gap-4">
-            <div className="bg-gradient-to-b from-[#dbeafe] to-[#bfdbfe] rounded-xl shadow-md px-5 py-4 text-center border border-blue-200 w-36">
-              <div className="text-[#0c4a6e] text-xl font-bold flex items-center justify-center gap-1 mb-1">
-                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+          <div className="flex justify-center gap-6">
+            <div className="bg-gradient-to-b from-[#dbeafe] to-[#bfdbfe] rounded-xl shadow-md px-6 py-5 text-center border border-blue-200 w-40">
+              <div className="text-[#0c4a6e] text-2xl font-bold flex items-center justify-center gap-2 mb-2">
+                {/* XP Icon (Yellow Star) */}
+                <svg className="w-6 h-6 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
                   <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.943a1 1 0 00.95.69h4.148c.969 0 1.371 1.24.588 1.81l-3.36 2.444a1 1 0 00-.364 1.118l1.287 3.943c.3.921-.755 1.688-1.54 1.118l-3.36-2.444a1 1 0 00-1.176 0l-3.36 2.444c-.784.57-1.838-.197-1.54-1.118l1.287-3.943a1 1 0 00-.364-1.118L2.075 9.37c-.783-.57-.38-1.81.588-1.81h4.148a1 1 0 00.95-.69l1.286-3.943z" />
                 </svg>
                 +120
@@ -239,9 +240,10 @@ export default function WritingPage({
               <div className="text-sm font-medium text-gray-800">XP Earned</div>
             </div>
   
-            <div className="bg-gradient-to-b from-[#dbeafe] to-[#bfdbfe] rounded-xl shadow-md px-5 py-4 text-center border border-blue-200 w-36">
-              <div className="text-[#0c4a6e] text-xl font-bold flex items-center justify-center gap-1 mb-1">
-                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+            <div className="bg-gradient-to-b from-[#dbeafe] to-[#bfdbfe] rounded-xl shadow-md px-6 py-5 text-center border border-blue-200 w-40">
+              <div className="text-[#0c4a6e] text-2xl font-bold flex items-center justify-center gap-2 mb-2">
+                {/* Credits Icon (Green) */}
+                <svg className="w-6 h-6 text-green-500" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M12 1L3 5v6c0 5.25 3.438 10.74 9 12 5.563-1.26 9-6.75 9-12V5l-9-4zM9 12.75V9.25L14.25 12 9 14.75z" />
                 </svg>
                 +40
@@ -256,12 +258,12 @@ export default function WritingPage({
   
   if (isTimeUp && currentWords < wordCount) {
     return (
-      <div className="fixed inset-0 flex items-center justify-center bg-[#fee2e2] z-50 p-6">
-        <div className="text-center bg-white rounded-2xl shadow-2xl p-10 max-w-lg w-full border border-gray-200 animate-fadeIn">
+      <div className="fixed inset-0 flex items-center justify-center bg-gradient-to-br from-[#fee2e2] to-[#fef2f2] z-50 p-6">
+        <div className="text-center bg-white rounded-3xl shadow-2xl p-12 max-w-lg w-full border border-gray-200 animate-fadeIn">
           {/* Clock X Icon */}
-          <div className="mx-auto mb-6 w-16 h-16 bg-gradient-to-br from-red-600 to-red-700 rounded-full flex items-center justify-center shadow-xl animate-pop">
+          <div className="mx-auto mb-8 w-20 h-20 bg-gradient-to-br from-red-600 to-red-700 rounded-full flex items-center justify-center shadow-xl animate-pop">
             <svg
-              className="w-8 h-8 text-white"
+              className="w-10 h-10 text-white"
               viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"
@@ -273,40 +275,36 @@ export default function WritingPage({
             </svg>
           </div>
   
-          {/* Heading */}
-          <h1 className="text-3xl font-semibold text-gray-900 mb-1">
+          <h1 className="text-4xl font-bold text-gray-900 mb-3">
             Time is Up!
           </h1>
   
-          {/* Word count info */}
-          <p className="text-gray-700 mb-6">You wrote <strong>{currentWords}</strong> words.</p>
+          <p className="text-lg text-gray-700 mb-8">You wrote <strong>{currentWords}</strong> words.</p>
   
-          {/* Action Buttons */}
-          <div className="flex flex-col space-y-3 sm:space-y-0 sm:flex-row sm:justify-center sm:gap-4 mb-6">
-            {/* Continue button with slightly darker Sky Blue */}
+          <div className="flex flex-col space-y-4 sm:space-y-0 sm:flex-row sm:justify-center sm:gap-6 mb-8">
+            {/* Continue button */}
             <Button
               onClick={() => alert('Continue (Buy with Credits) clicked')}
-              className="bg-[#0c4a6e] hover:bg-[#0369a1] text-white px-6 py-3 rounded-full transition-all duration-300 shadow-lg transform hover:scale-105"
+              className="bg-[#0c4a6e] hover:bg-[#0369a1] text-white px-8 py-4 rounded-full transition-all duration-300 shadow-lg transform hover:scale-105"
             >
               Continue (Buy with Credits)
             </Button>
-            {/* Save button with slightly darker Sky Blue */}
+            {/* Save button */}
             <Button
               onClick={() => alert('Save (Credits) clicked')}
-              className="bg-[#0c4a6e] hover:bg-[#0369a1] text-white px-6 py-3 rounded-full transition-all duration-300 shadow-lg transform hover:scale-105"
+              className="bg-[#0c4a6e] hover:bg-[#0369a1] text-white px-8 py-4 rounded-full transition-all duration-300 shadow-lg transform hover:scale-105"
             >
               Save (Credits)
             </Button>
           </div>
   
-          {/* Centered Delete Session Button */}
-          <div className="flex justify-center mt-6">
+          <div className="flex justify-center mt-8">
             <Button
               onClick={() => alert('Delete Session clicked')}
-              className="bg-red-700 hover:bg-red-800 text-white px-6 py-3 rounded-full transition-all duration-300 flex items-center justify-center gap-2 shadow-lg transform hover:scale-105"
+              className="bg-red-700 hover:bg-red-800 text-white px-8 py-4 rounded-full transition-all duration-300 flex items-center justify-center gap-2 shadow-lg transform hover:scale-105"
             >
               <svg
-                className="w-5 h-5 text-white"
+                className="w-6 h-6 text-white"
                 fill="none"
                 stroke="currentColor"
                 strokeWidth="2.5"
@@ -321,6 +319,8 @@ export default function WritingPage({
       </div>
     );
   }
+  
+  
   
   
   
