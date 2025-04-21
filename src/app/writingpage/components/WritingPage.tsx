@@ -9,14 +9,14 @@ interface WritingPageProps {
   timeLimit: number;
   wordCount: number;
   selectedPrompt: string;
-  generatePrompt: boolean; // ✅ Added this line
+  generatePrompt: boolean;
 }
 
 export default function WritingPage({
   timeLimit,
   wordCount,
   selectedPrompt,
-  generatePrompt, // ✅ Destructure it too
+  generatePrompt,
 }: WritingPageProps) {
   const [currentWords, setCurrentWords] = useState(0);
   const [timeLeft, setTimeLeft] = useState(timeLimit * 60);
@@ -34,9 +34,9 @@ export default function WritingPage({
   const [warning, setWarning] = useState<string | null>(null);
   const [shakeEffect, setShakeEffect] = useState(false);
   const [blurredWords, setBlurredWords] = useState<string[]>([]);
+  const [repeatedWordsWarning, setRepeatedWordsWarning] = useState<string | null>(null);
 
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
-
   const idleTimeLimit = 30000;
   const badWords = ['fuck', 'shit', 'bitch', 'asshole', 'damn', 'crap'];
 
@@ -48,6 +48,21 @@ export default function WritingPage({
   const blurCensoredWords = (text: string) => {
     const censoredWords = containsBadWords(text);
     setBlurredWords(censoredWords);
+  };
+
+  const checkRepeatedWords = (text: string) => {
+    const words = text.trim().split(/\s+/);
+    if (words.length >= 2) {
+      const lastWord = words[words.length - 1];
+      const secondLastWord = words[words.length - 2];
+      if (lastWord.toLowerCase() === secondLastWord.toLowerCase()) {
+        setRepeatedWordsWarning(lastWord.toLowerCase());
+      } else {
+        setRepeatedWordsWarning(null);
+      }
+    } else {
+      setRepeatedWordsWarning(null);
+    }
   };
 
   useEffect(() => {
@@ -110,6 +125,7 @@ export default function WritingPage({
       checkGrammar(text);
       getParaphrasingSuggestions(text);
       blurCensoredWords(text);
+      checkRepeatedWords(text);
     }
   }, [text]);
 
@@ -152,27 +168,27 @@ export default function WritingPage({
   const handleColorChange = (color: string) => setTextColor(color);
 
   const toggleBlurEffect = (word: string) => {
-    setBlurredWords((prev) => {
-      if (prev.includes(word)) {
-        return prev.filter((w) => w !== word);
-      } else {
-        return [...prev, word];
-      }
-    });
+    setBlurredWords((prev) =>
+      prev.includes(word) ? prev.filter((w) => w !== word) : [...prev, word]
+    );
   };
 
   const splitTextWithEffects = () => {
     return text.split(/\s+/).map((word, index) => {
       const isDeleted = deletedWords.includes(word);
       const isBlurred = blurredWords.includes(word);
+      const isRepeated = word.toLowerCase() === repeatedWordsWarning?.toLowerCase();
 
       return (
         <span
           key={index}
           onClick={() => toggleBlurEffect(word)}
-          className={`${isDeleted ? 'blink-text text-red-500' : ''} ${shakeEffect ? 'animate-shake' : ''}`}
+          className={`inline-block mr-2 transition-all duration-200 ${
+            isDeleted ? 'blink-text text-red-500' : ''
+          } ${isRepeated ? 'bg-yellow-200 text-yellow-800 font-bold underline animate-pulse px-1 rounded-sm' : ''} ${
+            shakeEffect ? 'animate-shake' : ''
+          }`}
           style={{
-            marginRight: '0.5rem',
             color: textColor,
             filter: isBlurred ? 'blur(5px)' : 'none',
             cursor: 'pointer',
@@ -184,153 +200,12 @@ export default function WritingPage({
     });
   };
 
-  const applyCorrection = (index: number, suggestion: string) => {
-    const newText =
-      text.slice(0, grammarErrors[index].offset) +
-      suggestion +
-      text.slice(grammarErrors[index].offset + grammarErrors[index].length);
-    setText(newText);
-  };
-
-  const applyParaphrase = (suggestion: string) => setText(suggestion);
-
-  const isGoalMet = currentWords >= wordCount;
-  const disabled = true; // Suggestions are locked
-
-  if (isTimeUp && currentWords >= wordCount) {
-    return (
-      <div className="fixed inset-0 flex items-center justify-center bg-gradient-to-br from-[#e0f7fa] to-[#f0f7fe] z-50 p-6">
-        <div className="text-center bg-white rounded-3xl shadow-xl p-12 max-w-lg w-full border border-gray-200 animate-fadeIn">
-          {/* Glowing Check Icon */}
-          <div className="mx-auto mb-8 w-20 h-20 bg-gradient-to-br from-[#60a5fa] to-[#3b82f6] rounded-full flex items-center justify-center shadow-xl animate-pop">
-            <svg
-              className="w-10 h-10 text-white"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth={2.5}
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <path d="M20 6L9 17l-5-5" />
-            </svg>
-          </div>
-  
-          <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-            You’re done writing!
-          </h1>
-          <p className="text-lg text-gray-600 mb-8">Your progress has been saved.</p>
-  
-          <Button
-            onClick={() => window.location.href = '/'}
-            className="bg-[#0c4a6e] hover:bg-[#0369a1] text-white px-8 py-4 text-lg rounded-full mb-8 transition-all duration-300 transform hover:scale-105 hover:shadow-2xl"
-          >
-            Back to Home
-          </Button>
-  
-          <div className="flex justify-center gap-6">
-            <div className="bg-gradient-to-b from-[#dbeafe] to-[#bfdbfe] rounded-xl shadow-md px-6 py-5 text-center border border-blue-200 w-40">
-              <div className="text-[#0c4a6e] text-2xl font-bold flex items-center justify-center gap-2 mb-2">
-                {/* XP Icon (Yellow Star) */}
-                <svg className="w-6 h-6 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
-                  <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.943a1 1 0 00.95.69h4.148c.969 0 1.371 1.24.588 1.81l-3.36 2.444a1 1 0 00-.364 1.118l1.287 3.943c.3.921-.755 1.688-1.54 1.118l-3.36-2.444a1 1 0 00-1.176 0l-3.36 2.444c-.784.57-1.838-.197-1.54-1.118l1.287-3.943a1 1 0 00-.364-1.118L2.075 9.37c-.783-.57-.38-1.81.588-1.81h4.148a1 1 0 00.95-.69l1.286-3.943z" />
-                </svg>
-                +120
-              </div>
-              <div className="text-sm font-medium text-gray-800">XP Earned</div>
-            </div>
-  
-            <div className="bg-gradient-to-b from-[#dbeafe] to-[#bfdbfe] rounded-xl shadow-md px-6 py-5 text-center border border-blue-200 w-40">
-              <div className="text-[#0c4a6e] text-2xl font-bold flex items-center justify-center gap-2 mb-2">
-                {/* Credits Icon (Green) */}
-                <svg className="w-6 h-6 text-green-500" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M12 1L3 5v6c0 5.25 3.438 10.74 9 12 5.563-1.26 9-6.75 9-12V5l-9-4zM9 12.75V9.25L14.25 12 9 14.75z" />
-                </svg>
-                +40
-              </div>
-              <div className="text-sm font-medium text-gray-800">Credits Earned</div>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
-  
-  if (isTimeUp && currentWords < wordCount) {
-    return (
-      <div className="fixed inset-0 flex items-center justify-center bg-gradient-to-br from-[#fee2e2] to-[#fef2f2] z-50 p-6">
-        <div className="text-center bg-white rounded-3xl shadow-2xl p-12 max-w-lg w-full border border-gray-200 animate-fadeIn">
-          {/* Clock X Icon */}
-          <div className="mx-auto mb-8 w-20 h-20 bg-gradient-to-br from-red-600 to-red-700 rounded-full flex items-center justify-center shadow-xl animate-pop">
-            <svg
-              className="w-10 h-10 text-white"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth={2.5}
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <path d="M18 6L6 18M6 6l12 12" />
-            </svg>
-          </div>
-  
-          <h1 className="text-4xl font-bold text-gray-900 mb-3">
-            Time is Up!
-          </h1>
-  
-          <p className="text-lg text-gray-700 mb-8">You wrote <strong>{currentWords}</strong> words.</p>
-  
-          <div className="flex flex-col space-y-4 sm:space-y-0 sm:flex-row sm:justify-center sm:gap-6 mb-8">
-            {/* Continue button */}
-            <Button
-              onClick={() => alert('Continue (Buy with Credits) clicked')}
-              className="bg-[#0c4a6e] hover:bg-[#0369a1] text-white px-8 py-4 rounded-full transition-all duration-300 shadow-lg transform hover:scale-105"
-            >
-              Continue (Buy with Credits)
-            </Button>
-            {/* Save button */}
-            <Button
-              onClick={() => alert('Save (Credits) clicked')}
-              className="bg-[#0c4a6e] hover:bg-[#0369a1] text-white px-8 py-4 rounded-full transition-all duration-300 shadow-lg transform hover:scale-105"
-            >
-              Save (Credits)
-            </Button>
-          </div>
-  
-          <div className="flex justify-center mt-8">
-            <Button
-              onClick={() => alert('Delete Session clicked')}
-              className="bg-red-700 hover:bg-red-800 text-white px-8 py-4 rounded-full transition-all duration-300 flex items-center justify-center gap-2 shadow-lg transform hover:scale-105"
-            >
-              <svg
-                className="w-6 h-6 text-white"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2.5"
-                viewBox="0 0 24 24"
-              >
-                <path d="M3 6h18M9 6v12m6-12v12M10 6l1-2h2l1 2" />
-              </svg>
-              Delete Session
-            </Button>
-          </div>
-        </div>
-      </div>
-    );
-  }
-  
-  
-  
-  
-  
-  
   return (
     <div className="container mx-auto px-6 py-8 bg-white text-black min-h-screen flex flex-col relative pb-24">
       {/* Toolbar */}
       <div className="flex justify-between items-center mb-6">
         <div className="flex gap-4 items-center">
-          {/* Font style */}
+          {/* Locked Font Selectors */}
           <div className="relative">
             <select
               value={fontStyle}
@@ -347,7 +222,6 @@ export default function WritingPage({
             <div className="absolute top-2 right-2 text-gray-500 text-xl pointer-events-none">🔒</div>
           </div>
 
-          {/* Font size */}
           <div className="relative">
             <select
               value={fontSize}
@@ -364,23 +238,23 @@ export default function WritingPage({
             <div className="absolute top-2 right-2 text-gray-500 text-xl pointer-events-none">🔒</div>
           </div>
 
-          {/* Color picker */}
           <div className="relative">
             <input
               type="color"
               value={textColor}
               onChange={(e) => handleColorChange(e.target.value)}
               disabled
-              className="w-12 h-12 rounded-lg cursor-pointer bg-gray-100 opacity-60 cursor-not-allowed"
+              className="w-12 h-12 rounded-lg bg-gray-100 opacity-60 cursor-not-allowed"
             />
             <div className="absolute top-1 right-1 text-gray-500 text-xl pointer-events-none">🔒</div>
           </div>
         </div>
       </div>
 
-      {/* Main Area */}
-      <div className="flex gap-8 flex-grow">
-        <div className="w-full md:w-2/3 bg-white p-6 border rounded-lg shadow-lg flex flex-col">
+      {/* Writing & Preview Section */}
+      <div className="flex gap-8 flex-grow h-[550px]">
+        {/* Writing Area */}
+        <div className="w-full md:w-2/3 bg-white p-6 border rounded-lg shadow-lg flex flex-col h-full">
           <textarea
             ref={textAreaRef}
             onChange={handleTextChange}
@@ -395,27 +269,44 @@ export default function WritingPage({
             style={{
               fontFamily: fontStyle,
               fontSize: `${fontSize}px`,
-              minHeight: '40vh',
-              height: '40vh',
+              height: '200px',
+              maxHeight: '200px',
               resize: 'none',
-              overflow: 'auto',
+              overflowY: 'auto',
+              overflowX: 'hidden',
               color: textColor,
+              lineHeight: 1.6,
+              width: '100%',
+              boxSizing: 'border-box',
             }}
             className="w-full p-4 focus:outline-none border-2 border-skyblue rounded-lg shadow-md bg-white"
           />
 
+          {/* Alert for repeated word */}
+          {repeatedWordsWarning && (
+            <div className="mt-4 bg-yellow-100 border-l-4 border-yellow-500 text-yellow-800 p-4 rounded shadow-md flex items-center gap-2 animate-fade-in-down">
+              <span className="text-2xl">⚠️</span>
+              <div>
+                <p className="font-semibold">Repeated word detected:</p>
+                <p>
+                  You repeated "<span className="font-bold">{repeatedWordsWarning}</span>". Try using a synonym or remove it.
+                </p>
+              </div>
+            </div>
+          )}
+
+          {warning && <div className="mt-4 text-red-500 text-center font-semibold">{warning}</div>}
+
           <div
-            className="mt-4 text-lg overflow-y-auto h-[160px] break-words whitespace-pre-wrap p-4 border border-gray-300 rounded-lg bg-gray-50"
-            style={{ fontSize: `${fontSize}px`, color: textColor }}
+            className="mt-4 text-lg overflow-y-auto flex-grow break-words whitespace-pre-wrap p-4 border border-gray-300 rounded-lg bg-gray-50"
+            style={{ fontSize: `${fontSize}px`, color: textColor, maxHeight: '200px' }}
           >
             {splitTextWithEffects()}
           </div>
-
-          {warning && <div className="mt-4 text-red-500 text-center font-semibold">{warning}</div>}
         </div>
 
         {/* Sidebar */}
-        <div className="w-full md:w-1/3 bg-gradient-to-b from-skyblue to-blue-700 text-white p-6 border-l-2 h-[500px] overflow-auto rounded-lg shadow-lg">
+        <div className="w-full md:w-1/3 bg-gradient-to-b from-skyblue to-blue-700 text-white p-6 border-l-2 h-full overflow-auto rounded-lg shadow-lg">
           <div className="mb-6">
             <h4 className="text-xl font-semibold mb-2 text-sky-700">
               Grammar Suggestions <span className="text-gray-500">🔒</span>
