@@ -86,7 +86,7 @@ export default function WritingPage({
         const wordArray = text.trim().split(/\s+/);
         wordArray.pop();
         setText(wordArray.join(' '));
-        setCurrentWords(wordArray.length);
+        updateWordCount(wordArray.join(' '));
         setIsIdle(true);
       } else if (isTyping || currentWords >= wordCount || isTimeUp) {
         setIdleWarning(false);
@@ -129,14 +129,20 @@ export default function WritingPage({
     }
   }, [text]);
 
+  const updateWordCount = (textValue: string) => {
+    const rawWords = textValue.trim().split(/\s+/);
+    const filteredWords = rawWords.filter((word, index, arr) => {
+      return index === 0 || word.toLowerCase() !== arr[index - 1].toLowerCase();
+    });
+    setCurrentWords(textValue.trim() === '' ? 0 : filteredWords.length);
+  };
+
   const handleTextChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const newText = e.target.value;
     const prevText = text;
 
     setText(newText);
-
-    const newWords = newText.trim().split(/\s+/);
-    setCurrentWords(newText.trim() === '' ? 0 : newWords.length);
+    updateWordCount(newText);
     setIsTyping(true);
 
     const foundBadWords = containsBadWords(newText);
@@ -147,6 +153,8 @@ export default function WritingPage({
     }
 
     const prevWords = prevText.trim().split(/\s+/);
+    const newWords = newText.trim().split(/\s+/);
+
     if (newWords.length < prevWords.length) {
       const deletedWord = prevWords[prevWords.length - 1];
       setDeletedWords((prev) => [...prev, deletedWord]);
