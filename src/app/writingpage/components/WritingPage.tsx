@@ -35,6 +35,7 @@ export default function WritingPage({
   const [shakeEffect, setShakeEffect] = useState(false);
   const [blurredWords, setBlurredWords] = useState<string[]>([]);
   const [repeatedWordsWarning, setRepeatedWordsWarning] = useState<string | null>(null);
+  const [showDoneModal, setShowDoneModal] = useState(false); // Track when writing is done
 
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
   const idleTimeLimit = 30000;
@@ -129,12 +130,17 @@ export default function WritingPage({
     }
   }, [text]);
 
+  // Update word count to include deleted words
   const updateWordCount = (textValue: string) => {
     const rawWords = textValue.trim().split(/\s+/);
     const filteredWords = rawWords.filter((word, index, arr) => {
       return index === 0 || word.toLowerCase() !== arr[index - 1].toLowerCase();
     });
-    setCurrentWords(textValue.trim() === '' ? 0 : filteredWords.length);
+
+    // Count all words, including deleted ones
+    const totalWords = filteredWords.length + deletedWords.length;
+
+    setCurrentWords(textValue.trim() === '' ? 0 : totalWords); // Update the current word count
   };
 
   const handleTextChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -191,11 +197,9 @@ export default function WritingPage({
         <span
           key={index}
           onClick={() => toggleBlurEffect(word)}
-          className={`inline-block mr-2 transition-all duration-200 ${
-            isDeleted ? 'blink-text text-red-500' : ''
-          } ${isRepeated ? 'bg-yellow-200 text-yellow-800 font-bold underline animate-pulse px-1 rounded-sm' : ''} ${
-            shakeEffect ? 'animate-shake' : ''
-          }`}
+          className={`inline-block mr-2 transition-all duration-200 ${isDeleted ? 'blink-text text-red-500' : ''} ${
+            isRepeated ? 'bg-yellow-200 text-yellow-800 font-bold underline animate-pulse px-1 rounded-sm' : ''
+          } ${shakeEffect ? 'animate-shake' : ''}`}
           style={{
             color: textColor,
             filter: isBlurred ? 'blur(5px)' : 'none',
@@ -208,8 +212,164 @@ export default function WritingPage({
     });
   };
 
+  useEffect(() => {
+    if (isTimeUp && currentWords >= wordCount) {
+      setShowDoneModal(true); // Show the "You're Done writing" modal after time is up and word count is met
+    }
+  }, [isTimeUp, currentWords, wordCount]);
+
   return (
     <div className="container mx-auto px-6 py-8 bg-white text-black min-h-screen flex flex-col relative pb-24">
+
+{/* You're Done Writing Modal */}
+{showDoneModal && (
+  <div className="fixed inset-0 flex items-center justify-center bg-sky-100 z-50 p-6">
+    <div className="text-center bg-white rounded-2xl shadow-xl p-10 max-w-md w-full border border-sky-200 animate-fadeIn">
+      {/* Done Icon */}
+      <div className="mx-auto mb-6 w-16 h-16 bg-gradient-to-br from-sky-400 to-sky-600 rounded-full flex items-center justify-center shadow-lg animate-pop">
+        <svg
+          className="w-8 h-8 text-white"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth={2.5}
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          <path d="M5 13l4 4L19 7" />
+        </svg>
+      </div>
+
+      <h1 className="text-2xl md:text-3xl font-semibold text-black mb-2">
+        You're Done Writing!
+      </h1>
+      <p className="text-black mb-6">Your progress has been saved</p>
+
+      <div className="flex justify-center gap-4">
+        {/* Back to Home Button */}
+        <Button
+          onClick={() => (window.location.href = '/')}
+          className="bg-sky-900 hover:bg-sky-700 text-white px-6 py-3 text-md rounded-full transition-all duration-300 transform hover:scale-105 hover:shadow-lg"
+        >
+          Back to Home
+        </Button>
+
+        {/* New Button - Next Level */}
+        <Button
+          onClick={() => alert('New button clicked!')}
+          className="bg-sky-900 text-white px-6 py-3 text-md rounded-full transition-all duration-400 transform hover:scale-105 hover:rotate-1 hover:shadow-2xl hover:bg-sky-600 focus:ring-4 focus:ring-sky-300 focus:outline-none"
+        >
+          Next Level
+        </Button>
+      </div>
+
+      {/* Enhanced Rewards Section */}
+      <div className="mt-10 flex justify-center gap-5 flex-wrap">
+        {/* XP Earned */}
+        <div className="flex items-center justify-center gap-4 px-8 py-4 bg-white rounded-2xl shadow-lg border border-blue-200 hover:shadow-xl transform transition-all duration-300 hover:scale-105 w-full max-w-md">
+          <div className="bg-gradient-to-br from-yellow-400 to-yellow-600 text-white w-10 h-10 rounded-full flex items-center justify-center shadow-md animate-bounce-slow">
+            <span className="text-lg">⭐</span>
+          </div>
+          <div className="text-center">
+            <div className="text-lg font-bold text-sky-700">+120 XP</div>
+            <div className="text-sm text-black font-medium">XP Earned</div>
+          </div>
+        </div>
+
+        {/* Credits Earned */}
+        <div className="flex items-center justify-center gap-4 px-8 py-4 bg-white rounded-2xl shadow-lg border border-indigo-200 hover:shadow-xl transform transition-all duration-300 hover:scale-105 w-full max-w-md">
+          <div className="bg-gradient-to-br from-indigo-400 to-indigo-700 text-white w-10 h-10 rounded-full flex items-center justify-center shadow-md animate-bounce-slow">
+            <span className="text-lg">🛡️</span>
+          </div>
+          <div className="text-center">
+            <div className="text-lg font-bold text-sky-700">+40 Credits</div>
+            <div className="text-sm text-black font-medium">Credits Earned</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+)}
+
+{/* Time’s Up Modal */}
+{isTimeUp && currentWords < wordCount && (
+  <div className="fixed inset-0 flex items-center justify-center bg-red-50 z-50 p-6">
+    <div className="text-center bg-white rounded-2xl shadow-xl p-10 max-w-md w-full border border-red-200 animate-fadeIn">
+      
+      {/* Time’s Up Icon */}
+      <div className="mx-auto mb-6 w-16 h-16 bg-gradient-to-br from-red-400 to-red-600 rounded-full flex items-center justify-center shadow-lg animate-pop">
+        <svg
+          className="w-8 h-8 text-white"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth={2.5}
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          <path d="M18 6L6 18M6 6l12 12" />
+        </svg>
+      </div>
+
+      <h1 className="text-2xl md:text-3xl font-semibold text-gray-900 mb-2">
+        Time’s up!
+      </h1>
+      <p className="text-gray-600 mb-6">
+        You wrote {currentWords} words. You didn’t finish your writing in time. Try again or keep practicing!
+      </p>
+
+      {/* Continue Button (Buy with Credits) */}
+      <div className="flex justify-center mb-6">
+        <Button
+          onClick={() => alert('Continue writing with credits.')}
+          className="bg-sky-700 hover:bg-sky-800 text-white text-md font-semibold rounded-full transition-all duration-300 transform hover:scale-105 hover:shadow-xl w-64 py-3"
+        >
+          Continue (Buy with Credits)
+        </Button>
+      </div>
+
+
+{/* Save and Delete Buttons - Side by Side */}
+<div className="flex justify-center space-x-4 mb-6">
+  {/* Save Button with Confirmation */}
+  <Button
+    onClick={() => {
+      const confirmed = window.confirm('Do you want to save your progress using credits?');
+      if (confirmed) {
+        alert('Progress saved!');
+        // Add your save logic here
+      }
+    }}
+   className="bg-white text-sky-600 border-2 border-sky-600 text-md rounded-full transition-all duration-300 transform hover:scale-105 hover:shadow-lg w-36 py-3"
+  >
+    Save (Credits)
+  </Button>
+
+  {/* Delete Button with Confirmation */}
+  <Button
+    onClick={() => {
+      const confirmed = window.confirm('Are you sure you want to delete this session? This action cannot be undone.');
+      if (confirmed) {
+        alert('Session deleted!');
+        // Add your delete logic here
+      }
+    }}
+    className="bg-white text-red-600 border-2 border-red-600 text-md rounded-full transition-all duration-300 transform hover:scale-105 hover:shadow-lg w-36 py-3"
+  >
+    Delete Session
+  </Button>
+</div>
+
+
+      
+    </div>
+  </div>
+)}
+
+
+
+
+
       {/* Toolbar */}
       <div className="flex justify-between items-center mb-6">
         <div className="flex gap-4 items-center">
