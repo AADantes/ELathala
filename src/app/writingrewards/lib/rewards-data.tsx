@@ -1,5 +1,5 @@
 import { Award, BookOpen, Clock, Crown, Edit3, Gift, Star, Users } from "lucide-react"
-import type { UserData, Reward, LevelMilestone } from "@/lib/types"
+import type { UserData, Reward, LevelMilestone } from "@/app/writingrewards/lib/types"
 
 // Mock user data
 export const userData: UserData = {
