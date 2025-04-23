@@ -328,7 +328,6 @@ export default function WritingPage({
         </Button>
       </div>
 
-
 {/* Save and Delete Buttons - Side by Side */}
 <div className="flex justify-center space-x-4 mb-6">
   {/* Save Button with Confirmation */}
@@ -340,7 +339,7 @@ export default function WritingPage({
         // Add your save logic here
       }
     }}
-   className="bg-white text-sky-600 border-2 border-sky-600 text-md rounded-full transition-all duration-300 transform hover:scale-105 hover:shadow-lg w-36 py-3"
+    className="bg-white text-sky-600 border-2 border-sky-600 text-md rounded-md transition-all duration-300 transform hover:scale-105 hover:shadow-lg w-36 py-3"
   >
     Save (Credits)
   </Button>
@@ -354,21 +353,16 @@ export default function WritingPage({
         // Add your delete logic here
       }
     }}
-    className="bg-white text-red-600 border-2 border-red-600 text-md rounded-full transition-all duration-300 transform hover:scale-105 hover:shadow-lg w-36 py-3"
+    className="bg-white text-red-600 border-2 border-red-600 text-md rounded-md transition-all duration-300 transform hover:scale-105 hover:shadow-lg w-36 py-3"
   >
     Delete Session
   </Button>
 </div>
 
 
-      
     </div>
   </div>
 )}
-
-
-
-
 
       {/* Toolbar */}
       <div className="flex justify-between items-center mb-6">
