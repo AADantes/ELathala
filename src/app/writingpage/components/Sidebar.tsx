@@ -1,4 +1,4 @@
-import React from 'react'
+import React from 'react';
 import {
   X,
   Home,
@@ -7,28 +7,54 @@ import {
   Star,
   HelpCircle,
   LogOut,
-} from 'lucide-react'
-import { Button } from '@/app/writingpage/ui/Button'
-import Link from 'next/link'
+} from 'lucide-react';
+import { Button } from '@/app/writingpage/ui/Button';
+import Link from 'next/link';
 
 interface SidebarProps {
-  isOpen: boolean
-  onClose: () => void
+  isOpen: boolean;
+  onClose: () => void;
+  bgColor: string; // Background color prop
 }
 
-export default function Sidebar({ isOpen, onClose }: SidebarProps) {
+// Function to lighten or darken the color, ensuring it’s still soft yet not too bright
+function adjustColorBrightness(color: string, amount: number) {
+  let colorCode = color.slice(1); // Remove the '#' symbol
+  let r = parseInt(colorCode.slice(0, 2), 16);
+  let g = parseInt(colorCode.slice(2, 4), 16);
+  let b = parseInt(colorCode.slice(4, 6), 16);
+
+  r = Math.max(0, Math.min(255, r + amount));
+  g = Math.max(0, Math.min(255, g + amount));
+  b = Math.max(0, Math.min(255, b + amount));
+
+  return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
+}
+
+// Function to generate contrasting hover colors
+function generateHoverColor(color: string) {
+  // Adjust the color to be lighter or darker for hover effects
+  return adjustColorBrightness(color, -50); // Darken for hover effect
+}
+
+export default function Sidebar({ isOpen, onClose, bgColor }: SidebarProps) {
+  // Adjust the color to make it softer, making it easier on the eyes
+  const softBgColor = adjustColorBrightness(bgColor, -30); // Darken the background slightly
+  const hoverBgColor = generateHoverColor(bgColor); // Get hover color for buttons/links
+
   return (
     <div
-      className={`fixed inset-y-0 left-0 w-80 bg-[#00cccc] shadow-xl shadow-black/30 transform ${
-        isOpen ? 'translate-x-0' : '-translate-x-full'
-      } transition-transform duration-300 ease-in-out z-50`}
+      className={`fixed inset-y-0 left-0 w-80 shadow-xl transform ${isOpen ? 'translate-x-0' : '-translate-x-full'} transition-transform duration-300 ease-in-out z-50`}
+      style={{
+        backgroundColor: softBgColor, // Apply the adjusted, softer background color
+      }}
     >
       <div className="p-4 text-white">
         <Button
           variant="ghost"
           size="icon"
           onClick={onClose}
-          className="mb-4 hover:bg-[#55B4ED] rounded-full transition-all duration-300 ease-in-out transform hover:scale-110"
+          className="mb-4 rounded-full transition-all duration-300 ease-in-out transform"
         >
           <X className="h-6 w-6 text-white" />
         </Button>
@@ -49,10 +75,10 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
             <li>
               <Link
                 href="/homepage"
-                className="flex items-center space-x-4 py-3 px-4 rounded-lg bg-white shadow-md shadow-black/30 transition-all duration-500 ease-in-out transform hover:scale-105 hover:bg-gradient-to-r hover:from-[#00C6FF] hover:to-[#0072FF] hover:text-white group"
+                className={`flex items-center space-x-4 py-3 px-4 rounded-lg bg-white shadow-md shadow-black/30 transition-all duration-300 ease-in-out transform hover:scale-105 hover:bg-[${hoverBgColor}] group`}
               >
-                <Home className="h-5 w-5 text-[#005B88] transition-all duration-300 group-hover:text-white group-hover:scale-110" />
-                <span className="text-black font-bold transition-all duration-300 group-hover:text-white group-hover:scale-110">
+                <Home className="h-5 w-5 text-[#005B88] transition-all duration-300 group-hover:text-[#005B88]" />
+                <span className="text-black font-bold transition-all duration-300 group-hover:text-black">
                   Home
                 </span>
               </Link>
@@ -60,10 +86,10 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
             <li>
               <Link
                 href="/works"
-                className="flex items-center space-x-4 py-3 px-4 rounded-lg bg-white shadow-md shadow-black/30 transition-all duration-500 ease-in-out transform hover:scale-105 hover:bg-gradient-to-r hover:from-[#00C6FF] hover:to-[#0072FF] hover:text-white group"
+                className={`flex items-center space-x-4 py-3 px-4 rounded-lg bg-white shadow-md shadow-black/30 transition-all duration-300 ease-in-out transform hover:scale-105 hover:bg-[${hoverBgColor}] group`}
               >
-                <BookOpen className="h-5 w-5 text-[#9D79FF] transition-all duration-300 group-hover:text-white group-hover:scale-110" />
-                <span className="text-black font-bold transition-all duration-300 group-hover:text-white group-hover:scale-110">
+                <BookOpen className="h-5 w-5 text-[#9D79FF] transition-all duration-300 group-hover:text-[#9D79FF]" />
+                <span className="text-black font-bold transition-all duration-300 group-hover:text-black">
                   Works
                 </span>
               </Link>
@@ -71,10 +97,10 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
             <li>
               <Link
                 href="/profile"
-                className="flex items-center space-x-4 py-3 px-4 rounded-lg bg-white shadow-md shadow-black/30 transition-all duration-500 ease-in-out transform hover:scale-105 hover:bg-gradient-to-r hover:from-[#00C6FF] hover:to-[#0072FF] hover:text-white group"
+                className={`flex items-center space-x-4 py-3 px-4 rounded-lg bg-white shadow-md shadow-black/30 transition-all duration-300 ease-in-out transform hover:scale-105 hover:bg-[${hoverBgColor}] group`}
               >
-                <User className="h-5 w-5 text-[#00FF85] transition-all duration-300 group-hover:text-white group-hover:scale-110" />
-                <span className="text-black font-bold transition-all duration-300 group-hover:text-white group-hover:scale-110">
+                <User className="h-5 w-5 text-[#00FF85] transition-all duration-300 group-hover:text-[#00FF85]" />
+                <span className="text-black font-bold transition-all duration-300 group-hover:text-black">
                   Profile
                 </span>
               </Link>
@@ -82,10 +108,10 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
             <li>
               <Link
                 href="/levels-rewards"
-                className="flex items-center space-x-4 py-3 px-4 rounded-lg bg-white shadow-md shadow-black/30 transition-all duration-500 ease-in-out transform hover:scale-105 hover:bg-gradient-to-r hover:from-[#00C6FF] hover:to-[#0072FF] hover:text-white group"
+                className={`flex items-center space-x-4 py-3 px-4 rounded-lg bg-white shadow-md shadow-black/30 transition-all duration-300 ease-in-out transform hover:scale-105 hover:bg-[${hoverBgColor}] group`}
               >
-                <Star className="h-5 w-5 text-[#FFD700] transition-all duration-300 group-hover:text-white group-hover:scale-110" />
-                <span className="text-black font-bold transition-all duration-300 group-hover:text-white group-hover:scale-110">
+                <Star className="h-5 w-5 text-[#FFD700] transition-all duration-300 group-hover:text-[#FFD700]" />
+                <span className="text-black font-bold transition-all duration-300 group-hover:text-black">
                   Levels and Rewards
                 </span>
               </Link>
@@ -93,10 +119,10 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
             <li>
               <Link
                 href="/help"
-                className="flex items-center space-x-4 py-3 px-4 rounded-lg bg-white shadow-md shadow-black/30 transition-all duration-500 ease-in-out transform hover:scale-105 hover:bg-gradient-to-r hover:from-[#00C6FF] hover:to-[#0072FF] hover:text-white group"
+                className={`flex items-center space-x-4 py-3 px-4 rounded-lg bg-white shadow-md shadow-black/30 transition-all duration-300 ease-in-out transform hover:scale-105 hover:bg-[${hoverBgColor}] group`}
               >
-                <HelpCircle className="h-5 w-5 text-[#FF6B6B] transition-all duration-300 group-hover:text-white group-hover:scale-110" />
-                <span className="text-black font-bold transition-all duration-300 group-hover:text-white group-hover:scale-110">
+                <HelpCircle className="h-5 w-5 text-[#FF6B6B] transition-all duration-300 group-hover:text-[#FF6B6B]" />
+                <span className="text-black font-bold transition-all duration-300 group-hover:text-black">
                   Help
                 </span>
               </Link>
@@ -104,10 +130,10 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
             <li>
               <Button
                 variant="ghost"
-                className="w-full flex items-center space-x-4 justify-start py-5 px-4 rounded-lg text-left text-red-500 bg-white shadow-sm shadow-black/20 transition-all duration-500 ease-in-out transform hover:bg-gradient-to-r hover:from-[#FF6B6B] hover:to-[#FF4C4C] hover:scale-105 hover:shadow-sm hover:shadow-[#FF4C4C] hover:text-white group"
+                className={`w-full flex items-center space-x-4 justify-start py-5 px-4 rounded-lg text-left text-red-500 bg-white shadow-sm shadow-black/20 transition-all duration-300 ease-in-out transform hover:bg-[${hoverBgColor}] group`}
               >
-                <LogOut className="h-5 w-5 text-[#FF6B6B] transition-all duration-300 group-hover:text-white group-hover:scale-110 group-hover:drop-shadow-sm" />
-                <span className="text-red-500 font-bold transition-all duration-300 group-hover:text-white group-hover:scale-110 group-hover:drop-shadow-sm">
+                <LogOut className="h-5 w-5 text-[#FF6B6B] transition-all duration-300 group-hover:text-[#FF6B6B]" />
+                <span className="text-red-500 font-bold transition-all duration-300 group-hover:text-red-500">
                   Logout
                 </span>
               </Button>
@@ -116,5 +142,5 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
         </nav>
       </div>
     </div>
-  )
+  );
 }

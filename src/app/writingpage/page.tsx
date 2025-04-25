@@ -6,44 +6,45 @@ import WritingPage from '@/app/writingpage/components/WritingPage'
 import Header from '@/app/writingpage/components/Header'
 import Sidebar from '@/app/writingpage/components/Sidebar'
 
-
-
-
 export default function Writingpage() {
-    const [isWriting, setIsWriting] = useState(false)
-    const [timeLimit, setTimeLimit] = useState(0)
-    const [wordCount, setWordCount] = useState(0)
-    const [generatePrompt, setGeneratePrompt] = useState(false)
-    const [selectedPrompt, setSelectedPrompt] = useState('')
-    const [isSidebarOpen, setIsSidebarOpen] = useState(false)
-  
-    const handleStart = (time: number, words: number, prompt: boolean, selectedPrompt: string) => {
-      setTimeLimit(time)
-      setWordCount(words)
-      setGeneratePrompt(prompt)
-      setSelectedPrompt(selectedPrompt)
-      setIsWriting(true)
-    }
-  
-    return (
-      <div className="min-h-screen bg-green-50 flex flex-col">
-        <Header onMenuClick={() => setIsSidebarOpen(true)} />
-        <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
-        <div className="flex-grow relative">
-          {!isWriting ? (
-            <StartPrompt onStart={handleStart} />
-          ) : (
-            <WritingPage
-              timeLimit={timeLimit}
-              wordCount={wordCount}
-              generatePrompt={generatePrompt}
-              selectedPrompt={selectedPrompt}
-            />
-          )}
-          {!isWriting && (
-            <div className="absolute inset-0 bg-blue-200 opacity-50" style={{ zIndex: 10 }}></div>
-          )}
-        </div>
-      </div>
-    )
+  const [isWriting, setIsWriting] = useState(false)
+  const [timeLimit, setTimeLimit] = useState(0)
+  const [wordCount, setWordCount] = useState(0)
+  const [generatePrompt, setGeneratePrompt] = useState(false)
+  const [selectedPrompt, setSelectedPrompt] = useState('')
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false)
+
+  // State for the background color
+  const [bgColor, setBgColor] = useState<string>('#4F8FB7')
+
+  const handleStart = (time: number, words: number, prompt: boolean, selectedPrompt: string) => {
+    setTimeLimit(time)
+    setWordCount(words)
+    setGeneratePrompt(prompt)
+    setSelectedPrompt(selectedPrompt)
+    setIsWriting(true)
   }
+
+  return (
+    <div className="min-h-screen bg-white flex flex-col">
+      {/* Pass bgColor and setBgColor to Header and Sidebar */}
+      <Header onMenuClick={() => setIsSidebarOpen(true)} bgColor={bgColor} setBgColor={setBgColor} />
+      <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} bgColor={bgColor} />
+      <div className="flex-grow relative">
+        {!isWriting ? (
+          <StartPrompt onStart={handleStart} />
+        ) : (
+          <WritingPage
+            timeLimit={timeLimit}
+            wordCount={wordCount}
+            generatePrompt={generatePrompt}
+            selectedPrompt={selectedPrompt}
+          />
+        )}
+        {!isWriting && (
+          <div className="absolute inset-0 bg-blue-200 opacity-50" style={{ zIndex: 10 }}></div>
+        )}
+      </div>
+    </div>
+  )
+}
