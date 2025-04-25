@@ -9,9 +9,10 @@ interface HeaderProps {
 }
 
 export default function Header({ onMenuClick, bgColor, setBgColor }: HeaderProps) {
+  const defaultColor = '#3498DB'; // Set default color to blue
   const [isDropdownOpen, setIsDropdownOpen] = useState<boolean>(false);
-  const [selectedColor, setSelectedColor] = useState<string>(bgColor); // Store the selected theme or custom color
-  const [customColor, setCustomColor] = useState<string>(bgColor); // For custom color picker
+  const [selectedColor, setSelectedColor] = useState<string>(bgColor || defaultColor); // Default to blue if no color
+  const [customColor, setCustomColor] = useState<string>(bgColor || defaultColor); // Default to blue if no color
 
   // Effect to load the saved color from localStorage when the component is mounted
   useEffect(() => {
@@ -19,6 +20,9 @@ export default function Header({ onMenuClick, bgColor, setBgColor }: HeaderProps
     if (savedColor) {
       setSelectedColor(savedColor);
       setBgColor(savedColor);
+    } else {
+      setSelectedColor(defaultColor); // Set to default blue if no color in localStorage
+      setBgColor(defaultColor); // Set the background color to blue
     }
   }, [setBgColor]);
 

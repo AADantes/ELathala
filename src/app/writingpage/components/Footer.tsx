@@ -12,10 +12,9 @@ export default function Footer({ currentWords, targetWords, timeLeft }: FooterPr
   const seconds = timeLeft % 60
 
   const wordProgress = Math.min(Math.max((currentWords / targetWords) * 100, 0), 100)
-  
+
   const totalTime = 60 * 60 // assuming 1 hour session
 
-  // For time progress: start at 100% and decrease as time runs out
   const timeProgress = Math.min(Math.max(((totalTime - timeLeft) / totalTime) * 100, 0), 100)
 
   const getMotivation = () => {
@@ -26,25 +25,28 @@ export default function Footer({ currentWords, targetWords, timeLeft }: FooterPr
     return "Let's get writing!"
   }
 
-  const timeDisplay = timeLeft >= 3600 
-    ? "1 hour"
-    : `${minutes}m ${seconds.toString().padStart(2, '0')}s`
+  const timeDisplay =
+    timeLeft >= 3600 ? '1 hour' : `${minutes}m ${seconds.toString().padStart(2, '0')}s`
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 bg-transparent text-white p-3 flex justify-between items-center z-10">
+    <div className="fixed bottom-0 left-0 right-0 bg-transparent text-black p-3 flex justify-between items-center z-10">
       {/* Timer Section */}
       <div className="flex flex-col items-center w-1/3 space-y-1">
-        <div className="flex items-center space-x-2 text-xl font-bold text-gray-600">
-          <Timer className="w-6 h-6 text-gray-600 hover:scale-110 transition-transform animate-pulse" />
-          <span className="font-mono text-xl text-gray-600">{timeDisplay}</span>
+        <div className="flex items-center space-x-2 text-xl font-bold text-black">
+          <Timer className="w-6 h-6 text-black hover:scale-110 transition-transform animate-pulse" />
+          <span className="font-mono text-xl text-black">{timeDisplay}</span>
         </div>
-        <div className="w-full bg-sky-900 rounded-full h-3 overflow-hidden">
+        <div className="w-full bg-gray-300 rounded-full h-3 overflow-hidden">
           <div
             className="h-full transition-all duration-500"
             style={{
-              width: `${100 - timeProgress}%`, // Decrease from 100% as time progresses
+              width: `${100 - timeProgress}%`,
               backgroundColor:
-                timeProgress > 66 ? '#38BDF8' : timeProgress > 33 ? '#0EA5E9' : '#0284C7',
+                timeProgress < 33
+                  ? '#22C55E' // green when time is high
+                  : timeProgress < 66
+                  ? '#FACC15' // yellow when time is mid
+                  : '#EF4444', // red when time is low
             }}
           />
         </div>
@@ -52,8 +54,8 @@ export default function Footer({ currentWords, targetWords, timeLeft }: FooterPr
 
       {/* Motivation Section */}
       <div className="flex flex-col items-center w-1/3 space-y-1 text-center">
-        <Medal className="w-6 h-6 text-sky-400 animate-bounce hover:scale-110 transition-transform" />
-        <span className="font-mono text-md text-gray-600 font-bold">{getMotivation()}</span>
+        <Medal className="w-6 h-6 text-yellow-400 animate-bounce hover:scale-110 transition-transform" />
+        <span className="font-mono text-md text-black font-bold">{getMotivation()}</span>
         {wordProgress === 100 && (
           <div className="text-green-400 font-mono text-lg mt-2 animate-bounce">
             <span>🎉 You did it! 🎉</span>
@@ -63,21 +65,25 @@ export default function Footer({ currentWords, targetWords, timeLeft }: FooterPr
 
       {/* Word Count Section */}
       <div className="flex flex-col items-center w-1/3 space-y-1">
-        <div
-          className={`flex items-center space-x-2 text-xl font-bold ${currentWords >= targetWords ? 'text-gray-500' : 'text-gray-600'}`}
-        >
-          <Edit className="w-6 h-6 text-gray-600 hover:scale-110 transition-transform animate-bounce" />
-          <span className="font-mono text-xl text-gray-600">
+        <div className="flex items-center space-x-2 text-xl font-bold text-black">
+          <Edit className="w-6 h-6 text-black hover:scale-110 transition-transform animate-bounce" />
+          <span className="font-mono text-xl text-black">
             {currentWords} / {targetWords} words
           </span>
         </div>
-        <div className="w-full bg-sky-900 rounded-full h-3 overflow-hidden">
+        <div className="w-full bg-gray-300 rounded-full h-3 overflow-hidden">
           <div
             className="h-full transition-all duration-500"
             style={{
               width: `${wordProgress}%`,
               backgroundColor:
-                wordProgress >= 100 ? '#7DD3FC' : wordProgress > 50 ? '#0EA5E9' : '#0284C7',
+                wordProgress >= 100
+                  ? '#22C55E' // green
+                  : wordProgress >= 66
+                  ? '#22C55E' // green
+                  : wordProgress >= 33
+                  ? '#FACC15' // yellow
+                  : '#EF4444', // red
             }}
           />
         </div>
