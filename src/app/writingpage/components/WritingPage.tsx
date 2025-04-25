@@ -470,14 +470,14 @@ export default function WritingPage({
         {/* Sidebar */}
         <div className="w-full md:w-1/3 bg-gradient-to-b from-skyblue to-blue-700 text-white p-6 border-l-2 h-full overflow-auto rounded-lg shadow-lg">
           <div className="mb-6">
-            <h4 className="text-xl font-semibold mb-2 text-sky-700">
+            <h4 className="text-xl font-semibold mb-2 text-black">
               Grammar Suggestions <span className="text-gray-500">🔒</span>
             </h4>
             <p className="text-black">Grammar Suggestions are locked.</p>
           </div>
 
           <div>
-            <h4 className="text-xl font-semibold mb-2 text-sky-700">
+            <h4 className="text-xl font-semibold mb-2 text-black">
               Paraphrasing Suggestions <span className="text-gray-500">🔒</span>
             </h4>
             <p className="text-black">Paraphrasing Suggestions are locked.</p>

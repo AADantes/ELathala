@@ -61,7 +61,12 @@ export default function Sidebar({ isOpen, onClose, bgColor }: SidebarProps) {
 
         <div className="mb-6 p-4 text-center">
           <div className="w-20 h-20 rounded-full mb-2 mx-auto bg-white flex items-center justify-center shadow-inner">
-            <User className="h-10 w-10 text-[#3A9FD9]" />
+            <User
+              className="h-10 w-10"
+              style={{
+                color: bgColor, // Dynamically set the icon color to match the background color
+              }}
+            />
           </div>
           <div className="font-bold text-xl text-white">Username</div>
           <div className="text-sm text-gray-100">Level 1 (100 XP)</div>
@@ -99,7 +104,12 @@ export default function Sidebar({ isOpen, onClose, bgColor }: SidebarProps) {
                 href="/profile"
                 className={`flex items-center space-x-4 py-3 px-4 rounded-lg bg-white shadow-md shadow-black/30 transition-all duration-300 ease-in-out transform hover:scale-105 hover:bg-[${hoverBgColor}] group`}
               >
-                <User className="h-5 w-5 text-[#00FF85] transition-all duration-300 group-hover:text-[#00FF85]" />
+                <User
+                  className="h-5 w-5"
+                  style={{
+                    color: bgColor, // Dynamically set the icon color to match the background color
+                  }}
+                />
                 <span className="text-black font-bold transition-all duration-300 group-hover:text-black">
                   Profile
                 </span>
