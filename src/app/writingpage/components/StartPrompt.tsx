@@ -1,77 +1,23 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react'; 
+import { prompts, genres, genreTopics } from '../lib/writingpage-data';
 import { Button } from '@/app/writingpage/ui/Button';
 import { Input } from '@/app/writingpage/ui/Input';
 import { Checkbox } from '@/app/writingpage/ui/CheckBox';
 import { useRouter } from 'next/navigation';
+import supabase from "../../../../config/supabaseClient"
 
 interface StartPromptProps {
   onStart: (
     time: number,
     words: number,
-    prompt: boolean,
-    selectedPrompt: string,
+    finalPrompt:string,
     genre: string,
-    topic: string
+    topic: string,
   ) => void;
 }
 
-const prompts = [
-  "Write about a time when you surprised yourself with your own strength.",
-  "If you could revisit one moment from your past, what would it be and why?",
-  "Imagine meeting a version of yourself from 10 years in the future—what advice would you give them?",
-  "Write about a habit you want to break and how it’s affected your life.",
-  "What does happiness mean to you? Has your definition changed over time?",
-];
-
-const genres = [
-  'Fiction',
-  'Non-Fiction',
-  'Poetry',
-  'Journal Entry',
-  'Creative Writing',
-  'Memoir',
-];
-
-const genreTopics: { [key: string]: string[] } = {
-  Fiction: [
-    'Fantasy Worlds',
-    'Superheroes',
-    'Mystery',
-    'Time Travel',
-    'Alternate Realities',
-  ],
-  'Non-Fiction': [
-    'Personal Growth',
-    'True Stories',
-    'History',
-    'Self-Improvement',
-    'Social Issues',
-  ],
-  Poetry: ['Love', 'Nature', 'Emotion', 'Dreams', 'Time'],
-  Memoir: [
-    'Life Lessons',
-    'Family Stories',
-    'Travel Experiences',
-    'Overcoming Challenges',
-    'Personal Milestones',
-  ],
-  'Creative Writing': [
-    'Imagination Unleashed',
-    'The Unknown',
-    'What if...',
-    'Inner Journeys',
-    'Strange Adventures',
-  ],
-  'Journal Entry': [
-    'Daily Reflections',
-    'Personal Growth',
-    'Current Events',
-    'Dreams and Goals',
-    'Thoughts on Society',
-  ],
-};
 
 export default function StartPrompt({ onStart }: StartPromptProps) {
   const [step, setStep] = useState(1);
@@ -82,6 +28,7 @@ export default function StartPrompt({ onStart }: StartPromptProps) {
   const [topic, setTopic] = useState<string>('');
   const [timeIsUp, setTimeIsUp] = useState(false);
   const [showStepMessage, setShowStepMessage] = useState(false);
+  const [author, setAuthor] = useState<string>('');
   const router = useRouter();
 
   const handleNext = () => {
@@ -96,16 +43,43 @@ export default function StartPrompt({ onStart }: StartPromptProps) {
     if (step > 1) setStep(step - 1);
   };
 
-  const handleStart = () => {
+  const handleStart = async () => {
     const time = Number(timeLimit);
     const words = Number(wordCount);
     if (time < 1 || time > 60 || words < 50 || !genre || !topic) return;
 
-    const finalPrompt = generatePrompt
-      ? prompts[Math.floor(Math.random() * prompts.length)]
-      : '';
-    onStart(time, words, generatePrompt, finalPrompt, genre, topic);
+    if (!topic && genre !== 'None') {
+      alert("Please select a topic before starting!");
+      return;
+    }
 
+
+  const finalPrompt = generatePrompt
+    ? prompts[Math.floor(Math.random() * prompts.length)]
+    : '';
+
+  // Insert data into the table
+  const { data, error: error } = await supabase
+    .from("Written Works") // Make sure to use double quotes for the table name with spaces
+    .insert([
+      {
+        workGenre: genre,
+        workTopic: topic,
+        timelimitSet: time,
+        noOfWordsSet: words,
+        workPrompt: finalPrompt || null,
+        created_at: new Date().toISOString(), // If you need a timestamp
+      }
+    ]);
+
+  if (error) {
+    console.error('Failed to save session:', error.message);
+    return;
+  }
+  
+    // 2. Continue to start the writing session
+    onStart(time, words, finalPrompt, genre, topic);
+  
     setTimeout(() => {
       setTimeIsUp(true);
     }, time * 60 * 1000);

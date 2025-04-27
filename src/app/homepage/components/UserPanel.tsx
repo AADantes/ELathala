@@ -14,13 +14,16 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/app/homepage/ui/card
 import { ChevronRight, Star, Gauge, ArrowUpCircle } from 'lucide-react'
 import { Bebas_Neue } from '@next/font/google'
 
+import  supabase  from '../../../../config/supabaseClient'
+
+
 // Load Bebas Neue for a bold, modern look
 const bebasNeue = Bebas_Neue({
   subsets: ['latin'],
   weight: '400',
 })
 
-interface UserData {
+export interface UserData {
   username: string
   experience: number
   level: number
@@ -28,13 +31,12 @@ interface UserData {
 }
 
 export function UserPanel({ userData }: { userData: UserData }) {
+
   const [isExperienceDialogOpen, setIsExperienceDialogOpen] = useState(false)
 
   return (
     <Card 
-      className="bg-gradient-to-br from-[#e5e7eb] to-[#f3f4f6] text-gray-900 rounded-2xl 
-        shadow-[0_4px_6px_rgba(0,0,0,0.1)] hover:shadow-[0_6px_8px_rgba(0,0,0,0.15)] 
-        transition-transform transform hover:scale-105 duration-300"
+      className="bg-gradient-to-br from-[#e5e7eb] to-[#f3f4f6] text-gray-900 rounded-2xl shadow-[0_4px_6px_rgba(0,0,0,0.1)] hover:shadow-[0_6px_8px_rgba(0,0,0,0.15)] transition-transform transform hover:scale-105 duration-300"
     >
       <CardHeader className="bg-[#f3f4f6] rounded-t-2xl px-6 py-4">
         <CardTitle 

@@ -7,15 +7,16 @@ const bebasNeue = Bebas_Neue({
   weight: '400',
 });
 
-interface Work {
-  id: number;
-  title: string;
-  wordCount: number;
-  timeSpent: number;
+interface WrittenWork {
+  workID: number
+  numberofWords: number
+  noOfWordsSet: number
+  timelimitSet: number
+  timeRendered: number
 }
 
 interface WritingHistoryProps {
-  works: Work[];
+  works: WrittenWork[]
 }
 
 export function WritingHistoryPanel({ works }: WritingHistoryProps) {
@@ -34,21 +35,28 @@ export function WritingHistoryPanel({ works }: WritingHistoryProps) {
         </CardTitle>
       </CardHeader>
       <CardContent className="p-6">
-        <p className="mb-4 text-yellow-500 text-lg">Total Works: {works.length}</p>
+        {/* <p className="mb-4 text-yellow-500 text-lg">Total Works: {works.length}</p> */}
+        <p className="mb-4 text-yellow-500 text-lg">Total Works: --</p>
+
         <ul className="space-y-3">
-          {works.map((work) => (
-            <li 
-              key={work.id} 
-              className="flex justify-between items-center bg-[#f9fafb] hover:bg-[#f3f4f6] 
+          {/* {works.map((work) => ( */}
+          {/*   <li key={work.workID} className="..."> */}
+          {/*     your list item content */}
+          {/*   </li> */}
+          {/* ))} */}
+          <li className="flex justify-between items-center bg-[#f9fafb] hover:bg-[#f3f4f6] 
                 transition-colors duration-300 rounded-lg px-4 py-3 
-                shadow-[0_2px_4px_rgba(0,0,0,0.1)] hover:shadow-[0_4px_6px_rgba(0,0,0,0.15)]"
-            >
-              <span className="text-gray-800 font-semibold">{work.title}</span>
-              <span className="text-sm text-gray-500">
-                {work.wordCount} words | {work.timeSpent} mins
-              </span>
-            </li>
-          ))}
+                shadow-[0_2px_4px_rgba(0,0,0,0.1)] hover:shadow-[0_4px_6px_rgba(0,0,0,0.15)]">
+            <div className="text-gray-800 font-semibold">
+              <p>Work ID: --</p>
+              <p>Words Written: --</p>
+            </div>
+            <div className="text-sm text-gray-500">
+              <p>Target Words: --</p>
+              <p>Time Limit: -- mins</p>
+              <p>Time Spent: -- mins</p>
+            </div>
+          </li>
         </ul>
       </CardContent>
     </Card>

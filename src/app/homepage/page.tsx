@@ -11,6 +11,7 @@ import supabase from "../../../config/supabaseClient"
 export default function HomePage() {
   const router = useRouter()
   const [userData, setUserData] = useState<any>(null)
+  const [works, setWorks] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -26,31 +27,46 @@ export default function HomePage() {
       }
 
       // Fetch user details
-      const { data: userData, error: userError } = await supabase
-        .from("User")
-        .select("id, username, userLevel, usercurrentExp, targetExp")
-        .eq("id", user.id)
+      const { data, error } = await supabase
+        .from('User')
+        .select('id, username, userLevel, usercurrentExp, targetExp')
+        .eq('id', user.id)
         .single()
 
-      if (userError) {
-        console.error("Error fetching user data:", userError)
+      if (error) {
+        console.error('Error fetching user data:', error)
         setLoading(false)
         return
       }
 
-      // Fetch user's works
-      const { data: works, error: worksError } = await supabase
-        .from("works")
-        .select("id, title, wordCount, timeSpent")
-        .eq("user_id", user.id) // Ensure `user_id` exists in `works` table
-
-      if (worksError) {
-        console.error("Error fetching works:", worksError)
+      if (data) {
+        setUserData({
+          username: data.username ?? 'Unknown User',
+          experience: data.usercurrentExp ?? 0,
+          level: data.userLevel ?? 1,
+          totalExperience: data.targetExp ?? 100,
+        })
       }
 
-      setUserData({ ...userData, works: works || [] })
+      const { data: writtenWorks, error: worksError } = await supabase
+      .from('Written Works')
+      .select('workID, numberofWords, noOfWordsSet, timelimitSet, timeRendered')
+      .eq('id', user.id)
+
+    if (worksError) {
+      console.error('Error fetching written works:', worksError)
+    }
+
+    // Set the written works
+    if (writtenWorks) {
+      setWorks(writtenWorks)
+    }
+
       setLoading(false)
     }
+
+      
+
 
     fetchUserData()
   }, [])
