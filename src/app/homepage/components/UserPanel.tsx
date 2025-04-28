@@ -14,7 +14,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/app/homepage/ui/card
 import { ChevronRight, Star, Gauge, ArrowUpCircle } from 'lucide-react'
 import { Bebas_Neue } from '@next/font/google'
 
-import  supabase  from '../../../../config/supabaseClient'
+import supabase from '../../../../config/supabaseClient'
 
 
 // Load Bebas Neue for a bold, modern look
@@ -36,9 +36,9 @@ export function UserPanel({ userData }: { userData: UserData }) {
 
   return (
     <Card 
-      className="bg-gradient-to-br from-[#e5e7eb] to-[#f3f4f6] text-gray-900 rounded-2xl shadow-[0_4px_6px_rgba(0,0,0,0.1)] hover:shadow-[0_6px_8px_rgba(0,0,0,0.15)] transition-transform transform hover:scale-105 duration-300"
+      className="bg-white text-gray-900 shadow-[0_4px_6px_rgba(0,0,0,0.1)] hover:shadow-[0_6px_8px_rgba(0,0,0,0.15)] transition-transform transform hover:scale-105 duration-300"
     >
-      <CardHeader className="bg-[#f3f4f6] rounded-t-2xl px-6 py-4">
+      <CardHeader className="bg-[#f9fafb] px-6 py-4">
         <CardTitle 
           className={`text-cyan-500 text-3xl font-extrabold tracking-wider leading-none text-center ${bebasNeue.className}`}
           style={{ letterSpacing: '2px' }}
@@ -63,7 +63,7 @@ export function UserPanel({ userData }: { userData: UserData }) {
                   <ChevronRight className="ml-1 h-4 w-4 transition-transform duration-300 ease-in-out group-hover:translate-x-1" />
                 </Button>
               </DialogTrigger>
-              <DialogContent className="border border-gray-300 shadow-xl rounded-xl bg-white text-gray-900 max-w-xl p-6 space-y-6 transform transition-all duration-300 ease-out">
+              <DialogContent className="border border-gray-300 shadow-xl bg-white text-gray-900 max-w-xl p-6 space-y-6 transform transition-all duration-300 ease-out">
                 <DialogHeader className="border-b border-gray-200 pb-2 mb-1">
                   <DialogTitle className="text-sky-600 text-3xl font-bold leading-tight">
                     Experience Details
@@ -74,7 +74,7 @@ export function UserPanel({ userData }: { userData: UserData }) {
                 </DialogHeader>
                 <div className="space-y-4 mt-4 text-gray-900">
                   {/* Current Level */}
-                  <div className="bg-gray-50 p-4 rounded-lg shadow-md flex justify-between items-center">
+                  <div className="bg-gray-50 p-4 shadow-md flex justify-between items-center">
                     <p className="flex items-center text-xl font-semibold">
                       <Star className="h-6 w-6 text-yellow-500 mr-2" />
                       Current Level:
@@ -84,7 +84,7 @@ export function UserPanel({ userData }: { userData: UserData }) {
                     </span>
                   </div>
                   {/* Total Experience */}
-                  <div className="bg-gray-50 p-4 rounded-lg shadow-md flex justify-between items-center">
+                  <div className="bg-gray-50 p-4 shadow-md flex justify-between items-center">
                     <p className="flex items-center text-xl font-semibold">
                       <Gauge className="h-6 w-6 text-purple-500 mr-2" />
                       Total Experience:
@@ -94,7 +94,7 @@ export function UserPanel({ userData }: { userData: UserData }) {
                     </span>
                   </div>
                   {/* Next Level */}
-                  <div className="bg-gray-50 p-4 rounded-lg shadow-md flex justify-between items-center">
+                  <div className="bg-gray-50 p-4 shadow-md flex justify-between items-center">
                     <p className="flex items-center text-xl font-semibold">
                       <ArrowUpCircle className="h-6 w-6 text-green-500 mr-2" />
                       Next Level:
@@ -113,10 +113,10 @@ export function UserPanel({ userData }: { userData: UserData }) {
 
           {/* Progress Bar */}
           <p className="text-xs text-sky-600 font-semibold">Experience Points</p>
-          <div className="relative w-full h-3 bg-gray-200 rounded-full overflow-hidden shadow-inner"> 
+          <div className="relative w-full h-3 bg-gray-200 overflow-hidden shadow-inner"> 
             <div 
               style={{ width: `${(userData.experience / userData.totalExperience) * 100}%` }} 
-              className="h-full bg-gradient-to-r from-yellow-400 via-orange-400 to-red-400 rounded-full transition-all duration-500 ease-in-out shadow-[inset_0_-1px_2px_rgba(0,0,0,0.4)]"
+              className="h-full bg-gradient-to-r from-yellow-400 via-orange-400 to-red-400 transition-all duration-500 ease-in-out shadow-[inset_0_-1px_2px_rgba(0,0,0,0.4)]"
             />
           </div>
           <p className="text-xs text-green-500 italic mt-2">

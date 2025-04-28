@@ -8,25 +8,25 @@ const bebasNeue = Bebas_Neue({
 });
 
 interface WrittenWork {
-  workID: number
-  numberofWords: number
-  noOfWordsSet: number
-  timelimitSet: number
-  timeRendered: number
+  workID: number;
+  numberofWords: number;
+  noOfWordsSet: number;
+  timelimitSet: number;
+  timeRendered: number;
 }
 
 interface WritingHistoryProps {
-  works: WrittenWork[]
+  works: WrittenWork[];
 }
 
 export function WritingHistoryPanel({ works }: WritingHistoryProps) {
   return (
     <Card 
-      className="bg-gradient-to-br from-[#e5e7eb] to-[#f3f4f6] text-gray-900 rounded-2xl 
+      className="bg-white text-gray-900 
         shadow-[0_4px_6px_rgba(0,0,0,0.1)] hover:shadow-[0_6px_8px_rgba(0,0,0,0.15)] 
         transition-transform transform hover:scale-105 duration-300"
     >
-      <CardHeader className="bg-[#f3f4f6] rounded-t-2xl px-6 py-4">
+      <CardHeader className="bg-[#f3f4f6] px-6 py-4">
         <CardTitle 
           className={`text-cyan-500 text-3xl font-extrabold tracking-wider leading-none text-center ${bebasNeue.className}`}
           style={{ letterSpacing: '2px' }}
@@ -39,13 +39,13 @@ export function WritingHistoryPanel({ works }: WritingHistoryProps) {
         <p className="mb-4 text-yellow-500 text-lg">Total Works: --</p>
 
         <ul className="space-y-3">
-          {/* {works.map((work) => ( */}
+          {/* {works.map((work) => ( */} 
           {/*   <li key={work.workID} className="..."> */}
           {/*     your list item content */}
           {/*   </li> */}
           {/* ))} */}
           <li className="flex justify-between items-center bg-[#f9fafb] hover:bg-[#f3f4f6] 
-                transition-colors duration-300 rounded-lg px-4 py-3 
+                transition-colors duration-300 px-4 py-3 
                 shadow-[0_2px_4px_rgba(0,0,0,0.1)] hover:shadow-[0_4px_6px_rgba(0,0,0,0.15)]">
             <div className="text-gray-800 font-semibold">
               <p>Work ID: --</p>
