@@ -13,7 +13,8 @@ interface StartPromptProps {
     prompt: boolean,
     selectedPrompt: string,
     genre: string,
-    topic: string
+    topic: string,
+    title: string
   ) => void;
 }
 
@@ -82,10 +83,11 @@ export default function StartPrompt({ onStart }: StartPromptProps) {
   const [topic, setTopic] = useState<string>('');
   const [timeIsUp, setTimeIsUp] = useState(false);
   const [showStepMessage, setShowStepMessage] = useState(false);
+  const [title, setTitle] = useState<string>(''); // Title state
   const router = useRouter();
 
   const handleNext = () => {
-    if (step < 5) {
+    if (step < 6) {
       setStep(step + 1);
       setShowStepMessage(true);
       setTimeout(() => setShowStepMessage(false), 1000);
@@ -99,12 +101,12 @@ export default function StartPrompt({ onStart }: StartPromptProps) {
   const handleStart = () => {
     const time = Number(timeLimit);
     const words = Number(wordCount);
-    if (time < 1 || time > 60 || words < 50 || !genre || !topic) return;
+    if (time < 1 || time > 60 || words < 50 || !genre || !topic || !title) return;
 
     const finalPrompt = generatePrompt
       ? prompts[Math.floor(Math.random() * prompts.length)]
       : '';
-    onStart(time, words, generatePrompt, finalPrompt, genre, topic);
+    onStart(time, words, generatePrompt, finalPrompt, genre, topic, title);
 
     setTimeout(() => {
       setTimeIsUp(true);
@@ -114,11 +116,23 @@ export default function StartPrompt({ onStart }: StartPromptProps) {
   const isNextDisabled = () => {
     const isTimeInvalid = Number(timeLimit) < 1 || Number(timeLimit) > 60;
     const isWordCountInvalid = Number(wordCount) < 50;
-    return (
-      (step === 2 && !topic) ||
-      (step === 3 && (isTimeInvalid || isWordCountInvalid)) ||
-      !genre
-    );
+
+    switch (step) {
+      case 1:
+        return !title || title.length < 3; // Title check
+      case 2:
+        return !genre; // Genre check
+      case 3:
+        return !topic; // Topic check
+      case 4:
+        return isTimeInvalid || isWordCountInvalid || !timeLimit || !wordCount; // Time & Word Count check
+      case 5:
+        return false; // Step 5 can always move forward if the other fields are validated
+      case 6:
+        return false; // Step 6 is final step, no need to validate
+      default:
+        return false;
+    }
   };
 
   if (timeIsUp) {
@@ -143,7 +157,7 @@ export default function StartPrompt({ onStart }: StartPromptProps) {
 
         {/* Progress Bar */}
         <div className="flex justify-between mb-6">
-          {[1, 2, 3, 4, 5].map((s) => (
+          {[1, 2, 3, 4, 5, 6].map((s) => (
             <div key={s} className="flex-1 px-1">
               <div
                 className={`h-2 rounded-full ${step >= s ? 'bg-[#0077b6]' : 'bg-gray-300'} transition-all`}
@@ -154,13 +168,14 @@ export default function StartPrompt({ onStart }: StartPromptProps) {
 
         {/* Step Title */}
         <h2 className="text-2xl font-bold mb-2 text-center text-[#0077b6]">
-          {step === 1 && 'Choose Your Genre'}
-          {step === 2 && 'Choose Your Topic'}
-          {step === 3 && 'Set Your Challenge'}
-          {step === 4 && 'Prompt Option'}
-          {step === 5 && 'Ready to Start'}
+          {step === 1 && 'Enter Your Title'}
+          {step === 2 && 'Choose Your Genre'}
+          {step === 3 && 'Choose Your Topic'}
+          {step === 4 && 'Set Your Challenge'}
+          {step === 5 && 'Prompt Option'}
+          {step === 6 && 'Ready to Start'}
         </h2>
-        <p className="text-center text-sm text-[#023e8a] mb-4">Step {step} of 5</p>
+        <p className="text-center text-sm text-[#023e8a] mb-4">Step {step} of 6</p>
 
         {showStepMessage && (
           <div className="text-green-600 text-sm mb-2 text-center transition-opacity duration-500">
@@ -168,65 +183,67 @@ export default function StartPrompt({ onStart }: StartPromptProps) {
           </div>
         )}
 
-        {/* STEP 1 */}
+        {/* STEP 1: Title */}
         {step === 1 && (
+          <div className="space-y-3">
+            <label className="block text-sm font-semibold mb-1 text-[#0077b6]">
+              Title of Your Work
+            </label>
+            <Input
+              type="text"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              placeholder="Enter your title"
+            />
+            {title && title.length < 3 && (
+              <p className="text-red-500 text-sm mt-2">
+                Title must be at least 3 characters long.
+              </p>
+            )}
+          </div>
+        )}
+
+        {/* STEP 2: Genre */}
+        {step === 2 && (
           <div className="space-y-3">
             {genres.map((g) => (
               <button
                 key={g}
                 onClick={() => setGenre(g)}
-                className={`w-full py-2 text-sm rounded-xl font-semibold border-2 transition-all transform hover:scale-105 ${
-                  genre === g
-                    ? 'bg-[#0077b6] text-white border-[#0077b6]'
-                    : 'bg-white text-[#0077b6] border-[#0077b6]'
-                }`}
+                className={`w-full py-2 text-sm rounded-xl font-semibold border-2 transition-all transform hover:scale-105 ${genre === g ? 'bg-[#0077b6] text-white border-[#0077b6]' : 'bg-white text-[#0077b6] border-[#0077b6]'}`}
               >
                 {g}
               </button>
             ))}
-            {/* Add 'None' button */}
             <button
               onClick={() => {
                 setGenre('None');
-                setTopic('None'); // Set topic to None when genre is None
+                setTopic('None');
               }}
-              className={`w-full py-2 text-sm rounded-xl font-semibold border-2 transition-all transform hover:scale-105 ${
-                genre === 'None'
-                  ? 'bg-[#0077b6] text-white border-[#0077b6]'
-                  : 'bg-white text-[#0077b6] border-[#0077b6]'
-              }`}
+              className={`w-full py-2 text-sm rounded-xl font-semibold border-2 transition-all transform hover:scale-105 ${genre === 'None' ? 'bg-[#0077b6] text-white border-[#0077b6]' : 'bg-white text-[#0077b6] border-[#0077b6]'}`}
             >
               None
             </button>
           </div>
         )}
 
-        {/* STEP 2 */}
-        {step === 2 && genre && (
+        {/* STEP 3: Topic */}
+        {step === 3 && genre && (
           <div className="space-y-3">
-            {/* Automatically set topic to None if genre is None */}
-            {genre !== 'None' && genreTopics[genre]?.map((t) => (
-              <button
-                key={t}
-                onClick={() => setTopic(t)}
-                className={`w-full py-2 text-sm rounded-xl font-semibold border-2 transition-all transform hover:scale-105 ${
-                  topic === t
-                    ? 'bg-[#0077b6] text-white border-[#0077b6]'
-                    : 'bg-white text-[#0077b6] border-[#0077b6]'
-                }`}
-              >
-                {t}
-              </button>
-            ))}
-            {/* Hide the 'None' button if genre is selected as None */}
+            {genre !== 'None' &&
+              genreTopics[genre]?.map((t) => (
+                <button
+                  key={t}
+                  onClick={() => setTopic(t)}
+                  className={`w-full py-2 text-sm rounded-xl font-semibold border-2 transition-all transform hover:scale-105 ${topic === t ? 'bg-[#0077b6] text-white border-[#0077b6]' : 'bg-white text-[#0077b6] border-[#0077b6]'}`}
+                >
+                  {t}
+                </button>
+              ))}
             {genre !== 'None' && (
               <button
                 onClick={() => setTopic('None')}
-                className={`w-full py-2 text-sm rounded-xl font-semibold border-2 transition-all transform hover:scale-105 ${
-                  topic === 'None'
-                    ? 'bg-[#0077b6] text-white border-[#0077b6]'
-                    : 'bg-white text-[#0077b6] border-[#0077b6]'
-                }`}
+                className={`w-full py-2 text-sm rounded-xl font-semibold border-2 transition-all transform hover:scale-105 ${topic === 'None' ? 'bg-[#0077b6] text-white border-[#0077b6]' : 'bg-white text-[#0077b6] border-[#0077b6]'}`}
               >
                 None
               </button>
@@ -234,8 +251,8 @@ export default function StartPrompt({ onStart }: StartPromptProps) {
           </div>
         )}
 
-        {/* STEP 3 */}
-        {step === 3 && (
+        {/* STEP 4: Time & Word Limit */}
+        {step === 4 && (
           <div className="space-y-6">
             <div>
               <label className="block text-sm font-semibold mb-1 text-[#0077b6]">
@@ -273,8 +290,8 @@ export default function StartPrompt({ onStart }: StartPromptProps) {
           </div>
         )}
 
-        {/* STEP 4 */}
-        {step === 4 && (
+        {/* STEP 5: Prompt Option */}
+        {step === 5 && (
           <div className="flex items-center mt-4">
             <Checkbox
               id="generatePrompt"
@@ -287,9 +304,13 @@ export default function StartPrompt({ onStart }: StartPromptProps) {
           </div>
         )}
 
-        {/* STEP 5 */}
-        {step === 5 && (
+        {/* STEP 6: Review */}
+        {step === 6 && (
           <div className="bg-gray-50 p-4 rounded-xl border border-gray-200 space-y-3 text-sm">
+            <div className="flex justify-between">
+              <span className="text-gray-600 font-medium">Title:</span>
+              <span className="text-gray-900 font-semibold">{title}</span>
+            </div>
             <div className="flex justify-between">
               <span className="text-gray-600 font-medium">Genre:</span>
               <span className="text-gray-900 font-semibold">{genre}</span>
@@ -334,15 +355,11 @@ export default function StartPrompt({ onStart }: StartPromptProps) {
             </Button>
           )}
 
-          {step < 5 ? (
+          {step < 6 ? (
             <Button
               onClick={handleNext}
               disabled={isNextDisabled()}
-              className={`px-4 py-2 rounded-xl transition transform ${
-                isNextDisabled()
-                  ? 'bg-gray-300 text-gray-500'
-                  : 'bg-[#0077b6] hover:bg-[#005f73] text-white hover:scale-105'
-              }`}
+              className={`px-4 py-2 rounded-xl transition transform ${isNextDisabled() ? 'bg-gray-300 text-gray-500' : 'bg-[#0077b6] hover:bg-[#005f73] text-white hover:scale-105'}`}
             >
               Next
             </Button>
