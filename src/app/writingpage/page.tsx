@@ -17,7 +17,13 @@ export default function Writingpage() {
   // State for the background color
   const [bgColor, setBgColor] = useState<string>('#4F8FB7');
 
-  const handleStart = (time: number, words: number, selectedPrompt: string) => {
+  const handleStart = (  time: number,
+    words: number,
+    prompt: boolean,
+    selectedPrompt: string,
+    genre: string,
+    topic: string,
+    title: string) => {
     setTimeLimit(time);
     setWordCount(words);
     setSelectedPrompt(selectedPrompt);
