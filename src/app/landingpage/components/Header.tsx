@@ -1,50 +1,50 @@
 'use client'
 
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
-import Link from 'next/link'
-import { Pen, User, Lock, Menu, X } from 'lucide-react'
-import { Button } from "@/app/landingpage/ui/button"
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/app/landingpage/ui/dialog"
-import { Input } from "@/app/landingpage/ui/input"
-import supabase from "../../../../config/supabaseClient"
-import { Bebas_Neue } from "next/font/google"
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import Link from 'next/link';
+import { User, Lock, Menu, X } from 'lucide-react';
+import { Button } from "@/app/landingpage/ui/button";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/app/landingpage/ui/dialog";
+import { Input } from "@/app/landingpage/ui/input";
+import supabase from "../../../../config/supabaseClient";
+import { Bebas_Neue } from "next/font/google";
 
 const bebasNeue = Bebas_Neue({
   subsets: ['latin'],
   weight: '400',
-})
+});
 
 export default function Header() {
-  const [loginEmail, setLoginEmail] = useState('')
-  const [loginPassword, setLoginPassword] = useState('')
-  const [isLoading, setIsLoading] = useState(false)
-  const [isLoginOpen, setIsLoginOpen] = useState(false)
-  const [isSignUpOpen, setIsSignUpOpen] = useState(false)
-  const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const [loginEmail, setLoginEmail] = useState('');
+  const [loginPassword, setLoginPassword] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [isLoginOpen, setIsLoginOpen] = useState(false);
+  const [isSignUpOpen, setIsSignUpOpen] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [signUpEmail, setSignUpEmail] = useState('');
   const [signUpUsername, setSignUpUsername] = useState('');
   const [signUpPassword, setSignUpPassword] = useState('');
-  const router = useRouter()
+  const router = useRouter();
 
   const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsLoading(true)
+    e.preventDefault();
+    setIsLoading(true);
 
     const { data, error } = await supabase.auth.signInWithPassword({
       email: loginEmail,
       password: loginPassword,
-    })
+    });
 
-    setIsLoading(false)
+    setIsLoading(false);
 
     if (!error) {
-      router.push('/homepage')
+      router.push('/homepage');
     }
 
-    setLoginEmail('')
-    setLoginPassword('')
-  }
+    setLoginEmail('');
+    setLoginPassword('');
+  };
 
   const registerUser = async (email: string, password: string, username: string) => {
     setIsLoading(true);
@@ -125,12 +125,16 @@ export default function Header() {
 
         {/* Logo */}
         <Link className="flex items-center" href="/">
-          <Pen className="h-6 w-6 mr-2 text-white" aria-label="Logo" />
+          <img
+            src="/logos/logo.png" // Replace with the actual path to your logo
+            alt="E-Lathala Logo"
+            className="h-28 w-auto mr-[-14px]" // Increased height and negative margin for closer alignment
+          />
           <span
-            className={`font-bold text-3xl text-white ${bebasNeue.className}`}
+            className={`font-bold text-4xl text-white ${bebasNeue.className}`}
             style={{
               letterSpacing: '1px',
-              textShadow: '1px 1px 2px rgba(0, 0, 0, 0.3)'
+              textShadow: '1px 1px 2px rgba(0, 0, 0, 0.3)',
             }}
           >
             E-LATHALA
@@ -250,5 +254,5 @@ export default function Header() {
         </nav>
       )}
     </header>
-  )
+  );
 }
