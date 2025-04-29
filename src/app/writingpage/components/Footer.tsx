@@ -1,5 +1,5 @@
 import React from 'react'
-import { Timer, Edit, Medal } from 'lucide-react'
+import { Timer, Edit, Medal, SkipForward } from 'lucide-react'
 
 interface FooterProps {
   currentWords: number
@@ -43,10 +43,10 @@ export default function Footer({ currentWords, targetWords, timeLeft }: FooterPr
               width: `${100 - timeProgress}%`,
               backgroundColor:
                 timeProgress < 33
-                  ? '#22C55E' // green when time is high
+                  ? '#22C55E'
                   : timeProgress < 66
-                  ? '#FACC15' // yellow when time is mid
-                  : '#EF4444', // red when time is low
+                  ? '#FACC15'
+                  : '#EF4444',
             }}
           />
         </div>
@@ -60,6 +60,20 @@ export default function Footer({ currentWords, targetWords, timeLeft }: FooterPr
           <div className="text-green-400 font-mono text-lg mt-2 animate-bounce">
             <span>🎉 You did it! 🎉</span>
           </div>
+        )}
+        
+        {/* Skip Button */}
+        {wordProgress === 100 && (
+      <button
+      className="mt-2 flex items-center justify-center space-x-2 bg-black hover:bg-gray-800 text-white font-bold py-2 px-4 w-32 rounded-full transition-transform hover:scale-105 animate-pulse"
+      onClick={() => alert('Skipped!')}
+    >
+      <SkipForward className="w-5 h-5" />
+      <span>Skip</span>
+    </button>
+    
+       
+        
         )}
       </div>
 
@@ -78,12 +92,12 @@ export default function Footer({ currentWords, targetWords, timeLeft }: FooterPr
               width: `${wordProgress}%`,
               backgroundColor:
                 wordProgress >= 100
-                  ? '#22C55E' // green
+                  ? '#22C55E'
                   : wordProgress >= 66
-                  ? '#22C55E' // green
+                  ? '#22C55E'
                   : wordProgress >= 33
-                  ? '#FACC15' // yellow
-                  : '#EF4444', // red
+                  ? '#FACC15'
+                  : '#EF4444',
             }}
           />
         </div>

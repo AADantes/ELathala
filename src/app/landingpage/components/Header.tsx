@@ -8,7 +8,7 @@ import { Button } from "@/app/landingpage/ui/button"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/app/landingpage/ui/dialog"
 import { Input } from "@/app/landingpage/ui/input"
 import supabase from "../../../../config/supabaseClient"
-import { Bebas_Neue } from '@next/font/google'
+import { Bebas_Neue } from "next/font/google"
 
 const bebasNeue = Bebas_Neue({
   subsets: ['latin'],

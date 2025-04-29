@@ -1,5 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/app/homepage/ui/card';
-import { Bebas_Neue } from '@next/font/google';
+import { Bebas_Neue } from "next/font/google";
 
 // Load Bebas Neue for a bold, modern look
 const bebasNeue = Bebas_Neue({

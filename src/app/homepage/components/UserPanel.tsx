@@ -12,7 +12,7 @@ import {
 } from "@/app/homepage/ui/dialog"
 import { Card, CardContent, CardHeader, CardTitle } from "@/app/homepage/ui/card"
 import { ChevronRight, Star, Gauge, ArrowUpCircle } from 'lucide-react'
-import { Bebas_Neue } from '@next/font/google'
+import { Bebas_Neue } from "next/font/google"
 
 import supabase from '../../../../config/supabaseClient'
 
