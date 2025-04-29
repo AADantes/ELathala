@@ -10,6 +10,7 @@ import {
 } from 'lucide-react';
 import { Button } from '@/app/writingpage/ui/Button';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation'; // Import useRouter
 
 interface SidebarProps {
   isOpen: boolean;
@@ -38,9 +39,17 @@ function generateHoverColor(color: string) {
 }
 
 export default function Sidebar({ isOpen, onClose, bgColor }: SidebarProps) {
+  const router = useRouter(); // Initialize useRouter
+
   // Adjust the color to make it softer, making it easier on the eyes
   const softBgColor = adjustColorBrightness(bgColor, -30); // Darken the background slightly
   const hoverBgColor = generateHoverColor(bgColor); // Get hover color for buttons/links
+
+  // Logout function
+  const handleLogout = () => {
+    // Perform any logout logic here (e.g., clearing tokens, user data, etc.)
+    router.push('/'); // Redirect to the landing page
+  };
 
   return (
     <div
@@ -141,6 +150,7 @@ export default function Sidebar({ isOpen, onClose, bgColor }: SidebarProps) {
               <Button
                 variant="ghost"
                 className={`w-full flex items-center space-x-4 justify-start py-5 px-4 rounded-lg text-left text-red-500 bg-white shadow-sm shadow-black/20 transition-all duration-300 ease-in-out transform hover:bg-[${hoverBgColor}] group`}
+                onClick={handleLogout} // Call the logout function
               >
                 <LogOut className="h-5 w-5 text-[#FF6B6B] transition-all duration-300 group-hover:text-[#FF6B6B]" />
                 <span className="text-red-500 font-bold transition-all duration-300 group-hover:text-red-500">

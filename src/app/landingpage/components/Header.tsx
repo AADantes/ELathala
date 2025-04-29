@@ -60,7 +60,7 @@ export default function Header() {
     const userId = data.user?.id;
 
     if (userId) {
-      const { error: insertError } = await supabase.from("Accounts").insert([
+      const { error: insertError } = await supabase.from("Accounts").insert([ 
         {
           userId,
           email,
@@ -79,7 +79,7 @@ export default function Header() {
         return;
       }
 
-      const { error: userInsertError } = await supabase.from("User").insert([
+      const { error: userInsertError } = await supabase.from("User").insert([ 
         {
           id: userId,
           username,
@@ -181,7 +181,7 @@ export default function Header() {
             </DialogContent>
           </Dialog>
 
-          {/* Sign Up */}
+          {/* Sign Up Button */}
           <Button
             className="bg-[#4FC3F7] text-white font-bold hover:bg-[#0288D1] rounded-lg transition-colors"
             onClick={() => setIsSignUpOpen(true)}
@@ -189,6 +189,7 @@ export default function Header() {
             Sign Up
           </Button>
 
+          {/* Sign Up Dialog */}
           <Dialog open={isSignUpOpen} onOpenChange={setIsSignUpOpen}>
             <DialogContent className="sm:max-w-[425px]">
               <DialogHeader>
@@ -205,11 +206,19 @@ export default function Header() {
                     onChange={(e) => setSignUpEmail(e.target.value)}
                   />
                 </div>
-                <Input
-                  placeholder="Enter your Username"
-                  value={signUpUsername}
-                  onChange={(e) => setSignUpUsername(e.target.value)}
-                />
+
+                {/* Username Input with Icon */}
+                <div className="space-y-2 relative">
+                  <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                  <Input
+                    placeholder="Enter your Username"
+                    className="pl-10"
+                    value={signUpUsername}
+                    onChange={(e) => setSignUpUsername(e.target.value)}
+                  />
+                </div>
+
+                {/* Password Input */}
                 <div className="space-y-2 relative">
                   <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
                   <Input
@@ -221,6 +230,7 @@ export default function Header() {
                   />
                 </div>
 
+                {/* Sign-Up Button */}
                 <Button
                   className="w-full mt-4 bg-[#0074B7] text-white hover:bg-[#005A8C] font-bold transition-colors rounded-lg"
                   onClick={handleSignUp}
