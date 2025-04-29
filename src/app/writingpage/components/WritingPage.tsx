@@ -130,25 +130,33 @@ export default function WritingPage({
     }
   }, [text]);
 
-  // Update word count to include deleted words
+  // Function to validate words
+  const isValidWord = (word: string): boolean => {
+    // Exclude words that are less than 2 characters, contain numbers, or are nonsensical
+    const regex = /^[a-zA-Z]+$/; // Only allow alphabetic words
+    return word.length > 1 && regex.test(word);
+  };
+
+  // Update word count to exclude invalid words
   const updateWordCount = (textValue: string) => {
-    const rawWords = textValue.trim().split(/\s+/);
-    const filteredWords = rawWords.filter((word, index, arr) => {
-      return index === 0 || word.toLowerCase() !== arr[index - 1].toLowerCase();
-    });
+    // Split the text into words using regex to handle extra spaces and special characters
+    const rawWords = textValue.trim().split(/\s+/).filter((word) => word !== '');
 
-    // Count all words, including deleted ones
-    const totalWords = filteredWords.length + deletedWords.length;
+    // Filter out invalid words
+    const validWords = rawWords.filter(isValidWord);
 
-    setCurrentWords(textValue.trim() === '' ? 0 : totalWords); // Update the current word count
+    // Count only valid words
+    const totalWords = validWords.length;
+
+    // Update the current word count
+    setCurrentWords(totalWords);
   };
 
   const handleTextChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const newText = e.target.value;
-    const prevText = text;
 
     setText(newText);
-    updateWordCount(newText);
+    updateWordCount(newText); // Update the word count
     setIsTyping(true);
 
     const foundBadWords = containsBadWords(newText);
@@ -156,21 +164,6 @@ export default function WritingPage({
       setWarning(`⚠️ Please avoid using inappropriate words like: ${foundBadWords.join(', ')}`);
     } else {
       setWarning(null);
-    }
-
-    const prevWords = prevText.trim().split(/\s+/);
-    const newWords = newText.trim().split(/\s+/);
-
-    if (newWords.length < prevWords.length) {
-      const deletedWord = prevWords[prevWords.length - 1];
-      setDeletedWords((prev) => [...prev, deletedWord]);
-      setWarning(`Oops! You deleted "${deletedWord}".`);
-      setShakeEffect(true);
-
-      setTimeout(() => {
-        setWarning(null);
-        setShakeEffect(false);
-      }, 2000);
     }
   };
 
@@ -217,6 +210,10 @@ export default function WritingPage({
       setShowDoneModal(true); // Show the "You're Done writing" modal after time is up and word count is met
     }
   }, [isTimeUp, currentWords, wordCount]);
+
+  const handleSkip = () => {
+    setShowDoneModal(true); // Show the "You're Done Writing" modal
+  };
 
   return (
     <div className="container mx-auto px-6 py-8 bg-white text-black min-h-screen flex flex-col relative pb-24">
@@ -487,7 +484,12 @@ export default function WritingPage({
 
       {/* Footer */}
       <div className="fixed bottom-0 w-full bg-white text-center z-10 shadow-md py-4">
-        <Footer currentWords={currentWords} targetWords={wordCount} timeLeft={timeLeft} />
+        <Footer
+          currentWords={currentWords}
+          targetWords={wordCount}
+          timeLeft={timeLeft}
+          onSkip={handleSkip} // Pass the callback here
+        />
       </div>
     </div>
   );

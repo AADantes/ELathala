@@ -2,12 +2,13 @@ import React from 'react'
 import { Timer, Edit, Medal, SkipForward } from 'lucide-react'
 
 interface FooterProps {
-  currentWords: number
-  targetWords: number
-  timeLeft: number // in seconds
+  currentWords: number;
+  targetWords: number;
+  timeLeft: number;
+  onSkip: () => void; // Add this prop
 }
 
-export default function Footer({ currentWords, targetWords, timeLeft }: FooterProps) {
+export default function Footer({ currentWords, targetWords, timeLeft, onSkip }: FooterProps) {
   const minutes = Math.floor(timeLeft / 60)
   const seconds = timeLeft % 60
 
@@ -66,7 +67,7 @@ export default function Footer({ currentWords, targetWords, timeLeft }: FooterPr
         {wordProgress === 100 && (
       <button
       className="mt-2 flex items-center justify-center space-x-2 bg-black hover:bg-gray-800 text-white font-bold py-2 px-4 w-32 rounded-full transition-transform hover:scale-105 animate-pulse"
-      onClick={() => alert('Skipped!')}
+      onClick={onSkip} // Call the onSkip function when clicked
     >
       <SkipForward className="w-5 h-5" />
       <span>Skip</span>
