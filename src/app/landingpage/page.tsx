@@ -4,7 +4,7 @@ import Header from '@/app/landingpage/components/Header'
 import HeroSection from '@/app/landingpage/components/HeroSection'
 import FeaturesSection from '@/app/landingpage/components/FeaturesSection'
 import HowItWorksSection from '@/app/landingpage/components/HowItWorksSection'
-import CallToActionSection from '@/app/landingpage/components/CallToActionSection'
+import About from '@/app/landingpage/components/About'
 import Footer from '@/app/landingpage/components/Footer'
 import supabase from '../../../config/supabaseClient'
 
@@ -28,7 +28,7 @@ const Home = () => {
             <HeroSection />
             <FeaturesSection />
             <HowItWorksSection />
-            <CallToActionSection />
+            <About />
           </main>
         </div>
       </div>

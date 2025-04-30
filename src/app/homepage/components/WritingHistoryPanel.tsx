@@ -24,7 +24,7 @@ export function WritingHistoryPanel({ works }: WritingHistoryProps) {
     <Card 
       className="bg-white text-gray-900 
         shadow-[0_4px_6px_rgba(0,0,0,0.1)] hover:shadow-[0_6px_8px_rgba(0,0,0,0.15)] 
-        transition-transform transform hover:scale-105 duration-300"
+        transition-transform transform hover:scale-105 duration-300 min-h-[400px]" // Adjusted height
     >
       <CardHeader className="bg-[#f3f4f6] px-6 py-4">
         <CardTitle 
@@ -35,11 +35,10 @@ export function WritingHistoryPanel({ works }: WritingHistoryProps) {
         </CardTitle>
       </CardHeader>
       <CardContent className="p-6">
-        {/* <p className="mb-4 text-yellow-500 text-lg">Total Works: {works.length}</p> */}
         <p className="mb-4 text-yellow-500 text-lg">Total Works: --</p>
 
         <ul className="space-y-3">
-          {/* {works.map((work) => ( */} 
+          {/* {works.map((work) => ( */}
           {/*   <li key={work.workID} className="..."> */}
           {/*     your list item content */}
           {/*   </li> */}

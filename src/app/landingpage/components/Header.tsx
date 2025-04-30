@@ -1,4 +1,4 @@
-'use client'
+'use client';
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -60,11 +60,11 @@ export default function Header() {
     const userId = data.user?.id;
 
     if (userId) {
-      const { error: insertError } = await supabase.from("Accounts").insert([ 
+      const { error: insertError } = await supabase.from("Accounts").insert([
         {
           userId,
           email,
-          password, // In production, always hash passwords!
+          password,
           isVerified: data.user?.email_confirmed_at ? true : false,
           isAdmin: false,
           dateRegistered: new Date(),
@@ -79,7 +79,7 @@ export default function Header() {
         return;
       }
 
-      const { error: userInsertError } = await supabase.from("User").insert([ 
+      const { error: userInsertError } = await supabase.from("User").insert([
         {
           id: userId,
           username,
@@ -123,15 +123,15 @@ export default function Header() {
           </Button>
         </div>
 
-        {/* Logo */}
-        <Link className="flex items-center" href="/">
+        {/* Logo and Text */}
+        <Link className="flex items-center space-x-3" href="/">
           <img
-            src="/logos/logo.png" // Replace with the actual path to your logo
+            src="/logos/logo.png"
             alt="E-Lathala Logo"
-            className="h-28 w-auto mr-[-14px]" // Increased height and negative margin for closer alignment
+            className="h-12 w-auto"
           />
           <span
-            className={`font-bold text-4xl text-white ${bebasNeue.className}`}
+            className={`font-bold text-3xl text-white ${bebasNeue.className}`}
             style={{
               letterSpacing: '1px',
               textShadow: '1px 1px 2px rgba(0, 0, 0, 0.3)',
@@ -143,13 +143,13 @@ export default function Header() {
 
         {/* Desktop Nav */}
         <nav className="hidden lg:flex gap-6 items-center">
-          <Link href="#home" className="text-white font-bold relative group hover:text-sky-950">Home</Link>
-          <Link href="/about" className="text-white font-bold relative group hover:text-sky-950">About</Link>
+          <Link href="/" className="text-white font-bold relative group hover:text-sky-950">Home</Link>
+          <Link href="#about" className="text-white font-bold relative group hover:text-sky-950">About</Link>
           <Link href="#features" className="text-white font-bold relative group hover:text-sky-950">Features</Link>
           <Link href="#how-it-works" className="text-white font-bold relative group hover:text-sky-950">How It Works</Link>
         </nav>
 
-        {/* Right-side Buttons */}
+        {/* Auth Buttons */}
         <nav className="flex gap-2 items-center">
           <Button
             className="text-white border-2 border-white bg-transparent hover:bg-white hover:text-[#0074B7] hover:border-[#0074B7] transition-colors font-bold rounded-lg"
@@ -161,9 +161,10 @@ export default function Header() {
           {/* Login Dialog */}
           <Dialog open={isLoginOpen} onOpenChange={setIsLoginOpen}>
             <DialogContent className="sm:max-w-[425px]">
-              <DialogHeader>
-                <DialogTitle className="text-[#005A8C] text-xl">Log in to E-Lathala</DialogTitle>
-                <DialogDescription>Enter your email and password to access your account.</DialogDescription>
+              <DialogHeader className="flex flex-col items-center">
+                <img src="/logos/logo.png" alt="E-Lathala Logo" className="h-16 mb-2" />
+                <DialogTitle className="text-[#005A8C] text-xl text-center">Log in to E-Lathala</DialogTitle>
+                <DialogDescription className="text-center">Enter your email and password to access your account.</DialogDescription>
               </DialogHeader>
               <form onSubmit={handleLogin} className="space-y-4 mt-4">
                 <div className="space-y-2 relative">
@@ -192,9 +193,10 @@ export default function Header() {
           {/* Sign Up Dialog */}
           <Dialog open={isSignUpOpen} onOpenChange={setIsSignUpOpen}>
             <DialogContent className="sm:max-w-[425px]">
-              <DialogHeader>
-                <DialogTitle className="text-[#005A8C] text-xl">Sign Up</DialogTitle>
-                <DialogDescription className="font-bold">Join E-Lathala by creating an account.</DialogDescription>
+              <DialogHeader className="flex flex-col items-center">
+                <img src="/logos/logo.png" alt="E-Lathala Logo" className="h-16 mb-2" />
+                <DialogTitle className="text-[#005A8C] text-xl text-center">Sign Up</DialogTitle>
+                <DialogDescription className="font-bold text-center">Join E-Lathala by creating an account.</DialogDescription>
               </DialogHeader>
               <div className="flex flex-col gap-4 mt-4">
                 <div className="space-y-2 relative">
@@ -206,8 +208,6 @@ export default function Header() {
                     onChange={(e) => setSignUpEmail(e.target.value)}
                   />
                 </div>
-
-                {/* Username Input with Icon */}
                 <div className="space-y-2 relative">
                   <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
                   <Input
@@ -217,8 +217,6 @@ export default function Header() {
                     onChange={(e) => setSignUpUsername(e.target.value)}
                   />
                 </div>
-
-                {/* Password Input */}
                 <div className="space-y-2 relative">
                   <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
                   <Input
@@ -229,8 +227,6 @@ export default function Header() {
                     onChange={(e) => setSignUpPassword(e.target.value)}
                   />
                 </div>
-
-                {/* Sign-Up Button */}
                 <Button
                   className="w-full mt-4 bg-[#0074B7] text-white hover:bg-[#005A8C] font-bold transition-colors rounded-lg"
                   onClick={handleSignUp}
@@ -238,7 +234,6 @@ export default function Header() {
                 >
                   {isLoading ? 'Signing Up...' : 'Sign Up'}
                 </Button>
-
                 <p className="text-sm text-center mt-4">
                   Already got an account?{' '}
                   <span
@@ -257,8 +252,8 @@ export default function Header() {
       {/* Mobile Menu */}
       {isMenuOpen && (
         <nav className="lg:hidden bg-[#2C3E50] text-white p-4 absolute top-20 left-0 w-full">
-          <Link href="#home" className="block py-2 text-lg font-bold relative group">Home</Link>
-          <Link href="/about" className="block py-2 text-lg font-bold relative group">About</Link>
+          <Link href="/" className="block py-2 text-lg font-bold relative group">Home</Link>
+          <Link href="#about" className="block py-2 text-lg font-bold relative group">About</Link>
           <Link href="#features" className="block py-2 text-lg font-bold relative group">Features</Link>
           <Link href="#how-it-works" className="block py-2 text-lg font-bold relative group">How It Works</Link>
         </nav>

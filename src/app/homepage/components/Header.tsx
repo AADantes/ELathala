@@ -1,4 +1,4 @@
-'use client'
+"use client"
 
 import Link from 'next/link'
 import { useState, useEffect } from 'react'
@@ -49,7 +49,7 @@ export function Header() {
 
   const handleLogout = async () => {
     await supabase.auth.signOut()
-    router.push('/landingpage')
+    router.push('/landingpage') // Redirect to landing page after logout
   }
 
   return (
@@ -66,9 +66,11 @@ export function Header() {
           </button>
 
           {/* Brand and Logo */}
-          <div className="flex items-center space-x-2">
-            <Pen className="h-6 w-6 text-white" />
-            <span className={`font-bold text-3xl text-white ${bebasNeue.className}`}>E-LATHALA</span>
+          <div className="flex items-center space-x-2 ml-4"> {/* Increased left margin */}
+            <img src="/logos/logo.png" alt="E-Lathala Logo" className="h-12 w-12 text-white" /> {/* Logo size */}
+            <span className={`font-bold text-3xl text-white ${bebasNeue.className}`}> {/* Further decreased text size */}
+              E-LATHALA
+            </span>
           </div>
         </div>
       </div>
@@ -119,7 +121,7 @@ export function Header() {
               <ul className="py-4 font-semibold space-y-3">
                 <li>
                   <Link 
-                    href="/" 
+                    href="/homepage" 
                     className="flex items-center px-6 py-3 text-lg text-black transition-all duration-300 hover:bg-gray-100 hover:scale-105 hover:shadow-lg rounded-xl"
                   >
                     <Home className="h-7 w-7 mr-4 text-blue-500" />

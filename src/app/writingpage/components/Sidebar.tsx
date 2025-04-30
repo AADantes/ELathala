@@ -1,16 +1,9 @@
 import React from 'react';
-import {
-  X,
-  Home,
-  BookOpen,
-  User,
-  Star,
-  HelpCircle,
-  LogOut,
-} from 'lucide-react';
+import { X, Home, BookOpen, User, Star, HelpCircle, LogOut } from 'lucide-react';
 import { Button } from '@/app/writingpage/ui/Button';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation'; // Import useRouter
+import supabase from '../../../../config/supabaseClient'; // Import supabase client
 
 interface SidebarProps {
   isOpen: boolean;
@@ -46,9 +39,9 @@ export default function Sidebar({ isOpen, onClose, bgColor }: SidebarProps) {
   const hoverBgColor = generateHoverColor(bgColor); // Get hover color for buttons/links
 
   // Logout function
-  const handleLogout = () => {
-    // Perform any logout logic here (e.g., clearing tokens, user data, etc.)
-    router.push('/'); // Redirect to the landing page
+  const handleLogout = async () => {
+    await supabase.auth.signOut(); // Perform the sign-out logic using supabase
+    router.push('/landingpage'); // Redirect to the landing page after logout
   };
 
   return (
@@ -142,7 +135,7 @@ export default function Sidebar({ isOpen, onClose, bgColor }: SidebarProps) {
               >
                 <HelpCircle className="h-5 w-5 text-[#FF6B6B] transition-all duration-300 group-hover:text-[#FF6B6B]" />
                 <span className="text-black font-bold transition-all duration-300 group-hover:text-black">
-                  Help
+                  Help & Support
                 </span>
               </Link>
             </li>

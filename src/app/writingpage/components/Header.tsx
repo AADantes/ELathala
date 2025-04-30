@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Menu, Palette } from 'lucide-react';
 import { Button } from '@/app/writingpage/ui/Button';
+import Link from 'next/link';
 
 interface HeaderProps {
   onMenuClick: () => void;
@@ -49,7 +50,8 @@ export default function Header({ onMenuClick, bgColor, setBgColor }: HeaderProps
       className="text-white p-4 flex items-center justify-between sticky top-0 z-50"
       style={{ backgroundColor: bgColor }}
     >
-      <div className="flex items-center space-x-2">
+      {/* Menu Icon and Logo (Side by Side) */}
+      <div className="flex items-center space-x-3">
         <Button
           variant="ghost"
           size="icon"
@@ -59,6 +61,22 @@ export default function Header({ onMenuClick, bgColor, setBgColor }: HeaderProps
         >
           <Menu className="h-6 w-6 text-white" />
         </Button>
+        <Link href="/" className="flex items-center space-x-3">
+          <img
+            src="/logos/logo.png"
+            alt="E-Lathala Logo"
+            className="h-12 w-auto"
+          />
+          <span
+            className="font-bold text-3xl text-white"
+            style={{
+              letterSpacing: '1px',
+              textShadow: '1px 1px 2px rgba(0, 0, 0, 0.3)',
+            }}
+          >
+            E-LATHALA
+          </span>
+        </Link>
       </div>
 
       {/* Color Picker */}
@@ -79,7 +97,7 @@ export default function Header({ onMenuClick, bgColor, setBgColor }: HeaderProps
 
         {isDropdownOpen && (
           <div className="absolute right-0 mt-2 w-56 bg-white text-black rounded-lg shadow-lg transition-transform duration-200 ease-in-out transform opacity-100 scale-100 p-3 z-50">
-            <h3 className="text-sm font-bold mb-2">Select a theme color</h3> {/* Bold Text */}
+            <h3 className="text-sm font-bold mb-2">Select a theme color</h3>
             <ul className="flex flex-wrap gap-2 mb-3">
               {[ 
                 '#4F8FB7', '#D9534F', '#28A745', '#FFC107', '#6C757D',
@@ -101,7 +119,7 @@ export default function Header({ onMenuClick, bgColor, setBgColor }: HeaderProps
 
             {/* Custom Color Picker */}
             <div className="flex items-center justify-between mt-3 px-4 py-3 bg-gray-50 rounded-md shadow-md">
-              <label htmlFor="custom-color" className="text-sm font-bold text-gray-800"> {/* Bold Text */}
+              <label htmlFor="custom-color" className="text-sm font-bold text-gray-800">
                 Custom Color:
               </label>
               <div className="relative flex items-center">
