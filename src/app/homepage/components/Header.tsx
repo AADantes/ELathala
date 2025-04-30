@@ -67,7 +67,7 @@ export function Header() {
 
           {/* Brand and Logo */}
           <div className="flex items-center space-x-2 ml-4"> {/* Increased left margin */}
-            <img src="/logos/logo.png" alt="E-Lathala Logo" className="h-12 w-12 text-white" /> {/* Logo size */}
+            <img src="/logos/Logo.png" alt="E-Lathala Logo" className="h-12 w-12 text-white" /> {/* Logo size */}
             <span className={`font-bold text-3xl text-white ${bebasNeue.className}`}> {/* Further decreased text size */}
               E-LATHALA
             </span>

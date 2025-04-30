@@ -63,7 +63,7 @@ export default function Header({ onMenuClick, bgColor, setBgColor }: HeaderProps
         </Button>
         <Link href="/" className="flex items-center space-x-3">
           <img
-            src="/logos/logo.png"
+            src="/logos/Logo.png"
             alt="E-Lathala Logo"
             className="h-12 w-auto"
           />
