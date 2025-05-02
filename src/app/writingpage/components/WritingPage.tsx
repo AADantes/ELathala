@@ -10,6 +10,9 @@ interface WritingPageProps {
   wordCount: number;
   selectedPrompt: string;
   generatePrompt: boolean;
+  title: string;
+  genre: string;
+  topics: string[];
 }
 
 export default function WritingPage({
@@ -17,6 +20,9 @@ export default function WritingPage({
   wordCount,
   selectedPrompt,
   generatePrompt,
+  title,
+  genre,
+  topics,
 }: WritingPageProps) {
   const [currentWords, setCurrentWords] = useState(0);
   const [timeLeft, setTimeLeft] = useState(timeLimit * 60);
@@ -217,6 +223,21 @@ export default function WritingPage({
 
   return (
     <div className="container mx-auto px-6 py-8 bg-white text-black min-h-screen flex flex-col relative pb-24">
+
+{/* Display Title, Genre, and Topic */}
+<div className="mb-6 bg-white p-4 rounded-xl border border-gray-200 shadow-md">
+  <h1 className="text-3xl font-bold text-[#0077b6] mb-4">{title || 'Untitled'}</h1>
+  {genre && (
+    <p className="text-lg text-gray-700">
+      <strong>Genre:</strong> {genre}
+    </p>
+  )}
+  {topics.length > 0 && (
+    <p className="text-lg text-gray-700">
+      <strong>Topic:</strong> {topics.join(', ')}
+    </p>
+  )}
+</div>
 
 {/* You're Done Writing Modal */}
 {showDoneModal && (

@@ -126,7 +126,7 @@ export default function Header() {
         {/* Logo and Text */}
         <Link className="flex items-center space-x-3" href="/">
           <img
-            src="/logos/Logo.png"
+            src="/logos/logo.png"
             alt="E-Lathala Logo"
             className="h-12 w-auto"
           />
@@ -162,7 +162,7 @@ export default function Header() {
           <Dialog open={isLoginOpen} onOpenChange={setIsLoginOpen}>
             <DialogContent className="sm:max-w-[425px]">
               <DialogHeader className="flex flex-col items-center">
-                <img src="/logos/Logo.png" alt="E-Lathala Logo" className="h-16 mb-2" />
+                <img src="/logos/logo.png" alt="E-Lathala Logo" className="h-16 mb-2" />
                 <DialogTitle className="text-[#005A8C] text-xl text-center">Log in to E-Lathala</DialogTitle>
                 <DialogDescription className="text-center">Enter your email and password to access your account.</DialogDescription>
               </DialogHeader>
@@ -194,7 +194,7 @@ export default function Header() {
           <Dialog open={isSignUpOpen} onOpenChange={setIsSignUpOpen}>
             <DialogContent className="sm:max-w-[425px]">
               <DialogHeader className="flex flex-col items-center">
-                <img src="/logos/Logo.png" alt="E-Lathala Logo" className="h-16 mb-2" />
+                <img src="/logos/logo.png" alt="E-Lathala Logo" className="h-16 mb-2" />
                 <DialogTitle className="text-[#005A8C] text-xl text-center">Sign Up</DialogTitle>
                 <DialogDescription className="font-bold text-center">Join E-Lathala by creating an account.</DialogDescription>
               </DialogHeader>

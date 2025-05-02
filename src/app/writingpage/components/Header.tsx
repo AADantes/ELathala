@@ -7,9 +7,12 @@ interface HeaderProps {
   onMenuClick: () => void;
   bgColor: string;
   setBgColor: (color: string) => void;
+  title: string;
+  genre: string;
+  topic: string;
 }
 
-export default function Header({ onMenuClick, bgColor, setBgColor }: HeaderProps) {
+export default function Header({ onMenuClick, bgColor, setBgColor, title, genre, topic }: HeaderProps) {
   const defaultColor = '#3498DB'; // Set default color to blue
   const [isDropdownOpen, setIsDropdownOpen] = useState<boolean>(false);
   const [selectedColor, setSelectedColor] = useState<string>(bgColor || defaultColor); // Default to blue if no color
@@ -17,13 +20,15 @@ export default function Header({ onMenuClick, bgColor, setBgColor }: HeaderProps
 
   // Effect to load the saved color from localStorage when the component is mounted
   useEffect(() => {
-    const savedColor = localStorage.getItem('selectedColor');
-    if (savedColor) {
-      setSelectedColor(savedColor);
-      setBgColor(savedColor);
-    } else {
-      setSelectedColor(defaultColor); // Set to default blue if no color in localStorage
-      setBgColor(defaultColor); // Set the background color to blue
+    if (typeof window !== 'undefined') {
+      const savedColor = localStorage.getItem('selectedColor');
+      if (savedColor) {
+        setSelectedColor(savedColor);
+        setBgColor(savedColor);
+      } else {
+        setSelectedColor(defaultColor);
+        setBgColor(defaultColor);
+      }
     }
   }, [setBgColor]);
 
@@ -63,7 +68,7 @@ export default function Header({ onMenuClick, bgColor, setBgColor }: HeaderProps
         </Button>
         <Link href="/" className="flex items-center space-x-3">
           <img
-            src="/logos/Logo.png"
+            src="/logos/logo.png"
             alt="E-Lathala Logo"
             className="h-12 w-auto"
           />

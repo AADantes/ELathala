@@ -12,7 +12,7 @@ export default function HeroSection() {
       <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-0">
         {/* Central Logo (replace Feather) */}
         <Image
-          src="/logos/Logo.png"
+          src="/logos/logo.png"
           alt="E-Lathala Logo"
           width={500}
           height={500}
