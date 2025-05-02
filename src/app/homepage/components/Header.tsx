@@ -139,11 +139,11 @@ export function Header() {
                 </li>
                 <li>
                   <Link 
-                    href="/profile" 
+                    href="/account-settings" 
                     className="flex items-center px-6 py-3 text-lg text-black transition-all duration-300 hover:bg-gray-100 hover:scale-105 hover:shadow-lg rounded-xl"
                   >
                     <User className="h-7 w-7 mr-4 text-teal-500" />
-                    Profile
+                    Account Settings
                   </Link>
                 </li>
                 <li>
@@ -169,7 +169,7 @@ export function Header() {
                 <li>
                   <button
                     onClick={handleLogout}
-                    className="flex items-center w-full text-left px-6 py-3 text-red-600 transition-all duration-300 hover:bg-red-200 hover:scale-105 hover:shadow-lg rounded-xl focus:outline-none focus:ring-2 focus:ring-red-600 focus:ring-opacity-50"
+                    className="flex items-center w-full text-left px-6 py-3 text-red-600 transition-all duration-300 hover:bg-red-200 hover:scale-105 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-red-600 focus:ring-opacity-50"
                   >
                     <LogOut className="h-7 w-7 mr-4 text-red-600 transition-transform duration-300 transform hover:scale-110" />
                     Log Out

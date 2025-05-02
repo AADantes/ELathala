@@ -3,21 +3,14 @@
 import { motion } from 'framer-motion';
 import { Button } from '@/app/landingpage/ui/button';
 import { Feather } from 'lucide-react';
-import Image from 'next/image';
 
 export default function HeroSection() {
   return (
     <section className="relative w-full min-h-screen pt-32 md:pt-40 lg:pt-48 xl:pt-56 pb-12 md:pb-24 lg:pb-32 xl:pb-48 overflow-hidden bg-transparent">
-      {/* Background Logo and Feathers */}
+      {/* Background Feathers */}
       <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-0">
-        {/* Central Logo (replace Feather) */}
-        <Image
-          src="/logos/logo.png"
-          alt="E-Lathala Logo"
-          width={500}
-          height={500}
-          className="opacity-10 w-[300px] sm:w-[400px] md:w-[500px] h-auto object-contain"
-        />
+        {/* Central Feather Icon as Background */}
+        <Feather className="w-[300px] sm:w-[400px] md:w-[500px] h-auto text-black opacity-10" />
 
         {/* Floating Feathers with Animation */}
         <motion.div
@@ -159,9 +152,9 @@ export default function HeroSection() {
               Start Writing
               <motion.div
                 animate={{
-                  x: [0, 10, -10, 0],  // Writing motion sideways
-                  y: [0, -5, 5, 0], // Pen up and down movement
-                  rotate: [0, 5, -5, 0], // Slight rotation for a more realistic writing feel
+                  x: [0, 10, -10, 0],
+                  y: [0, -5, 5, 0],
+                  rotate: [0, 5, -5, 0],
                 }}
                 transition={{
                   duration: 2,
