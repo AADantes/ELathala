@@ -1,12 +1,14 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import StartPrompt from '@/app/writingpage/components/StartPrompt';
 import WritingPage from '@/app/writingpage/components/WritingPage';
 import Header from '@/app/writingpage/components/Header';
 import Sidebar from '@/app/writingpage/components/Sidebar';
+import { UuidProvider, useUuid } from './components/UUIDContext';
 
 export default function Writingpage() {
+  
   const [isWriting, setIsWriting] = useState(false);
   const [timeLimit, setTimeLimit] = useState(0);
   const [wordCount, setWordCount] = useState(0);
@@ -16,9 +18,10 @@ export default function Writingpage() {
   const [title, setTitle] = useState('');
   const [genre, setGenre] = useState('');
   const [topic, setTopic] = useState('');
-  const [bgColor, setBgColor] = useState('#4F8FB7'); // Default background color
+  const [bgColor, setBgColor] = useState('#4F8FB7');
+  const [uuid, setUuid] = useState<string | null>(null);
 
-  // Handling the start of the writing session
+
   const handleStart = (
     time: number,
     words: number,
@@ -39,7 +42,9 @@ export default function Writingpage() {
   };
 
   return (
-    <div className="min-h-screen bg-white flex flex-col">
+    <UuidProvider>
+    
+      <div className="min-h-screen bg-white flex flex-col">
       {/* Header Component */}
       <Header
         onMenuClick={() => setIsSidebarOpen(true)}
@@ -74,5 +79,6 @@ export default function Writingpage() {
         )}
       </div>
     </div>
+    </UuidProvider>
   );
 }

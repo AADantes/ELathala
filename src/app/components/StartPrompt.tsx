@@ -1,8 +1,8 @@
 import React, { useState } from 'react'
-import { Button } from '@/app/components/ui/Button'
-import { Input } from '@/app/components/ui/Input'
-import { Checkbox } from '@/app/components/ui/CheckBox'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/app/components/ui/Select'
+import { Button } from '../writing-results/ui/button'
+import { Input } from '../writing-results/ui/input'
+import { Checkbox } from '../writing-results/ui/checkbox'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../writing-results/ui/select'
 
 interface StartPromptProps {
   onStart: (time: number, words: number, prompt: boolean, selectedPrompt: string) => void

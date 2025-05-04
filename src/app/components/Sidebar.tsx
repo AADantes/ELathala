@@ -1,6 +1,6 @@
 import React from 'react'
 import { X } from 'lucide-react'
-import { Button } from '@/app/components/ui/Button'
+import { Button } from '../writing-results/ui/button'
 import Link from 'next/link'
 
 interface SidebarProps {

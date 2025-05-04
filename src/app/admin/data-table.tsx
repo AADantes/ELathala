@@ -7,7 +7,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/app/components/ui/admintable"
+} from "../writing-results/ui/table"
 
 interface DataTableProps {
   columns: string[]

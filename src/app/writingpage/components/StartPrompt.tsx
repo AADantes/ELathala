@@ -1,10 +1,12 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Button } from '@/app/writingpage/ui/Button';
-import { Input } from '@/app/writingpage/ui/Input';
-import { Checkbox } from '@/app/writingpage/ui/CheckBox';
+import supabase from '../../../../config/supabaseClient';
+import { Button } from '../../writingpage/ui/Button';
+import { Input } from '../..//writingpage/ui/Input';
+import { Checkbox } from '../../writingpage/ui/CheckBox';
 import { useRouter } from 'next/navigation';
+import { useUuid } from './UUIDContext';
 
 interface StartPromptProps {
   onStart: (
@@ -84,7 +86,9 @@ export default function StartPrompt({ onStart }: StartPromptProps) {
   const [timeIsUp, setTimeIsUp] = useState(false);
   const [showStepMessage, setShowStepMessage] = useState(false);
   const [title, setTitle] = useState<string>(''); // Title state
+  const { setGeneratedUuid } = useUuid()
   const router = useRouter();
+
 
   const handleNext = () => {
     if (step < 6) {
@@ -98,20 +102,59 @@ export default function StartPrompt({ onStart }: StartPromptProps) {
     if (step > 1) setStep(step - 1);
   };
 
-  const handleStart = () => {
+
+
+  const handleStart = async () => {
     const time = Number(timeLimit);
     const words = Number(wordCount);
     if (time < 1 || time > 60 || words < 50 || !genre || !topic || !title) return;
-
+  
     const finalPrompt = generatePrompt
       ? prompts[Math.floor(Math.random() * prompts.length)]
       : '';
+  
+    // Call onStart function for starting the process
     onStart(time, words, generatePrompt, finalPrompt, genre, topic, title);
-
+  
+    // Set a timeout for when time is up
     setTimeout(() => {
       setTimeIsUp(true);
     }, time * 60 * 1000);
-  };
+  
+    // Insert the record into Supabase and retrieve the UUID
+    try {
+      const { data, error } = await supabase
+        .from('written_works')
+        .insert([
+          {
+            timelimitSet: time,
+            noOfWordsSet: words,
+            workPrompt: finalPrompt,
+            workGenre: genre,
+            workTopic: topic,
+            workTitle: title,
+          },
+        ])
+        .select('workID');
+  
+        if (error) {
+          console.error('Error inserting data into Supabase:', error);
+          return;
+        }
+    
+        const generatedUuid = data?.[0]?.workID;
+        console.log('Inserted new written work with UUID:', generatedUuid);
+    
+        // Save the UUID to context
+        if (generatedUuid) {
+          setGeneratedUuid(generatedUuid);
+          console.log("UUID of Work: ", generatedUuid);
+        }
+    
+      } catch (err) {
+        console.error('Unexpected error inserting data into Supabase:', err);
+      }
+    };
 
   const isNextDisabled = () => {
     const isTimeInvalid = Number(timeLimit) < 1 || Number(timeLimit) > 60;
@@ -375,4 +418,5 @@ export default function StartPrompt({ onStart }: StartPromptProps) {
       </div>
     </div>
   );
-}
+
+  }

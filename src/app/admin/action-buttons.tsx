@@ -1,6 +1,6 @@
 "use client";
 
-import { Button } from "@/app/components/ui/adminbutton";
+import { Button } from "../homepage/ui/button";
 
 interface ActionButtonsProps {
   onAdd: () => void;

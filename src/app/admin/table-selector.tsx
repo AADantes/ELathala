@@ -1,13 +1,13 @@
 "use client"
 
-import { Label } from "@/app/components/ui/adminlabel"
+import { Label } from "../writing-results/ui/label"
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/app/components/ui/adminselect"
+} from "../writing-results/ui/select"
 
 interface TableSelectorProps {
   tables: string[]

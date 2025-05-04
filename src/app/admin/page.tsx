@@ -6,7 +6,7 @@ import AdminHeader from "@/app/admin/header"
 import TableSelector from "@/app/admin/table-selector"
 import DataTable from "@/app/admin/data-table"
 import RecordForm from "@/app/admin/record-form"
-import { Card, CardContent, CardHeader, CardTitle } from "@/app/components/ui/admincard"
+import { Card, CardContent, CardHeader, CardTitle } from "../homepage/ui/card"
 import supabase from "../../../config/supabaseClient"
 
 export default function AdminPage() {

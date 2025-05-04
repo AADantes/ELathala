@@ -3,9 +3,9 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import supabase from "../../../config/supabaseClient";
-import { Button } from "@/app/components/ui/Button";
-import { Input } from "@/app/components/ui/Input";
-import { Card, CardContent, CardHeader, CardTitle } from "@/app/components/ui/Card";
+import { Button } from "../writing-results/ui/button";
+import { Input } from "../writing-results/ui/input";
+import { Card, CardContent, CardHeader, CardTitle } from "../writing-results/ui/card";
 
 export default function AdminLogin() {
   const router = useRouter();

@@ -3,7 +3,10 @@
 import { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import Footer from './Footer';
-import { Button } from '@/app/writingpage/ui/Button';
+import { Button } from '../../writingpage/ui/Button';
+import supabase from '../../../../config/supabaseClient';
+import { useRouter } from 'next/navigation';
+import { useUuid } from './UUIDContext';
 
 interface WritingPageProps {
   timeLimit: number;
@@ -42,6 +45,8 @@ export default function WritingPage({
   const [blurredWords, setBlurredWords] = useState<string[]>([]);
   const [repeatedWordsWarning, setRepeatedWordsWarning] = useState<string | null>(null);
   const [showDoneModal, setShowDoneModal] = useState(false); // Track when writing is done
+  const router = useRouter();
+  const { generatedUuid } = useUuid();
 
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
   const idleTimeLimit = 30000;
@@ -114,7 +119,7 @@ export default function WritingPage({
       });
       setGrammarErrors(response.data.matches);
     } catch (error) {
-      console.error('Grammar check failed:', error);
+      // Handle error silently
     }
   };
 
@@ -123,7 +128,7 @@ export default function WritingPage({
       const response = await axios.post('https://paraphrasing-api.com/api/v1/paraphrase', { text });
       setParaphrasingSuggestions(response.data.suggestions);
     } catch (error) {
-      console.error('Paraphrasing failed:', error);
+      // Handle error silently
     }
   };
 
@@ -138,31 +143,22 @@ export default function WritingPage({
 
   // Function to validate words
   const isValidWord = (word: string): boolean => {
-    // Exclude words that are less than 2 characters, contain numbers, or are nonsensical
     const regex = /^[a-zA-Z]+$/; // Only allow alphabetic words
     return word.length > 1 && regex.test(word);
   };
 
   // Update word count to exclude invalid words
   const updateWordCount = (textValue: string) => {
-    // Split the text into words using regex to handle extra spaces and special characters
     const rawWords = textValue.trim().split(/\s+/).filter((word) => word !== '');
-
-    // Filter out invalid words
     const validWords = rawWords.filter(isValidWord);
-
-    // Count only valid words
     const totalWords = validWords.length;
-
-    // Update the current word count
     setCurrentWords(totalWords);
   };
 
   const handleTextChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const newText = e.target.value;
-
     setText(newText);
-    updateWordCount(newText); // Update the word count
+    updateWordCount(newText);
     setIsTyping(true);
 
     const foundBadWords = containsBadWords(newText);
@@ -179,6 +175,57 @@ export default function WritingPage({
   const handlePaste = (e: React.ClipboardEvent<HTMLTextAreaElement>) => e.preventDefault();
   const handleCut = (e: React.ClipboardEvent<HTMLTextAreaElement>) => e.preventDefault();
   const handleColorChange = (color: string) => setTextColor(color);
+
+  const HandleResult = async () => {
+    try {
+      // Update written_works table
+      const { error: writtenWorksError } = await supabase
+        .from('written_works')
+        .update({
+          numberofWords: currentWords,
+        })
+        .eq('workID', generatedUuid);
+
+      if (writtenWorksError) {
+        console.error('Error updating written_works in Supabase:', writtenWorksError.message);
+      } else {
+        console.log('written_works updated successfully.');
+      }
+
+      // Get current authenticated user
+      const {
+        data: { user },
+        error: userFetchError,
+      } = await supabase.auth.getUser();
+
+      if (userFetchError) {
+        console.error('Error fetching user from Supabase auth:', userFetchError.message);
+        return;
+      }
+
+      if (!user) {
+        console.warn('No authenticated user found.');
+        return;
+      }
+
+      // Update User table with usercurrentExp and userCredits using user.id
+      const { error: userError } = await supabase
+        .from('User')
+        .update({
+          usercurrentExp: currentWords,
+          userCredits: currentWords * 0.5,
+        })
+        .eq('id', user.id);
+
+      if (userError) {
+        console.error('Error updating User in Supabase:', userError.message);
+      } else {
+        console.log('User updated successfully.');
+      }
+    } catch (err) {
+      console.error('Unexpected error updating data in Supabase:', err);
+    }
+  };
 
   const toggleBlurEffect = (word: string) => {
     setBlurredWords((prev) =>
@@ -213,174 +260,158 @@ export default function WritingPage({
 
   useEffect(() => {
     if (isTimeUp && currentWords >= wordCount) {
-      setShowDoneModal(true); // Show the "You're Done writing" modal after time is up and word count is met
+      setShowDoneModal(true);
     }
   }, [isTimeUp, currentWords, wordCount]);
 
   const handleSkip = () => {
-    setShowDoneModal(true); // Show the "You're Done Writing" modal
+    setShowDoneModal(true);
   };
 
   return (
     <div className="container mx-auto px-6 py-8 bg-white text-black min-h-screen flex flex-col relative pb-24">
-
-{/* Display Title, Genre, and Topic */}
-<div className="mb-6 bg-white p-4 rounded-xl border border-gray-200 shadow-md">
-  <h1 className="text-3xl font-bold text-[#0077b6] mb-4">{title || 'Untitled'}</h1>
-  {genre && (
-    <p className="text-lg text-gray-700">
-      <strong>Genre:</strong> {genre}
-    </p>
-  )}
-  {topics.length > 0 && (
-    <p className="text-lg text-gray-700">
-      <strong>Topic:</strong> {topics.join(', ')}
-    </p>
-  )}
-</div>
-
-{/* You're Done Writing Modal */}
-{showDoneModal && (
-  <div className="fixed inset-0 flex items-center justify-center bg-sky-100 z-50 p-6">
-    <div className="text-center bg-white rounded-2xl shadow-xl p-10 max-w-md w-full border border-sky-200 animate-fadeIn">
-      {/* Done Icon */}
-      <div className="mx-auto mb-6 w-16 h-16 bg-gradient-to-br from-sky-400 to-sky-600 rounded-full flex items-center justify-center shadow-lg animate-pop">
-        <svg
-          className="w-8 h-8 text-white"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth={2.5}
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        >
-          <path d="M5 13l4 4L19 7" />
-        </svg>
+      {/* Display Title, Genre, and Topic */}
+      <div className="mb-6 bg-white p-4 rounded-xl border border-gray-200 shadow-md">
+        <h1 className="text-3xl font-bold text-[#0077b6] mb-4">{title || 'Untitled'}</h1>
+        {genre && (
+          <p className="text-lg text-gray-700">
+            <strong>Genre:</strong> {genre}
+          </p>
+        )}
+        {topics.length > 0 && (
+          <p className="text-lg text-gray-700">
+            <strong>Topic:</strong> {topics.join(', ')}
+          </p>
+        )}
       </div>
 
-      <h1 className="text-2xl md:text-3xl font-semibold text-black mb-2">
-        You're Done Writing!
-      </h1>
-      <p className="text-black mb-6">Your progress has been saved</p>
+      {/* You're Done Writing Modal */}
+      {showDoneModal && (
+        <div className="fixed inset-0 flex items-center justify-center bg-sky-100 z-50 p-6">
+          <div className="text-center bg-white rounded-2xl shadow-xl p-10 max-w-md w-full border border-sky-200 animate-fadeIn">
+            {/* Done Icon */}
+            <div className="mx-auto mb-6 w-16 h-16 bg-gradient-to-br from-sky-400 to-sky-600 rounded-full flex items-center justify-center shadow-lg animate-pop">
+              <svg
+                className="w-8 h-8 text-white"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth={2.5}
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M5 13l4 4L19 7" />
+              </svg>
+            </div>
 
-      <div className="flex justify-center gap-4">
-        {/* Back to Home Button */}
-        <Button
-          onClick={() => (window.location.href = '/')}
-          className="bg-sky-900 hover:bg-sky-700 text-white px-6 py-3 text-md rounded-full transition-all duration-300 transform hover:scale-105 hover:shadow-lg"
-        >
-          Back to Home
-        </Button>
+            <h1 className="text-2xl md:text-3xl font-semibold text-black mb-2">
+              You're Done Writing!
+            </h1>
+            <p className="text-black mb-6">Your progress has been saved</p>
 
-        {/* New Button - Next Level */}
-        <Button
-          onClick={() => alert('New button clicked!')}
-          className="bg-sky-900 text-white px-6 py-3 text-md rounded-full transition-all duration-400 transform hover:scale-105 hover:rotate-1 hover:shadow-2xl hover:bg-sky-600 focus:ring-4 focus:ring-sky-300 focus:outline-none"
-        >
-          Next Level
-        </Button>
-      </div>
+            <div className="flex justify-center gap-4">
+              {/* Back to Home Button */}
+              <Button
+                onClick={() => (router.push('/homepage'))}
+                className="bg-sky-900 hover:bg-sky-700 text-white px-6 py-3 text-md rounded-full transition-all duration-300 transform hover:scale-105 hover:shadow-lg"
+              >
+                Back to Home
+              </Button>
 
-      {/* Enhanced Rewards Section */}
-      <div className="mt-10 flex justify-center gap-5 flex-wrap">
-        {/* XP Earned */}
-        <div className="flex items-center justify-center gap-4 px-8 py-4 bg-white rounded-2xl shadow-lg border border-blue-200 hover:shadow-xl transform transition-all duration-300 hover:scale-105 w-full max-w-md">
-          <div className="bg-gradient-to-br from-yellow-400 to-yellow-600 text-white w-10 h-10 rounded-full flex items-center justify-center shadow-md animate-bounce-slow">
-            <span className="text-lg">⭐</span>
-          </div>
-          <div className="text-center">
-            <div className="text-lg font-bold text-sky-700">+120 XP</div>
-            <div className="text-sm text-black font-medium">XP Earned</div>
-          </div>
-        </div>
+              {/* New Button - Next Level */}
+              <Button
+                onClick={async () => {
+                  await HandleResult()
+                  router.push('/writingresults');
+                }}
+                className="bg-sky-900 text-white px-6 py-3 text-md rounded-full transition-all duration-400 transform hover:scale-105 hover:rotate-1 hover:shadow-2xl hover:bg-sky-600 focus:ring-4 focus:ring-sky-300 focus:outline-none"
+              >
+                View Results
+              </Button>
+            </div>
 
-        {/* Credits Earned */}
-        <div className="flex items-center justify-center gap-4 px-8 py-4 bg-white rounded-2xl shadow-lg border border-indigo-200 hover:shadow-xl transform transition-all duration-300 hover:scale-105 w-full max-w-md">
-          <div className="bg-gradient-to-br from-indigo-400 to-indigo-700 text-white w-10 h-10 rounded-full flex items-center justify-center shadow-md animate-bounce-slow">
-            <span className="text-lg">🛡️</span>
-          </div>
-          <div className="text-center">
-            <div className="text-lg font-bold text-sky-700">+40 Credits</div>
-            <div className="text-sm text-black font-medium">Credits Earned</div>
+     
+            <div className="mt-10 flex justify-center gap-5 flex-wrap">
+              {/* XP Earned */}
+
+
+              {/* Credits Earned */}
+
+            </div>
           </div>
         </div>
-      </div>
-    </div>
-  </div>
-)}
+      )}
 
-{/* Time’s Up Modal */}
-{isTimeUp && currentWords < wordCount && (
-  <div className="fixed inset-0 flex items-center justify-center bg-red-50 z-50 p-6">
-    <div className="text-center bg-white rounded-2xl shadow-xl p-10 max-w-md w-full border border-red-200 animate-fadeIn">
-      
-      {/* Time’s Up Icon */}
-      <div className="mx-auto mb-6 w-16 h-16 bg-gradient-to-br from-red-400 to-red-600 rounded-full flex items-center justify-center shadow-lg animate-pop">
-        <svg
-          className="w-8 h-8 text-white"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth={2.5}
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        >
-          <path d="M18 6L6 18M6 6l12 12" />
-        </svg>
-      </div>
+      {/* Time’s Up Modal */}
+      {isTimeUp && currentWords < wordCount && (
+        <div className="fixed inset-0 flex items-center justify-center bg-red-50 z-50 p-6">
+          <div className="text-center bg-white rounded-2xl shadow-xl p-10 max-w-md w-full border border-red-200 animate-fadeIn">
+            {/* Time’s Up Icon */}
+            <div className="mx-auto mb-6 w-16 h-16 bg-gradient-to-br from-red-400 to-red-600 rounded-full flex items-center justify-center shadow-lg animate-pop">
+              <svg
+                className="w-8 h-8 text-white"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth={2.5}
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M18 6L6 18M6 6l12 12" />
+              </svg>
+            </div>
 
-      <h1 className="text-2xl md:text-3xl font-semibold text-gray-900 mb-2">
-        Time’s up!
-      </h1>
-      <p className="text-gray-600 mb-6">
-        You wrote {currentWords} words. You didn’t finish your writing in time. Try again or keep practicing!
-      </p>
+            <h1 className="text-2xl md:text-3xl font-semibold text-gray-900 mb-2">
+              Time’s up!
+            </h1>
+            <p className="text-gray-600 mb-6">
+              You wrote {currentWords} words. You didn’t finish your writing in time. Try again or keep practicing!
+            </p>
 
-      {/* Continue Button (Buy with Credits) */}
-      <div className="flex justify-center mb-6">
-        <Button
-          onClick={() => alert('Continue writing with credits.')}
-          className="bg-sky-700 hover:bg-sky-800 text-white text-md font-semibold rounded-full transition-all duration-300 transform hover:scale-105 hover:shadow-xl w-64 py-3"
-        >
-          Continue (Buy with Credits)
-        </Button>
-      </div>
+            {/* Continue Button (Buy with Credits) */}
+            <div className="flex justify-center mb-6">
+              <Button
+                onClick={() => alert('Continue writing with credits.')}
+                className="bg-sky-700 hover:bg-sky-800 text-white text-md font-semibold rounded-full transition-all duration-300 transform hover:scale-105 hover:shadow-xl w-64 py-3"
+              >
+                Continue (Buy with Credits)
+              </Button>
+            </div>
 
-{/* Save and Delete Buttons - Side by Side */}
-<div className="flex justify-center space-x-4 mb-6">
-  {/* Save Button with Confirmation */}
-  <Button
-    onClick={() => {
-      const confirmed = window.confirm('Do you want to save your progress using credits?');
-      if (confirmed) {
-        alert('Progress saved!');
-        // Add your save logic here
-      }
-    }}
-    className="bg-white text-sky-600 border-2 border-sky-600 text-md rounded-md transition-all duration-300 transform hover:scale-105 hover:shadow-lg w-36 py-3"
-  >
-    Save (Credits)
-  </Button>
+            {/* Save and Delete Buttons - Side by Side */}
+            <div className="flex justify-center space-x-4 mb-6">
+              {/* Save Button with Confirmation */}
+              <Button
+                onClick={() => {
+                  const confirmed = window.confirm('Do you want to save your progress using credits?');
+                  if (confirmed) {
+                    alert('Progress saved!');
+                    // Add your save logic here
+                  }
+                }}
+                className="bg-white text-sky-600 border-2 border-sky-600 text-md rounded-md transition-all duration-300 transform hover:scale-105 hover:shadow-lg w-36 py-3"
+              >
+                Save (Credits)
+              </Button>
 
-  {/* Delete Button with Confirmation */}
-  <Button
-    onClick={() => {
-      const confirmed = window.confirm('Are you sure you want to delete this session? This action cannot be undone.');
-      if (confirmed) {
-        alert('Session deleted!');
-        // Add your delete logic here
-      }
-    }}
-    className="bg-white text-red-600 border-2 border-red-600 text-md rounded-md transition-all duration-300 transform hover:scale-105 hover:shadow-lg w-36 py-3"
-  >
-    Delete Session
-  </Button>
-</div>
-
-
-    </div>
-  </div>
-)}
+              {/* Delete Button with Confirmation */}
+              <Button
+                onClick={async () => {
+                  const confirmed = window.confirm('Are you sure you want to delete this session? This action cannot be undone.');
+                  if (confirmed) {
+                    await HandleResult();
+                    alert('Session deleted!');
+                    router.push('/homepage');
+                  }
+                }}
+                className="bg-white text-red-600 border-2 border-red-600 text-md rounded-md transition-all duration-300 transform hover:scale-105 hover:shadow-lg w-36 py-3"
+              >
+                Delete Session
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Toolbar */}
       <div className="flex justify-between items-center mb-6">
@@ -431,8 +462,8 @@ export default function WritingPage({
         </div>
       </div>
 
-      {/* Writing & Preview Section */}
-      <div className="flex gap-8 flex-grow h-[550px]">
+  {/* Writing & Preview Section */}
+  <div className="flex gap-8 flex-grow h-[550px]">
         {/* Writing Area */}
         <div className="w-full md:w-2/3 bg-white p-6 border rounded-lg shadow-lg flex flex-col h-full">
           <textarea
