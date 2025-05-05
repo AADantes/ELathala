@@ -25,11 +25,13 @@ export default function Header() {
   const [signUpEmail, setSignUpEmail] = useState('');
   const [signUpUsername, setSignUpUsername] = useState('');
   const [signUpPassword, setSignUpPassword] = useState('');
+  const [loginError, setLoginError] = useState<string | null>(null);
   const router = useRouter();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+    setLoginError(null);
 
     const { data, error } = await supabase.auth.signInWithPassword({
       email: loginEmail,
@@ -38,10 +40,12 @@ export default function Header() {
 
     setIsLoading(false);
 
-    if (!error) {
-      router.push('/homepage');
+    if (error) {
+      setLoginError("Invalid email or password. Please try again.");
+      return;
     }
 
+    router.push('/homepage');
     setLoginEmail('');
     setLoginPassword('');
   };
@@ -141,14 +145,6 @@ export default function Header() {
           </span>
         </Link>
 
-        {/* Desktop Nav */}
-        <nav className="hidden lg:flex gap-6 items-center">
-          <Link href="/" className="text-white font-bold relative group hover:text-sky-950">Home</Link>
-          <Link href="#about" className="text-white font-bold relative group hover:text-sky-950">About</Link>
-          <Link href="#features" className="text-white font-bold relative group hover:text-sky-950">Features</Link>
-          <Link href="#how-it-works" className="text-white font-bold relative group hover:text-sky-950">How It Works</Link>
-        </nav>
-
         {/* Auth Buttons */}
         <nav className="flex gap-2 items-center">
           <Button
@@ -162,7 +158,6 @@ export default function Header() {
           <Dialog open={isLoginOpen} onOpenChange={setIsLoginOpen}>
             <DialogContent className="sm:max-w-[425px]">
               <DialogHeader className="flex flex-col items-center">
-                <img src="/logos/logo.png" alt="E-Lathala Logo" className="h-16 mb-2" />
                 <DialogTitle className="text-[#005A8C] text-xl text-center">Log in to E-Lathala</DialogTitle>
                 <DialogDescription className="text-center">Enter your email and password to access your account.</DialogDescription>
               </DialogHeader>
@@ -175,6 +170,9 @@ export default function Header() {
                   <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
                   <Input id="password" type="password" placeholder="Password" value={loginPassword} onChange={(e) => setLoginPassword(e.target.value)} required className="pl-10" />
                 </div>
+                {loginError && (
+                  <p className="text-red-500 text-sm text-center">{loginError}</p>
+                )}
                 <Button type="submit" className="w-full bg-[#0074B7] text-white hover:bg-[#005A8C] font-bold transition-colors rounded-lg" disabled={isLoading}>
                   {isLoading ? 'Logging in...' : 'Log In'}
                 </Button>
@@ -194,7 +192,6 @@ export default function Header() {
           <Dialog open={isSignUpOpen} onOpenChange={setIsSignUpOpen}>
             <DialogContent className="sm:max-w-[425px]">
               <DialogHeader className="flex flex-col items-center">
-                <img src="/logos/logo.png" alt="E-Lathala Logo" className="h-16 mb-2" />
                 <DialogTitle className="text-[#005A8C] text-xl text-center">Sign Up</DialogTitle>
                 <DialogDescription className="font-bold text-center">Join E-Lathala by creating an account.</DialogDescription>
               </DialogHeader>
@@ -248,16 +245,6 @@ export default function Header() {
           </Dialog>
         </nav>
       </div>
-
-      {/* Mobile Menu */}
-      {isMenuOpen && (
-        <nav className="lg:hidden bg-[#2C3E50] text-white p-4 absolute top-20 left-0 w-full">
-          <Link href="/" className="block py-2 text-lg font-bold relative group">Home</Link>
-          <Link href="#about" className="block py-2 text-lg font-bold relative group">About</Link>
-          <Link href="#features" className="block py-2 text-lg font-bold relative group">Features</Link>
-          <Link href="#how-it-works" className="block py-2 text-lg font-bold relative group">How It Works</Link>
-        </nav>
-      )}
     </header>
   );
 }
