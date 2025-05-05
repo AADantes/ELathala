@@ -4,11 +4,12 @@ import Link from "next/link";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from 'framer-motion';
-import { Menu, LogOut, Home, Edit, User, Award, HelpCircle, Pen, X, Store } from 'lucide-react'; // Replaced ShoppingCart with Store
+import {
+  Menu, LogOut, Home, Edit, User, Award, HelpCircle, X, Store
+} from 'lucide-react';
 import { Bebas_Neue } from 'next/font/google';
 import supabase from '../../../../config/supabaseClient';
 
-// Load the Bebas Neue font
 const bebasNeue = Bebas_Neue({
   subsets: ['latin'],
   weight: '400',
@@ -16,7 +17,7 @@ const bebasNeue = Bebas_Neue({
 
 export function Header() {
   const [showSidebar, setShowSidebar] = useState(false);
-  const [user, setUser] = useState<{ username: string; userLevel: number } | null>(null);
+  const [user, setUser] = useState<{ username: string; userLevel: number; avatar_url?: string } | null>(null);
   const router = useRouter();
 
   useEffect(() => {
@@ -33,7 +34,7 @@ export function Header() {
 
       const { data, error } = await supabase
         .from('User')
-        .select('username, userLevel')
+        .select('username, userLevel, avatar_url')
         .eq('id', user.id)
         .single();
 
@@ -49,15 +50,14 @@ export function Header() {
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
-    router.push('/landingpage'); // Redirect to landing page after logout
+    router.push('/landingpage');
   };
 
   return (
     <header className="border-b border-transparent bg-[#4F8FB7]">
       <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-        {/* Menu Icon and Brand on the left */}
+        {/* Left Side */}
         <div className="flex items-center space-x-4">
-          {/* Menu Icon */}
           <button
             onClick={() => setShowSidebar(true)}
             className="text-white hover:text-sky-950 transition-transform transform hover:scale-110 duration-300"
@@ -65,21 +65,20 @@ export function Header() {
             <Menu className="h-7 w-7" />
           </button>
 
-          {/* Brand and Logo */}
           <div className="flex items-center space-x-2 ml-4">
-            <img src="/logos/logo.png" alt="E-Lathala Logo" className="h-12 w-12 text-white" />
+            <img src="/logos/logo.png" alt="E-Lathala Logo" className="h-12 w-12" />
             <span className={`font-bold text-3xl text-white ${bebasNeue.className}`}>
               E-LATHALA
             </span>
           </div>
         </div>
 
-        {/* Shop Button */}
+        {/* Right Side */}
         <button
-          onClick={() => router.push('/shop')} // Redirect to the shop page
+          onClick={() => router.push('/shop')}
           className="text-white hover:text-sky-950 transition-transform transform hover:scale-110 duration-300"
         >
-          <Store className="h-7 w-7" /> {/* Changed icon to Store */}
+          <Store className="h-7 w-7" />
         </button>
       </div>
 
@@ -87,7 +86,6 @@ export function Header() {
       <AnimatePresence>
         {showSidebar && (
           <>
-            {/* Overlay to close the sidebar when clicked outside */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 0.5 }}
@@ -96,7 +94,6 @@ export function Header() {
               className="fixed top-0 left-0 right-0 bottom-0 bg-black bg-opacity-50 z-40"
             />
 
-            {/* Sidebar container */}
             <motion.div
               initial={{ x: -384 }}
               animate={{ x: 0 }}
@@ -104,7 +101,6 @@ export function Header() {
               transition={{ type: 'tween', ease: 'easeInOut', duration: 0.3 }}
               className="fixed top-0 left-0 z-50 h-full w-96 bg-white shadow-xl overflow-hidden"
             >
-              {/* Close Button */}
               <button
                 onClick={() => setShowSidebar(false)}
                 className="absolute top-4 right-4 text-2xl text-gray-700 hover:text-gray-900"
@@ -114,18 +110,28 @@ export function Header() {
 
               {/* User Info */}
               <div className="py-8 px-8 bg-sky-50 text-center">
-                <div className="w-20 h-20 bg-sky-600 text-white rounded-full flex items-center justify-center mx-auto text-3xl font-bold">
-                  {user ? user.username.charAt(0).toUpperCase() : "?"}
-                </div>
+                {user?.avatar_url ? (
+                  <img
+                    src={user.avatar_url}
+                    alt="Profile"
+                    className="w-20 h-20 rounded-full mx-auto object-cover"
+                  />
+                ) : (
+                  <div className="w-20 h-20 bg-sky-600 text-white rounded-full flex items-center justify-center mx-auto text-3xl font-bold">
+                    {user?.username?.charAt(0).toUpperCase() || "?"}
+                  </div>
+                )}
                 <p className="mt-3 text-lg font-bold text-gray-800">
                   {user ? user.username : "Loading..."}
                 </p>
-                <p className="text-base text-gray-500 font-bold">Writer Level {user ? user.userLevel : "..."}</p>
+                <p className="text-base text-gray-500 font-bold">
+                  Writer Level {user ? user.userLevel : "..."}
+                </p>
               </div>
 
               <hr className="border-gray-200" />
 
-              {/* Sidebar Links */}
+              {/* Navigation */}
               <ul className="py-4 font-semibold space-y-3">
                 <li>
                   <Link
@@ -172,8 +178,6 @@ export function Header() {
                     Help & Support
                   </Link>
                 </li>
-
-                {/* Logout Button */}
                 <li>
                   <button
                     onClick={handleLogout}
