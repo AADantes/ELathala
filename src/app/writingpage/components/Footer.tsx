@@ -70,7 +70,7 @@ export default function Footer({ currentWords, targetWords, timeLeft, onSkip }: 
       onClick={onSkip} // Call the onSkip function when clicked
     >
       <SkipForward className="w-5 h-5" />
-      <span>Skip</span>
+      <span>Done</span>
     </button>
     
        

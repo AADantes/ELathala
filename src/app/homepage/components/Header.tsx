@@ -1,56 +1,56 @@
-"use client"
+"use client";
 
-import Link from 'next/link'
-import { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
-import { motion, AnimatePresence } from 'framer-motion'
-import { Menu, LogOut, Home, Edit, User, Award, HelpCircle, Pen, X } from 'lucide-react'
-import { Bebas_Neue } from 'next/font/google'
-import supabase from '../../../../config/supabaseClient'
+import Link from "next/link";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { motion, AnimatePresence } from 'framer-motion';
+import { Menu, LogOut, Home, Edit, User, Award, HelpCircle, Pen, X, Store } from 'lucide-react'; // Replaced ShoppingCart with Store
+import { Bebas_Neue } from 'next/font/google';
+import supabase from '../../../../config/supabaseClient';
 
 // Load the Bebas Neue font
 const bebasNeue = Bebas_Neue({
   subsets: ['latin'],
   weight: '400',
-})
+});
 
 export function Header() {
-  const [showSidebar, setShowSidebar] = useState(false)
-  const [user, setUser] = useState<{ username: string; userLevel: number } | null>(null)
-  const router = useRouter()
+  const [showSidebar, setShowSidebar] = useState(false);
+  const [user, setUser] = useState<{ username: string; userLevel: number } | null>(null);
+  const router = useRouter();
 
   useEffect(() => {
     const fetchUser = async () => {
       const {
         data: { user },
         error: authError,
-      } = await supabase.auth.getUser()
+      } = await supabase.auth.getUser();
 
       if (authError || !user) {
-        console.error('Error fetching auth user:', authError)
-        return
+        console.error('Error fetching auth user:', authError);
+        return;
       }
 
       const { data, error } = await supabase
         .from('User')
         .select('username, userLevel')
         .eq('id', user.id)
-        .single()
+        .single();
 
       if (error) {
-        console.error('Error fetching user data:', error)
+        console.error('Error fetching user data:', error);
       } else {
-        setUser(data)
+        setUser(data);
       }
-    }
+    };
 
-    fetchUser()
-  }, [])
+    fetchUser();
+  }, []);
 
   const handleLogout = async () => {
-    await supabase.auth.signOut()
-    router.push('/landingpage') // Redirect to landing page after logout
-  }
+    await supabase.auth.signOut();
+    router.push('/landingpage'); // Redirect to landing page after logout
+  };
 
   return (
     <header className="border-b border-transparent bg-[#4F8FB7]">
@@ -66,13 +66,21 @@ export function Header() {
           </button>
 
           {/* Brand and Logo */}
-          <div className="flex items-center space-x-2 ml-4"> {/* Increased left margin */}
-            <img src="/logos/logo.png" alt="E-Lathala Logo" className="h-12 w-12 text-white" /> {/* Logo size */}
-            <span className={`font-bold text-3xl text-white ${bebasNeue.className}`}> {/* Further decreased text size */}
+          <div className="flex items-center space-x-2 ml-4">
+            <img src="/logos/logo.png" alt="E-Lathala Logo" className="h-12 w-12 text-white" />
+            <span className={`font-bold text-3xl text-white ${bebasNeue.className}`}>
               E-LATHALA
             </span>
           </div>
         </div>
+
+        {/* Shop Button */}
+        <button
+          onClick={() => router.push('/shop')} // Redirect to the shop page
+          className="text-white hover:text-sky-950 transition-transform transform hover:scale-110 duration-300"
+        >
+          <Store className="h-7 w-7" /> {/* Changed icon to Store */}
+        </button>
       </div>
 
       {/* Sidebar */}
@@ -90,11 +98,11 @@ export function Header() {
 
             {/* Sidebar container */}
             <motion.div
-              initial={{ x: -384 }} // Sidebar starting position off the screen
-              animate={{ x: 0 }} // Move to the visible position (0, aligned to the left)
-              exit={{ x: -384 }} // Exit the sidebar off the screen
-              transition={{ type: 'tween', ease: 'easeInOut', duration: 0.3 }} // Smooth sliding effect with no bouncing
-              className="fixed top-0 left-0 z-50 h-full w-96 bg-white shadow-xl overflow-hidden" // Removed rounded-r-3xl class
+              initial={{ x: -384 }}
+              animate={{ x: 0 }}
+              exit={{ x: -384 }}
+              transition={{ type: 'tween', ease: 'easeInOut', duration: 0.3 }}
+              className="fixed top-0 left-0 z-50 h-full w-96 bg-white shadow-xl overflow-hidden"
             >
               {/* Close Button */}
               <button
@@ -120,8 +128,8 @@ export function Header() {
               {/* Sidebar Links */}
               <ul className="py-4 font-semibold space-y-3">
                 <li>
-                  <Link 
-                    href="/homepage" 
+                  <Link
+                    href="/homepage"
                     className="flex items-center px-6 py-3 text-lg text-black transition-all duration-300 hover:bg-gray-100 hover:scale-105 hover:shadow-lg rounded-xl"
                   >
                     <Home className="h-7 w-7 mr-4 text-blue-500" />
@@ -129,8 +137,8 @@ export function Header() {
                   </Link>
                 </li>
                 <li>
-                  <Link 
-                    href="/works" 
+                  <Link
+                    href="/works"
                     className="flex items-center px-6 py-3 text-lg text-black transition-all duration-300 hover:bg-gray-100 hover:scale-105 hover:shadow-lg rounded-xl"
                   >
                     <Edit className="h-7 w-7 mr-4 text-violet-500" />
@@ -138,8 +146,8 @@ export function Header() {
                   </Link>
                 </li>
                 <li>
-                  <Link 
-                    href="/account-settings" 
+                  <Link
+                    href="/account-settings"
                     className="flex items-center px-6 py-3 text-lg text-black transition-all duration-300 hover:bg-gray-100 hover:scale-105 hover:shadow-lg rounded-xl"
                   >
                     <User className="h-7 w-7 mr-4 text-teal-500" />
@@ -147,8 +155,8 @@ export function Header() {
                   </Link>
                 </li>
                 <li>
-                  <Link 
-                    href="/level-rewards" 
+                  <Link
+                    href="/level-rewards"
                     className="flex items-center px-6 py-3 text-lg text-black transition-all duration-300 hover:bg-gray-100 hover:scale-105 hover:shadow-lg rounded-xl"
                   >
                     <Award className="h-7 w-7 mr-4 text-yellow-500" />
@@ -156,8 +164,8 @@ export function Header() {
                   </Link>
                 </li>
                 <li>
-                  <Link 
-                    href="/help" 
+                  <Link
+                    href="/help"
                     className="flex items-center px-6 py-3 text-lg text-black transition-all duration-300 hover:bg-gray-100 hover:scale-105 hover:shadow-lg rounded-xl"
                   >
                     <HelpCircle className="h-7 w-7 mr-4 text-red-500" />
@@ -181,5 +189,5 @@ export function Header() {
         )}
       </AnimatePresence>
     </header>
-  )
+  );
 }

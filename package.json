@@ -48,6 +48,7 @@
     "feather-icons": "^4.29.2",
     "framer-motion": "^11.18.2",
     "input-otp": "^1.4.2",
+    "languagetool-api": "^1.1.2",
     "lucide-react": "^0.452.0",
     "mongoose": "^8.8.0",
     "next": "^14.2.17",
