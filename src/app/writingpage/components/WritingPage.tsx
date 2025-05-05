@@ -271,7 +271,7 @@ export default function WritingPage({
   return (
     <div className="container mx-auto px-6 py-8 bg-white text-black min-h-screen flex flex-col relative pb-24">
     {/* Display Title, Genre, and Topic */}
-<div className="mb-6 text-center">
+<div className="mb-6">
   <h1 className="text-3xl font-bold text-black mb-4">{title || 'Untitled'}</h1>
   {genre && (
     <p className="text-lg text-gray-700">

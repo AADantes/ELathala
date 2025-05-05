@@ -17,7 +17,13 @@ const bebasNeue = Bebas_Neue({
 
 export function Header() {
   const [showSidebar, setShowSidebar] = useState(false);
-  const [user, setUser] = useState<{ username: string; userLevel: number; avatar_url?: string } | null>(null);
+  const [user, setUser] = useState<{
+    username: string;
+    userLevel: number;
+    xp: string;
+    credits: number;
+    avatar_url?: string;
+  } | null>(null);
   const router = useRouter();
 
   useEffect(() => {
@@ -34,7 +40,7 @@ export function Header() {
 
       const { data, error } = await supabase
         .from('User')
-        .select('username, userLevel, avatar_url')
+        .select('username, userLevel, xp, credits, avatar_url')
         .eq('id', user.id)
         .single();
 
@@ -74,12 +80,30 @@ export function Header() {
         </div>
 
         {/* Right Side */}
-        <button
-          onClick={() => router.push('/shop')}
-          className="text-white hover:text-sky-950 transition-transform transform hover:scale-110 duration-300"
-        >
-          <Store className="h-7 w-7" />
-        </button>
+        <div className="flex items-center space-x-4">
+          {/* Stats Display */}
+          <div className="flex items-center space-x-2">
+            {/* Level */}
+            <div className="flex items-center justify-center w-20 h-8 px-2 py-1 bg-white rounded-full shadow-sm">
+              <span className="text-lg mr-1">✒️</span>
+              <span className="text-sm font-bold">{user?.userLevel ?? 1}</span>
+            </div>
+
+            {/* XP */}
+            <div className="flex items-center justify-center w-20 h-8 px-2 py-1 bg-white rounded-full shadow-sm">
+              <span className="text-sm text-blue-600 font-semibold mr-1">XP</span>
+              <span className="text-sm font-bold">{user?.xp ?? "0.0"}</span>
+            </div>
+          </div>
+
+          {/* Shop Button */}
+          <button
+            onClick={() => router.push('/shop')}
+            className="text-white hover:text-sky-950 transition-transform transform hover:scale-110 duration-300"
+          >
+            <Store className="h-7 w-7" />
+          </button>
+        </div>
       </div>
 
       {/* Sidebar */}
@@ -125,8 +149,7 @@ export function Header() {
                   {user ? user.username : "Loading..."}
                 </p>
                 <p className="text-base text-gray-500 font-bold">
-                  Writer Level {user ? user.userLevel : "..."}
-                </p>
+                  Writer Level {user ? user.userLevel : "..."}</p>
               </div>
 
               <hr className="border-gray-200" />

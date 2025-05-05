@@ -103,7 +103,7 @@ export default function Sidebar({ isOpen, onClose, bgColor }: SidebarProps) {
             </li>
             <li>
               <Link
-                href="/profile"
+                href="/account-settings" // Updated path to route to the Account Settings page
                 className={`flex items-center space-x-4 py-3 px-4 rounded-lg bg-white shadow-md shadow-black/30 transition-all duration-300 ease-in-out transform hover:scale-105 hover:bg-[${hoverBgColor}] group`}
               >
                 <User
@@ -113,7 +113,7 @@ export default function Sidebar({ isOpen, onClose, bgColor }: SidebarProps) {
                   }}
                 />
                 <span className="text-black font-bold transition-all duration-300 group-hover:text-black">
-                  Profile
+                  Account Settings
                 </span>
               </Link>
             </li>
