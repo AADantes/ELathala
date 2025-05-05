@@ -114,137 +114,159 @@ export default function Header() {
   };
 
   return (
-    <header className="fixed top-0 left-0 w-full h-20 flex items-center bg-[#4F8FB7] text-white z-50">
-      <div className="container mx-auto flex items-center justify-between px-4 w-full">
+    <>
+      <header className="fixed top-0 left-0 w-full h-20 flex items-center bg-[#4F8FB7] text-white z-50">
+        <div className="container mx-auto flex items-center justify-between px-4 w-full">
 
-        {/* Mobile Menu Button */}
-        <div className="lg:hidden flex items-center pr-4">
-          <Button
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
-            className="text-white bg-transparent border-none focus:outline-none"
-          >
-            {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-          </Button>
-        </div>
+          {/* Mobile Menu Button */}
+          <div className="lg:hidden flex items-center pr-4">
+            <Button
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              className="text-white bg-transparent border-none focus:outline-none"
+            >
+              {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+            </Button>
+          </div>
 
-        {/* Logo and Text */}
-        <Link className="flex items-center space-x-3" href="/">
-          <img
-            src="/logos/logo.png"
-            alt="E-Lathala Logo"
-            className="h-12 w-auto"
-          />
-          <span
-            className={`font-bold text-3xl text-white ${bebasNeue.className}`}
-            style={{
-              letterSpacing: '1px',
-              textShadow: '1px 1px 2px rgba(0, 0, 0, 0.3)',
-            }}
-          >
-            E-LATHALA
-          </span>
-        </Link>
+          {/* Logo and Text */}
+          <Link className="flex items-center space-x-3" href="/">
+            <img
+              src="/logos/logo.png"
+              alt="E-Lathala Logo"
+              className="h-12 w-auto"
+            />
+            <span
+              className={`font-bold text-3xl text-white ${bebasNeue.className}`}
+              style={{
+                letterSpacing: '1px',
+                textShadow: '1px 1px 2px rgba(0, 0, 0, 0.3)',
+              }}
+            >
+              E-LATHALA
+            </span>
+          </Link>
 
-        {/* Auth Buttons */}
-        <nav className="flex gap-2 items-center">
-          <Button
-            className="text-white border-2 border-white bg-transparent hover:bg-white hover:text-[#0074B7] hover:border-[#0074B7] transition-colors font-bold rounded-lg"
-            onClick={() => setIsLoginOpen(true)}
-          >
-            Log In
-          </Button>
+          {/* Center-aligned Navigation Buttons */}
+          <nav className="hidden lg:flex flex-1 justify-center space-x-6">
+            <Link href="/" className="text-white font-bold hover:text-black">Home</Link>
+            <Link href="#about" className="text-white font-bold hover:text-black">About</Link>
+            <Link href="#features" className="text-white font-bold hover:text-black">Features</Link>
+            <Link href="#how-it-works" className="text-white font-bold hover:text-black">How it Works</Link>
+          </nav>
 
-          {/* Login Dialog */}
-          <Dialog open={isLoginOpen} onOpenChange={setIsLoginOpen}>
-            <DialogContent className="sm:max-w-[425px]">
-              <DialogHeader className="flex flex-col items-center">
-                <DialogTitle className="text-[#005A8C] text-xl text-center">Log in to E-Lathala</DialogTitle>
-                <DialogDescription className="text-center">Enter your email and password to access your account.</DialogDescription>
-              </DialogHeader>
-              <form onSubmit={handleLogin} className="space-y-4 mt-4">
-                <div className="space-y-2 relative">
-                  <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-                  <Input id="email" type="email" placeholder="Email" value={loginEmail} onChange={(e) => setLoginEmail(e.target.value)} required className="pl-10" />
-                </div>
-                <div className="space-y-2 relative">
-                  <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-                  <Input id="password" type="password" placeholder="Password" value={loginPassword} onChange={(e) => setLoginPassword(e.target.value)} required className="pl-10" />
-                </div>
-                {loginError && (
-                  <p className="text-red-500 text-sm text-center">{loginError}</p>
-                )}
-                <Button type="submit" className="w-full bg-[#0074B7] text-white hover:bg-[#005A8C] font-bold transition-colors rounded-lg" disabled={isLoading}>
-                  {isLoading ? 'Logging in...' : 'Log In'}
-                </Button>
-              </form>
-            </DialogContent>
-          </Dialog>
+          {/* Auth Buttons */}
+          <nav className="flex gap-2 items-center">
+            <Button
+              className="text-white border-2 border-white bg-transparent hover:bg-white hover:text-[#0074B7] hover:border-[#0074B7] transition-colors font-bold rounded-lg"
+              onClick={() => setIsLoginOpen(true)}
+            >
+              Log In
+            </Button>
 
-          {/* Sign Up Button */}
-          <Button
-            className="bg-[#4FC3F7] text-white font-bold hover:bg-[#0288D1] rounded-lg transition-colors"
-            onClick={() => setIsSignUpOpen(true)}
-          >
-            Sign Up
-          </Button>
+            {/* Login Dialog */}
+            <Dialog open={isLoginOpen} onOpenChange={setIsLoginOpen}>
+              <DialogContent className="sm:max-w-[425px]">
+                <DialogHeader className="flex flex-col items-center">
+                  <DialogTitle className="text-[#005A8C] text-xl text-center">Log in to E-Lathala</DialogTitle>
+                  <DialogDescription className="text-center">Enter your email and password to access your account.</DialogDescription>
+                </DialogHeader>
+                <form onSubmit={handleLogin} className="space-y-4 mt-4">
+                  <div className="space-y-2 relative">
+                    <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                    <Input id="email" type="email" placeholder="Email" value={loginEmail} onChange={(e) => setLoginEmail(e.target.value)} required className="pl-10" />
+                  </div>
+                  <div className="space-y-2 relative">
+                    <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                    <Input id="password" type="password" placeholder="Password" value={loginPassword} onChange={(e) => setLoginPassword(e.target.value)} required className="pl-10" />
+                  </div>
+                  {loginError && (
+                    <p className="text-red-500 text-sm text-center">{loginError}</p>
+                  )}
+                  <Button type="submit" className="w-full bg-[#0074B7] text-white hover:bg-[#005A8C] font-bold transition-colors rounded-lg" disabled={isLoading}>
+                    {isLoading ? 'Logging in...' : 'Log In'}
+                  </Button>
+                </form>
+              </DialogContent>
+            </Dialog>
 
-          {/* Sign Up Dialog */}
-          <Dialog open={isSignUpOpen} onOpenChange={setIsSignUpOpen}>
-            <DialogContent className="sm:max-w-[425px]">
-              <DialogHeader className="flex flex-col items-center">
-                <DialogTitle className="text-[#005A8C] text-xl text-center">Sign Up</DialogTitle>
-                <DialogDescription className="font-bold text-center">Join E-Lathala by creating an account.</DialogDescription>
-              </DialogHeader>
-              <div className="flex flex-col gap-4 mt-4">
-                <div className="space-y-2 relative">
-                  <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-                  <Input
-                    placeholder="Enter your email"
-                    className="pl-10"
-                    value={signUpEmail}
-                    onChange={(e) => setSignUpEmail(e.target.value)}
-                  />
-                </div>
-                <div className="space-y-2 relative">
-                  <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-                  <Input
-                    placeholder="Enter your Username"
-                    className="pl-10"
-                    value={signUpUsername}
-                    onChange={(e) => setSignUpUsername(e.target.value)}
-                  />
-                </div>
-                <div className="space-y-2 relative">
-                  <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-                  <Input
-                    placeholder="Password"
-                    type="password"
-                    className="pl-10"
-                    value={signUpPassword}
-                    onChange={(e) => setSignUpPassword(e.target.value)}
-                  />
-                </div>
-                <Button
-                  className="w-full mt-4 bg-[#0074B7] text-white hover:bg-[#005A8C] font-bold transition-colors rounded-lg"
-                  onClick={handleSignUp}
-                  disabled={isLoading}
-                >
-                  {isLoading ? 'Signing Up...' : 'Sign Up'}
-                </Button>
-                <p className="text-sm text-center mt-4">
-                  Already got an account?{' '}
-                  <span
-                    className="text-[#0074B7] font-bold cursor-pointer"
-                    onClick={() => { setIsSignUpOpen(false); setIsLoginOpen(true); }}
+            {/* Sign Up Button */}
+            <Button
+              className="bg-[#4FC3F7] text-white font-bold hover:bg-[#0288D1] rounded-lg transition-colors"
+              onClick={() => setIsSignUpOpen(true)}
+            >
+              Sign Up
+            </Button>
+
+            {/* Sign Up Dialog */}
+            <Dialog open={isSignUpOpen} onOpenChange={setIsSignUpOpen}>
+              <DialogContent className="sm:max-w-[425px]">
+                <DialogHeader className="flex flex-col items-center">
+                  <DialogTitle className="text-[#005A8C] text-xl text-center">Sign Up</DialogTitle>
+                  <DialogDescription className="font-bold text-center">Join E-Lathala by creating an account.</DialogDescription>
+                </DialogHeader>
+                <div className="flex flex-col gap-4 mt-4">
+                  <div className="space-y-2 relative">
+                    <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                    <Input
+                      placeholder="Enter your email"
+                      className="pl-10"
+                      value={signUpEmail}
+                      onChange={(e) => setSignUpEmail(e.target.value)}
+                    />
+                  </div>
+                  <div className="space-y-2 relative">
+                    <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                    <Input
+                      placeholder="Enter your Username"
+                      className="pl-10"
+                      value={signUpUsername}
+                      onChange={(e) => setSignUpUsername(e.target.value)}
+                    />
+                  </div>
+                  <div className="space-y-2 relative">
+                    <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                    <Input
+                      placeholder="Password"
+                      type="password"
+                      className="pl-10"
+                      value={signUpPassword}
+                      onChange={(e) => setSignUpPassword(e.target.value)}
+                    />
+                  </div>
+                  <Button
+                    className="w-full mt-4 bg-[#0074B7] text-white hover:bg-[#005A8C] font-bold transition-colors rounded-lg"
+                    onClick={handleSignUp}
+                    disabled={isLoading}
                   >
-                    Log in
-                  </span>
-                </p>
-              </div>
-            </DialogContent>
-          </Dialog>
-        </nav>
-      </div>
-    </header>
+                    {isLoading ? 'Signing Up...' : 'Sign Up'}
+                  </Button>
+                  <p className="text-sm text-center mt-4">
+                    Already got an account?{' '}
+                    <span
+                      className="text-[#0074B7] font-bold cursor-pointer"
+                      onClick={() => { setIsSignUpOpen(false); setIsLoginOpen(true); }}
+                    >
+                      Log in
+                    </span>
+                  </p>
+                </div>
+              </DialogContent>
+            </Dialog>
+          </nav>
+        </div>
+      </header>
+
+      {/* Mobile Menu */}
+      {isMenuOpen && (
+        <div className="fixed top-20 left-0 w-full bg-white text-[#4F8FB7] z-40 shadow-lg lg:hidden">
+          <nav className="flex flex-col items-center space-y-4 py-4">
+            <Link href="/" className="text-gray-700 font-bold hover:text-black" onClick={() => setIsMenuOpen(false)}>Home</Link>
+            <Link href="#about" className="text-gray-700 font-bold hover:text-black" onClick={() => setIsMenuOpen(false)}>About</Link>
+            <Link href="#features" className="text-gray-700 font-bold hover:text-black" onClick={() => setIsMenuOpen(false)}>Features</Link>
+            <Link href="#how-it-works" className="text-gray-700 font-bold hover:text-black" onClick={() => setIsMenuOpen(false)}>How it Works</Link>
+          </nav>
+        </div>
+      )}
+    </>
   );
 }
