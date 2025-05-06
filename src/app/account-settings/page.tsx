@@ -166,27 +166,14 @@ export default function AccountSettingsPage() {
       <Header />
       <div className="max-w-4xl mx-auto p-8 space-y-10">
         {/* Profile Section */}
-        <div className="flex items-center space-x-6 mb-8">
-          {userData?.avatar_url ? (
-            <img
-              src={userData.avatar_url}
-              alt="Profile"
-              className="w-20 h-20 rounded-full object-cover border-2 border-sky-500 shadow-lg"
-            />
-          ) : (
-            <FaUserCircle className="w-20 h-20 text-gray-300" />
-          )}
-          <div>
-            <h2 className="text-2xl font-bold text-black">
-              {userData?.username || "Guest"}
-            </h2>
-            <p className="text-gray-500">Manage your account settings below</p>
-          </div>
+        <div className="text-center mb-8">
+          <h2 className="text-3xl font-bold text-black">Account Settings</h2>
+          <p className="text-gray-500">Manage your account settings below</p>
         </div>
 
         {/* Change Password Section */}
         <div className="bg-white shadow-lg rounded-2xl p-8 mb-8 transition-all duration-300 ease-in-out">
-          <h2 className="text-2xl font-semibold text-black mb-6">Change Password</h2>
+          <h2 className="text-xl font-semibold text-black mb-6">Change Password</h2>
 
           <input
             type="password"
@@ -237,7 +224,7 @@ export default function AccountSettingsPage() {
 
         {/* Delete Account Section */}
         <div className="bg-white shadow-lg rounded-2xl p-8 mb-8 transition-all duration-300 ease-in-out">
-          <h2 className="text-2xl font-semibold text-black mb-6">Delete Account</h2>
+          <h2 className="text-xl font-semibold text-black mb-6">Delete Account</h2>
 
           <p className="text-red-500 text-sm mb-4">
             WARNING: Deleting your account is permanent and cannot be undone.
