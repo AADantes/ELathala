@@ -9,27 +9,21 @@ import { CardDescription } from '../ui/card-description'
 import { CardContent } from '../ui/card-content'
 import { Badge } from '../ui/badge'
 import IconLabel from '../ui/icon-label'
-import { useUuid } from '../../writingpage/components/UUIDContext'
-import supabase from '../../../../config/supabaseClient'
+import { useUuid } from '../../UUIDContext'
+import supabase from '../../../../../config/supabaseClient'
 
-type ChallengeParametersCardProps = {
-  results: {
-    timelimitSet: string;
-    workGenre: string;
-    workTopic: string;
-  };
-};
-
-
-export default function ChallengeParametersCard({ results }: ChallengeParametersCardProps) {
+export default function ChallengeParametersCard() {
   const { generatedUuid } = useUuid()
-  const [loading, setLoading] = useState<boolean>(true) // Add loading state
+  const [loading, setLoading] = useState(true)
+  const [timelimitSet, setTimelimitSet] = useState('—')
+  const [workGenre, setWorkGenre] = useState('—')
+  const [workTopic, setWorkTopic] = useState('—')
 
   useEffect(() => {
-    if (!generatedUuid) return // If there's no UUID, don't fetch
+    if (!generatedUuid) return
 
     const fetchChallengeParams = async () => {
-      setLoading(true) // Start loading
+      setLoading(true)
 
       const { data, error } = await supabase
         .from('written_works')
@@ -39,12 +33,13 @@ export default function ChallengeParametersCard({ results }: ChallengeParameters
 
       if (error) {
         console.error('Error fetching challenge parameters:', error.message)
-        setLoading(false) // Stop loading if there's an error
-        return
+      } else if (data) {
+        setTimelimitSet(data.timelimitSet || '—')
+        setWorkGenre(data.workGenre || '—')
+        setWorkTopic(data.workTopic || '—')
       }
 
-      // Optionally update state with fetched data
-      setLoading(false) // Stop loading after data is fetched
+      setLoading(false)
     }
 
     fetchChallengeParams()
@@ -77,16 +72,16 @@ export default function ChallengeParametersCard({ results }: ChallengeParameters
         <CardDescription>Your writing challenge settings</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
-        <IconLabel icon={<Clock className="h-5 w-5" />} label="Time Set" value={results.timelimitSet ?? '—'} />
+        <IconLabel icon={<Clock className="h-5 w-5" />} label="Time Set" value={timelimitSet} />
         <IconLabel
           icon={<Bookmark className="h-5 w-5" />}
           label="Genre"
-          value={<Badge variant="secondary">{results.workGenre ?? '—'}</Badge>}
+          value={<Badge variant="secondary">{workGenre}</Badge>}
         />
         <IconLabel
           icon={<Tag className="h-5 w-5" />}
           label="Topic"
-          value={<Badge variant="secondary">{results.workTopic ?? '—'}</Badge>}
+          value={<Badge variant="secondary">{workTopic}</Badge>}
         />
       </CardContent>
     </Card>

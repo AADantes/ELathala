@@ -7,8 +7,8 @@ import { CardHeader } from '../ui/card-header'
 import { CardTitle } from '../ui/card-title'
 import { CardDescription } from '../ui/card-description'
 import { CardContent } from '../ui/card-content'
-import { useUuid } from '../../writingpage/components/UUIDContext'
-import supabase from '../../../../config/supabaseClient'
+import { useUuid } from '../../UUIDContext'
+import supabase from '../../../../../config/supabaseClient'
 
 // Define the prop type
 type PromptCardProps = {
@@ -33,6 +33,8 @@ export default function PromptCard({ prompt }: PromptCardProps) {
         console.error('Error fetching prompt:', error.message)
         return
       }
+
+      console.log('Fetched data from written_works:', data) // Log fetched data
 
       setWorkPrompt(data?.workPrompt ?? null)
     }

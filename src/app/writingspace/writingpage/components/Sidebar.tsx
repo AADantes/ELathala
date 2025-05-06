@@ -1,9 +1,9 @@
 import React from 'react';
 import { X, Home, BookOpen, User, Star, HelpCircle, LogOut } from 'lucide-react';
-import { Button } from '@/app/writingpage/ui/Button';
+import { Button } from '../ui/Button';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation'; // Import useRouter
-import supabase from '../../../../config/supabaseClient'; // Import supabase client
+import supabase from '../../../../../config/supabaseClient'; // Import supabase client
 
 interface SidebarProps {
   isOpen: boolean;

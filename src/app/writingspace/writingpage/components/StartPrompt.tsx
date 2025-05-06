@@ -1,12 +1,12 @@
 'use client';
 
 import React, { useState } from 'react';
-import supabase from '../../../../config/supabaseClient';
+import supabase from '../../../../../config/supabaseClient';
 import { Button } from '../../writingpage/ui/Button';
 import { Input } from '../..//writingpage/ui/Input';
 import { Checkbox } from '../../writingpage/ui/CheckBox';
 import { useRouter } from 'next/navigation';
-import { useUuid } from './UUIDContext';
+import { useUuid } from '../../UUIDContext';
 import { prompts, genres, genreTopics, genreTopicPrompts } from '../lib/writingpage-data';
 
 interface StartPromptProps {
@@ -20,7 +20,6 @@ interface StartPromptProps {
     title: string
   ) => void;
 }
-
 
 
 export default function StartPrompt({ onStart }: StartPromptProps) {
@@ -84,7 +83,7 @@ export default function StartPrompt({ onStart }: StartPromptProps) {
           {
             timelimitSet: time,
             noOfWordsSet: words,
-            workPrompt: generatePrompt,
+            workPrompt: finalPrompt,
             workGenre: genre,
             workTopic: topic,
             workTitle: title,

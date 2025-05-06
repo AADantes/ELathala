@@ -2,10 +2,10 @@
 
 import React, { useState, useEffect } from 'react';
 import { Menu, Palette } from 'lucide-react';
-import { Button } from '@/app/writingpage/ui/Button';
+import { Button } from '../ui/Button';
 import Link from 'next/link';
 import { Bebas_Neue } from 'next/font/google';
-import supabase from '../../../../config/supabaseClient';
+import supabase from '../../../../../config/supabaseClient';
 
 const bebasNeue = Bebas_Neue({
   subsets: ['latin'],
@@ -117,21 +117,7 @@ export default function Header({ onMenuClick, bgColor, setBgColor }: HeaderProps
         </Link>
       </div>
 
-      {/* Right: XP, Level, Color Picker */}
-      <div className="flex items-center space-x-2">
-        <div className="flex items-center space-x-2">
-          {/* Level */}
-          <div className="flex items-center justify-center w-20 h-8 px-2 py-1 bg-white rounded-full shadow-sm">
-            <span className="text-lg mr-1">✒️</span>
-            <span className="text-sm font-bold text-black">{user?.userLevel ?? 1}</span>
-          </div>
 
-          {/* XP */}
-          <div className="flex items-center justify-center w-20 h-8 px-2 py-1 bg-white rounded-full shadow-sm">
-            <span className="text-sm text-blue-600 font-semibold mr-1">XP</span>
-            <span className="text-sm font-bold text-black">{user?.usercurrentExp ?? '0.0'}</span>
-          </div>
-        </div>
 
         {/* Color Picker */}
         <div className="relative">
@@ -185,7 +171,6 @@ export default function Header({ onMenuClick, bgColor, setBgColor }: HeaderProps
             </div>
           )}
         </div>
-      </div>
     </header>
   );
 }

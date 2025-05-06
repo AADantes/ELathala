@@ -8,7 +8,7 @@ export default function ResultsActions() {
         <Link href="/homepage">Back to Main Menu</Link>
       </Button>
       <Button variant="outline" asChild>
-        <Link href="/writingpage">Start New Project</Link>
+        <Link href="/writingspace/writingpage">Start New Project</Link>
       </Button>
     </div>
   )

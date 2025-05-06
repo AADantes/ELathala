@@ -25,7 +25,7 @@ export const UuidProvider = ({ children }: { children: ReactNode }) => {
   );
 };
 
-import supabase from '../../../../config/supabaseClient';
+import supabase from '../../../config/supabaseClient';
 
 export const useUuid = () => {
   const context = useContext(UuidContext);

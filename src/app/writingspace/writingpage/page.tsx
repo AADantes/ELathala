@@ -1,11 +1,10 @@
 'use client';
 
 import React, { useState } from 'react';
-import StartPrompt from '@/app/writingpage/components/StartPrompt';
-import WritingPage from '@/app/writingpage/components/WritingPage';
-import Header from '@/app/writingpage/components/Header';
-import Sidebar from '@/app/writingpage/components/Sidebar';
-import { UuidProvider, useUuid } from './components/UUIDContext';
+import StartPrompt from '../writingpage/components/StartPrompt';
+import WritingPage from '../writingpage/components/WritingPage';
+import Header from '../writingpage/components/Header';
+import Sidebar from '../writingpage/components/Sidebar';
 
 export default function Writingpage() {
   
@@ -42,7 +41,6 @@ export default function Writingpage() {
   };
 
   return (
-    <UuidProvider>
     
       <div className="min-h-screen bg-white flex flex-col">
       {/* Header Component */}
@@ -79,6 +77,5 @@ export default function Writingpage() {
         )}
       </div>
     </div>
-    </UuidProvider>
   );
 }

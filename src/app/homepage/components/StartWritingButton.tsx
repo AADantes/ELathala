@@ -6,7 +6,7 @@ import { motion } from 'framer-motion';
 export function StartWritingButton() {
   return (
     <div className="mt-8 text-center">
-      <Link href="/writingpage">
+      <Link href="/writingspace/writingpage">
         <Button
           size="lg"
           className="bg-sky-800 hover:bg-sky-900 text-white font-bold shadow-lg hover:shadow-3xl transition-all transform hover:scale-110 duration-300 ease-in-out"

@@ -4,9 +4,9 @@ import { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import Footer from './Footer';
 import { Button } from '../../writingpage/ui/Button';
-import supabase from '../../../../config/supabaseClient';
+import supabase from '../../../../../config/supabaseClient';
 import { useRouter } from 'next/navigation';
-import { useUuid } from './UUIDContext';
+import { useUuid } from '../../UUIDContext';
 
 interface WritingPageProps {
   timeLimit: number;

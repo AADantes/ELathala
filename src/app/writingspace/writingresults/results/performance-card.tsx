@@ -1,34 +1,39 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { useUuid } from '../../writingpage/components/UUIDContext' // Adjust path based on your structure
+import { useUuid } from '../../UUIDContext'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card'
 import IconLabel from '../ui/icon-label'
 import { Award, BookText, Star } from 'lucide-react'
-import supabase from '../../../../config/supabaseClient'
+import supabase from '../../../../../config/supabaseClient'
 
-// Type definition for the props
 type PerformanceCardProps = {
   earnedExp: string;
   earnedCredits: string;
-  wordsSet: number;
-  wordsWritten: number;
+  noOfWordsSet: number;
+  numberofWords: number;
 };
 
 export default function PerformanceCard({
-  earnedExp, // These will be passed as props
+  earnedExp,
   earnedCredits,
-  wordsSet,
-  wordsWritten,
 }: PerformanceCardProps) {
-  const { generatedUuid } = useUuid() // Get UUID from context
-  const [loading, setLoading] = useState<boolean>(true) // Loading state for data fetch
+  const { generatedUuid } = useUuid()
+  const [loading, setLoading] = useState(true)
+  const [wordsSet, setWordsSet] = useState<number>(0)
+  const [wordsWritten, setWordsWritten] = useState<number>(0)
+
+  // Log exp and credits when they change
+  useEffect(() => {
+    console.log('earnedExp:', earnedExp)
+    console.log('earnedCredits:', earnedCredits)
+  }, [earnedExp, earnedCredits])
 
   useEffect(() => {
-    if (!generatedUuid) return // Don't fetch if UUID is not available
+    if (!generatedUuid) return
 
     const fetchPerformanceData = async () => {
-      setLoading(true) // Start loading
+      setLoading(true)
 
       const { data, error } = await supabase
         .from('written_works')
@@ -38,18 +43,21 @@ export default function PerformanceCard({
 
       if (error) {
         console.error('Error fetching performance data:', error.message)
-        setLoading(false) // Stop loading on error
+        setLoading(false)
         return
       }
 
-      // Optionally, update any state here if needed (e.g., wordsSet, wordsWritten)
-      setLoading(false) // Stop loading when data is fetched
+      if (data) {
+        setWordsSet(data.noOfWordsSet)
+        setWordsWritten(data.numberofWords)
+      }
+
+      setLoading(false)
     }
 
     fetchPerformanceData()
-  }, [generatedUuid]) // Re-run the effect if generatedUuid changes
+  }, [generatedUuid])
 
-  // If the data is still loading, show the loading state
   if (loading) {
     return (
       <Card>
@@ -67,7 +75,6 @@ export default function PerformanceCard({
     )
   }
 
-  // If data has loaded, show performance information
   return (
     <Card>
       <CardHeader>
@@ -78,10 +85,10 @@ export default function PerformanceCard({
         <CardDescription>How you did in this challenge</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
-        <IconLabel icon={<BookText className="h-5 w-5" />} label="Number of Words Set" value={`${wordsSet} words`} />
-        <IconLabel icon={<BookText className="h-5 w-5" />} label="Words Written" value={`${wordsWritten} words`} />
-        <IconLabel icon={<Award className="h-5 w-5" />} label="Credits Gained" value={`${earnedCredits || '—'} credits`} />
-        <IconLabel icon={<Star className="h-5 w-5" />} label="Experience Gained" value={`${earnedExp || '—'} XP`} />
+        <IconLabel icon={<BookText className="h-5 w-5" />} label="Number of Words Set" value={`${wordsSet ?? 0} words`} />
+        <IconLabel icon={<BookText className="h-5 w-5" />} label="Words Written" value={`${wordsWritten ?? 0} words`} />
+        <IconLabel icon={<Award className="h-5 w-5" />} label="Credits Gained" value={`${earnedCredits ?? '0'} credits`} />
+        <IconLabel icon={<Star className="h-5 w-5" />} label="Experience Gained" value={`${earnedExp ?? '0'} XP`} />
       </CardContent>
     </Card>
   )

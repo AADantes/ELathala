@@ -1,8 +1,8 @@
 import React from 'react'
-import { Tooltip } from '../writingresults/ui/tooltip'
-import { Button } from '../writingresults/ui/button'
+import { Tooltip } from '../writingspace/writingresults/ui/tooltip'
+import { Button } from '../writingspace/writingresults/ui/button'
 import { AlignLeft, AlignCenter, AlignRight, Bold, Italic, Underline } from 'lucide-react'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../writingresults/ui/select'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../writingspace/writingresults/ui/select'
 
 export default function TextEditorDashboard() {
   return (

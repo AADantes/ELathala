@@ -139,7 +139,8 @@ export default function UserPanelWrapper() {
 
 export function UserPanel({ userData, isExperienceDialogOpen, setIsExperienceDialogOpen }: { userData: UserData, isExperienceDialogOpen: boolean, setIsExperienceDialogOpen: (open: boolean) => void }) {
   return (
-    <Card className="bg-white text-gray-900 shadow-[0_4px_6px_rgba(0,0,0,0.1)] hover:shadow-[0_6px_8px_rgba(0,0,0,0.15)] transition-transform transform hover:scale-105 duration-300">
+    <Card className="bg-white text-gray-900 shadow-[0_4px_6px_rgba(0,0,0,0.1)] hover:shadow-[0_6px_8px_rgba(0,0,0,0.15)] transition-transform transform hover:scale-105 duration-300 h-[600px]">
+
       <CardHeader className="bg-[#f9fafb] px-6 py-4">
         <CardTitle 
           className={`text-cyan-500 text-3xl font-extrabold tracking-wider leading-none text-center ${bebasNeue.className}`}
