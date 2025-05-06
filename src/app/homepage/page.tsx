@@ -98,12 +98,13 @@ export default function HomePage() {
           />
           <WritingHistoryPanel works={works} />
         </div>
+        <div className="mt-8 flex justify-center">
+          {/* Move Start Writing Button above Daily Streak */}
+          <StartWritingButton />
+        </div>
         <div className="mt-8">
           {/* Add the DailyStreak component */}
           <DailyStreak />
-        </div>
-        <div className="mt-8 flex justify-center">
-          <StartWritingButton />
         </div>
       </main>
     </div>
