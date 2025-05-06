@@ -476,7 +476,7 @@ export default function WritingPage({
               <Button
                 onClick={async () => {
                   await HandleResult()
-                  router.push('/writingresults');
+                  router.push('/writingspace/writingresults');
                 }}
                 className="bg-sky-900 text-white px-6 py-3 text-md rounded-full transition-all duration-400 transform hover:scale-105 hover:rotate-1 hover:shadow-2xl hover:bg-sky-600 focus:ring-4 focus:ring-sky-300 focus:outline-none"
               >
