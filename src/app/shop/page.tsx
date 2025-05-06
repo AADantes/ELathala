@@ -3,10 +3,10 @@
 import { Button } from "../shop/ui/button"
 import { useState, useEffect } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../shop/ui/tabs"
-import { CreditDisplay } from "./Shop/credit-display"
-import { ProfilePicturesList } from "./Shop/ProfilePictureList"
-import { FontsList } from "./Shop/fonts-list"
-import { FeaturesList } from "./Shop/features-list"
+import { CreditDisplay } from "../shop/Shop/credit-display"
+import { ProfilePicturesList } from "../shop/Shop/ProfilePictureList"
+import { FontsList } from "../shop/Shop/fonts-list"
+import { FeaturesList } from "../shop/Shop/features-list"
 import supabase from "../../../config/supabaseClient"
 
 export default function Shop() {
