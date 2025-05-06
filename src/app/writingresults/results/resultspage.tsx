@@ -1,3 +1,4 @@
+'use client'
 
 import { useUuid, UuidProvider } from "../../../app/writingpage/components/UUIDContext"; // Adjust the import path
 import ResultsHeader from "../../writingresults/results/results-header"
