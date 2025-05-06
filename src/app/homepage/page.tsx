@@ -98,6 +98,7 @@ export default function HomePage() {
             isExperienceDialogOpen={isExperienceDialogOpen} 
             setIsExperienceDialogOpen={setIsExperienceDialogOpen} 
           />
+<<<<<<< HEAD
           <WritingHistoryPanel works={works} /> {/* Pass works here */}
         </div>
         <div className="mt-8 flex justify-center">
@@ -107,6 +108,18 @@ export default function HomePage() {
           {/* Pass userId to DailyStreak component */}
           {userId && <DailyStreak userId={userId} />}
         </div>
+=======
+          <WritingHistoryPanel works={works} />
+        </div>
+        <div className="mt-8 flex justify-center">
+          {/* Move Start Writing Button above Daily Streak */}
+          <StartWritingButton />
+        </div>
+        <div className="mt-8">
+          {/* Add the DailyStreak component */}
+          <DailyStreak />
+        </div>
+>>>>>>> 8dfda26d7c27dd1600e99feb250f632579f86c2c
       </main>
     </div>
   );

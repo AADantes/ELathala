@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Menu, Palette } from 'lucide-react';
+import { Menu, Palette, Award } from 'lucide-react';
 import { Button } from '@/app/writingpage/ui/Button';
 import Link from 'next/link';
 import { Bebas_Neue } from 'next/font/google';
@@ -122,7 +122,7 @@ export default function Header({ onMenuClick, bgColor, setBgColor }: HeaderProps
         <div className="flex items-center space-x-2">
           {/* Level */}
           <div className="flex items-center justify-center w-20 h-8 px-2 py-1 bg-white rounded-full shadow-sm">
-            <span className="text-lg mr-1">✒️</span>
+            <Award className="text-yellow-500 h-5 w-5 mr-1" /> {/* Changed to a level icon */}
             <span className="text-sm font-bold text-black">{user?.userLevel ?? 1}</span>
           </div>
 

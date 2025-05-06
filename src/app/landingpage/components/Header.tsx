@@ -51,19 +51,28 @@ export default function Header() {
   };
 
   const registerUser = async (email: string, password: string, username: string) => {
-    setIsLoading(true);
-
-    const { data, error } = await supabase.auth.signUp({ email, password });
-
-    if (error) {
-      console.error("Signup error:", error.message);
-      setIsLoading(false);
-      return;
-    }
-
-    const userId = data.user?.id;
-
-    if (userId) {
+    try {
+      setIsLoading(true);
+  
+      // Sign up the user with Supabase
+      const { data, error } = await supabase.auth.signUp({ email, password });
+  
+      if (error) {
+        console.error("Signup error:", error.message);
+        alert("Signup failed: " + error.message);
+        setIsLoading(false);
+        return;
+      }
+  
+      const userId = data.user?.id;
+  
+      if (!userId) {
+        alert("Signup failed: User ID not found.");
+        setIsLoading(false);
+        return;
+      }
+  
+      // Insert into the "Accounts" table
       const { error: insertError } = await supabase.from("Accounts").insert([
         {
           userId,
@@ -76,13 +85,15 @@ export default function Header() {
           created_at: new Date(),
         },
       ]);
-
+  
       if (insertError) {
         console.error("Error inserting into Accounts:", insertError.message);
+        alert("Failed to save account details: " + insertError.message);
         setIsLoading(false);
         return;
       }
-
+  
+      // Insert into the "User" table
       const { error: userInsertError } = await supabase.from("User").insert([
         {
           id: userId,
@@ -95,17 +106,22 @@ export default function Header() {
           created_at: new Date(),
         },
       ]);
-
+  
       if (userInsertError) {
         console.error("Error inserting into User table:", userInsertError.message);
+        alert("Failed to save user details: " + userInsertError.message);
         setIsLoading(false);
         return;
       }
+  
+      alert("Signup successful! Please check your email to verify your account.");
+      setIsSignUpOpen(false);
+    } catch (err) {
+      console.error("Unexpected error during signup:", err);
+      alert("An unexpected error occurred. Please try again.");
+    } finally {
+      setIsLoading(false);
     }
-
-    setIsLoading(false);
-    setIsSignUpOpen(false);
-    alert("Signup successful!");
   };
 
   const handleSignUp = async (e: React.FormEvent) => {
