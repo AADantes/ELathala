@@ -156,16 +156,6 @@ export default function DailyStreak({ userId }: { userId: string }) {
               <div className="absolute bottom-full mb-2 hidden group-hover:block bg-black text-white text-xs px-2 py-1 rounded shadow">
                 {isUnlocked ? "Completed" : "Locked"} — Day {i + 1}
               </div>
-
-              <motion.div
-                className="my-1"
-                animate={isUnlocked ? { scale: [1, 1.2, 1] } : {}}
-                transition={{ repeat: Infinity, duration: 2 }}
-              >
-                {isUnlocked
-                  ? rewardIcons[i] ?? <FaCheckCircle />
-                  : <FaLock className="w-6 h-6" />}
-              </motion.div>
             </motion.div>
           );
         })}
