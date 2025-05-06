@@ -7,7 +7,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "../writing-results/ui/table"
+} from "../writingresults/ui/table"
 
 interface DataTableProps {
   columns: string[]

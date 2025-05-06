@@ -1,6 +1,6 @@
 import React from 'react'
 import { Menu } from 'lucide-react'
-import { Button } from '../writing-results/ui/button'
+import { Button } from '../writingresults/ui/button'
 
 interface HeaderProps {
   onMenuClick: () => void

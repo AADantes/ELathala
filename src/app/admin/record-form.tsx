@@ -3,16 +3,16 @@ import {
   CardContent,
   CardHeader,
   CardTitle,
-} from "../writing-results/ui/card"
-import { Input } from "../writing-results/ui/input"
-import { Label } from "../writing-results/ui/label"
+} from "../writingresults/ui/card"
+import { Input } from "../writingresults/ui/input"
+import { Label } from "../writingresults/ui/label"
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "../writing-results/ui/select"
+} from "../writingresults/ui/select"
 import ActionButtons from "@/app/admin/action-buttons"
 
 interface RecordFormProps {
