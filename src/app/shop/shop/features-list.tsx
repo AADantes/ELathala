@@ -1,6 +1,6 @@
 "use client";
 
-import { FeatureCard } from "@/app/shop/shop/feature-card"
+import { FeatureCard } from "@/app/shop/Shop/feature-card"
 import { customizationFeatures } from "@/app/shop/lib/shop-data"
 
 export function FeaturesList() {

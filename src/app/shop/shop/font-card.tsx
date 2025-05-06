@@ -10,7 +10,7 @@ import {
   CardTitle,
 } from "@/app/shop/ui/card"
 import { Button } from "@/app/shop/ui/button"
-import { PurchaseDialog } from "@/app/shop/shop/purchase-dialog"
+import { PurchaseDialog } from "@/app/shop/Shop/purchase-dialog"
 import type { Font } from "@/app/shop/lib/shop-data"
 
 interface FontCardProps {

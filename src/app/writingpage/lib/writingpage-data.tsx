@@ -1,58 +1,282 @@
 // src/app/writingpage/data/writingData.ts
 
 export const prompts: string[] = [
-    "Write about a time when you surprised yourself with your own strength.",
-    "If you could revisit one moment from your past, what would it be and why?",
-    "Imagine meeting a version of yourself from 10 years in the future—what advice would you give them?",
-    "Write about a habit you want to break and how it’s affected your life.",
-    "What does happiness mean to you? Has your definition changed over time?",
-  ];
+  "Write about a time when you surprised yourself with your own strength.",
+  "If you could revisit one moment from your past, what would it be and why?",
+  "Imagine meeting a version of yourself from 10 years in the future—what advice would you give them?",
+  "Write about a habit you want to break and how it’s affected your life.",
+  "What does happiness mean to you? Has your definition changed over time?",
+];
+
+export const genres: string[] = [
+  'Fiction',
+  'Non-Fiction',
+  'Poetry',
+  'Journal Entry',
+  'Creative Writing',
+  'Memoir',
+];
+
+export const genreTopics: { [key: string]: string[] } = {
+  Fiction: [
+    'Fantasy Worlds',
+    'Superheroes',
+    'Mystery',
+    'Time Travel',
+    'Alternate Realities',
+  ],
+  'Non-Fiction': [
+    'Personal Growth',
+    'True Stories',
+    'History',
+    'Self-Improvement',
+    'Social Issues',
+  ],
+  Poetry: ['Love', 'Nature', 'Emotion', 'Dreams', 'Time'],
+  Memoir: [
+    'Life Lessons',
+    'Family Stories',
+    'Travel Experiences',
+    'Overcoming Challenges',
+    'Personal Milestones',
+  ],
+  'Creative Writing': [
+    'Imagination Unleashed',
+    'The Unknown',
+    'What if...',
+    'Inner Journeys',
+    'Strange Adventures',
+  ],
+  'Journal Entry': [
+    'Daily Reflections',
+    'Personal Growth',
+    'Current Events',
+    'Dreams and Goals',
+    'Thoughts on Society',
+  ],
+};
   
-  export const genres: string[] = [
-    'Fiction',
-    'Non-Fiction',
-    'Poetry',
-    'Journal Entry',
-    'Creative Writing',
-    'Memoir',
-  ];
-  
-  export const genreTopics: { [key: string]: string[] } = {
-    Fiction: [
-      'Fantasy Worlds',
-      'Superheroes',
-      'Mystery',
-      'Time Travel',
-      'Alternate Realities',
+export const genreTopicPrompts: { [genre: string]: { [topic: string]: string[] } } = {
+  'Fiction': {
+    'Fantasy Worlds': [
+      "Describe a day in the life of a baker in a magical city.",
+      "Write about a forgotten kingdom that reawakens after a thousand years.",
+      "Create a world where animals rule and humans are myth.",
+      "What happens when the moon grants wishes once a year?",
+      "A forest appears overnight—what secrets does it hold?",
     ],
-    'Non-Fiction': [
-      'Personal Growth',
-      'True Stories',
-      'History',
-      'Self-Improvement',
-      'Social Issues',
+    'Superheroes': [
+      "A superhero discovers their powers are slowly fading—what do they do?",
+      "Write from the perspective of a sidekick who wants to step into the spotlight.",
+      "What happens when a villain saves the day instead?",
+      "A new law bans all superpowers—what now?",
+      "A teenage superhero hides their identity from their best friend.",
     ],
-    Poetry: ['Love', 'Nature', 'Emotion', 'Dreams', 'Time'],
-    Memoir: [
-      'Life Lessons',
-      'Family Stories',
-      'Travel Experiences',
-      'Overcoming Challenges',
-      'Personal Milestones',
+    'Mystery': [
+      "Someone leaves anonymous letters in a small town—what do they reveal?",
+      "A person wakes up with no memory and a stranger’s passport.",
+      "A library book checked out 100 years ago suddenly returns—why?",
+      "Write about a missing painting that leads to an ancient conspiracy.",
+      "A detective finds clues in dreams—are they real?",
     ],
-    'Creative Writing': [
-      'Imagination Unleashed',
-      'The Unknown',
-      'What if...',
-      'Inner Journeys',
-      'Strange Adventures',
+    'Time Travel': [
+      "A traveler goes back to stop a war but ends up starting it.",
+      "Write about someone who relives the same day but in different decades.",
+      "A mysterious watch allows five time jumps—how are they used?",
+      "Someone accidentally switches places with their ancestor.",
+      "A child finds an ancient artifact that shows their future.",
     ],
-    'Journal Entry': [
-      'Daily Reflections',
-      'Personal Growth',
-      'Current Events',
-      'Dreams and Goals',
-      'Thoughts on Society',
+    'Alternate Realities': [
+      "Write about a world where no one lies—until one person does.",
+      "A character slips into a reality where their life turned out completely different.",
+      "Imagine a society where people age backward—how does it work?",
+      "In this reality, emotions can be traded like currency.",
+      "A glitch in the system allows someone to glimpse other possible lives.",
     ],
-  };
-  
+  },
+  'Non-Fiction': {
+    'Personal Growth': [
+      "Describe a moment that changed your perspective on life.",
+      "What’s a lesson you learned the hard way?",
+      "How do you stay motivated during tough times?",
+      "Write about a turning point in your self-development journey.",
+      "Who has inspired your personal growth the most and why?",
+    ],
+    'True Stories': [
+      "Write about an experience you’ll never forget.",
+      "Describe a stranger who changed your life.",
+      "Tell the story of a challenge you overcame.",
+      "What happened on the most unusual day of your life?",
+      "Share a real-life story that makes you proud.",
+    ],
+    'History': [
+      "Write about a historical event that fascinates you.",
+      "If you could witness any moment in history, what would it be?",
+      "Describe the life of a lesser-known historical figure.",
+      "How has history shaped your present?",
+      "Compare a past event with something happening today.",
+    ],
+    'Self-Improvement': [
+      "What daily habit has made a big difference in your life?",
+      "Describe your approach to setting goals.",
+      "Write about an area in your life you’re actively working on.",
+      "What does success mean to you, and how has that changed?",
+      "What advice would you give someone starting their self-improvement journey?",
+    ],
+    'Social Issues': [
+      "What social issue matters most to you and why?",
+      "Describe an experience that opened your eyes to inequality.",
+      "How can one person make a difference in their community?",
+      "Write about a current event that you feel strongly about.",
+      "What role does social media play in social change?",
+    ],
+  },
+  'Poetry': {
+    'Love': [
+      "Describe the feeling of falling in love without using the word 'love'.",
+      "Write a poem about a love that could never be.",
+      "Capture the moment two people realize they love each other.",
+      "What does unspoken love feel like?",
+      "Write a letter in verse to a past lover.",
+    ],
+    'Nature': [
+      "Describe a thunderstorm through the eyes of a tree.",
+      "Write a poem about the changing of seasons.",
+      "Capture the sound of rain without naming it.",
+      "Compare a mountain to a human emotion.",
+      "What does the ocean whisper at night?",
+    ],
+    'Emotion': [
+      "Write a poem from the point of view of anger.",
+      "Describe the shape of sadness.",
+      "Express joy using only metaphors.",
+      "Capture the fleeting nature of hope.",
+      "Write about the complexity of forgiveness.",
+    ],
+    'Dreams': [
+      "Write a poem about a dream you once had and never forgot.",
+      "Describe the boundary between dream and reality.",
+      "What if dreams were messages from another world?",
+      "Write from the perspective of a dream that’s recurring.",
+      "Capture the surreal feeling of waking up mid-dream.",
+    ],
+    'Time': [
+      "Describe time as a river.",
+      "Write a poem that captures a single moment.",
+      "What if time had a heartbeat?",
+      "Write about the weight of waiting.",
+      "Explore the idea of timelessness.",
+    ],
+  },
+  'Memoir': {
+    'Life Lessons': [
+      "Share a story that taught you something you’ll never forget.",
+      "What’s a mistake you’re glad you made?",
+      "Describe a turning point in your life.",
+      "What’s a motto you live by—and how did you learn it?",
+      "Write about a time you had to grow up fast.",
+    ],
+    'Family Stories': [
+      "Describe a holiday memory with your family.",
+      "Write about a family member who had a big impact on you.",
+      "What’s a funny or strange family tradition you remember?",
+      "Tell a story passed down through generations.",
+      "What’s your earliest memory of feeling loved?",
+    ],
+    'Travel Experiences': [
+      "Write about a trip that changed you.",
+      "Describe the most surprising place you've ever visited.",
+      "What’s a memory from traveling that stands out?",
+      "Share an unexpected moment from your travels.",
+      "Describe a culture you encountered and what it taught you.",
+    ],
+    'Overcoming Challenges': [
+      "Write about a time you didn’t give up.",
+      "What did you learn from failing?",
+      "Describe a situation where you had to be brave.",
+      "Share a story of resilience.",
+      "What helped you get through a tough time?",
+    ],
+    'Personal Milestones': [
+      "Describe your proudest accomplishment.",
+      "Write about a moment you’ll never forget.",
+      "How did you celebrate a major achievement?",
+      "What’s a 'first' that was meaningful to you?",
+      "Reflect on a goal you worked hard to reach.",
+    ],
+  },
+  'Creative Writing': {
+    'Imagination Unleashed': [
+      "Write about a world made entirely of sound.",
+      "Describe a color that doesn’t exist.",
+      "Imagine an invisible city.",
+      "What would it be like if people had wings?",
+      "Tell the story of a creature made of dreams.",
+    ],
+    'The Unknown': [
+      "Write a story where the main character doesn’t know who they are.",
+      "Describe a world where no one can speak.",
+      "What’s hiding behind the last door in the universe?",
+      "Create a story with no known ending.",
+      "Write from the perspective of a forgotten god.",
+    ],
+    'What if...': [
+      "What if gravity stopped working for one hour each day?",
+      "What if people could see each other’s thoughts?",
+      "What if animals suddenly started talking?",
+      "What if dreams could be recorded and replayed?",
+      "What if everyone was born with a visible countdown to death?",
+    ],
+    'Inner Journeys': [
+      "Describe someone learning to forgive themselves.",
+      "Write about a character discovering their true passion.",
+      "Explore the emotional landscape of anxiety.",
+      "What happens during a moment of personal clarity?",
+      "Tell the story of an internal conflict resolved.",
+    ],
+    'Strange Adventures': [
+      "A person wakes up in a place they've never seen with no memory of who they are.",
+      "Write about a train that travels to impossible places.",
+      "Describe an adventure through a mirror world.",
+      "What if a map could only be read under moonlight?",
+      "Create a tale about a quest that starts with a mistake.",
+    ],
+  },
+  'Journal Entry': {
+    'Daily Reflections': [
+      "What’s something you learned today?",
+      "How did today make you feel and why?",
+      "What challenged you today?",
+      "What’s something you’re grateful for today?",
+      "Describe your mood throughout the day.",
+    ],
+    'Personal Growth': [
+      "What habit are you working to build or break?",
+      "How have you changed in the past year?",
+      "Write about something you’re proud of recently.",
+      "What’s a small win you experienced this week?",
+      "What does progress mean to you today?",
+    ],
+    'Current Events': [
+      "How do you feel about a recent news story?",
+      "What’s your take on a current social issue?",
+      "Describe your reaction to a global event.",
+      "How does what’s happening in the world affect you?",
+      "Write your opinion on something trending now.",
+    ],
+    'Dreams and Goals': [
+      "What’s a dream you have and why?",
+      "Describe your biggest goal and your plan to reach it.",
+      "What motivates you to pursue your goals?",
+      "What’s standing between you and your dream?",
+      "Visualize a day in your life after you’ve achieved your goal.",
+    ],
+    'Thoughts on Society': [
+      "What do you value in a community?",
+      "Describe something you wish would change in the world.",
+      "How do you define fairness?",
+      "What does freedom mean to you?",
+      "How does society shape the way you think?",
+    ],
+  }
+};

@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { Card, CardHeader, CardFooter, CardTitle } from '@/app/shop/ui/card';
 import { Button } from '@/app/shop/ui/button';
-import { PurchaseDialog } from '@/app/shop/shop/purchase-dialog';
+import { PurchaseDialog } from '@/app/shop/Shop/purchase-dialog';
 import supabase from '../../../../config/supabaseClient';
 
 interface ProfilePicture {

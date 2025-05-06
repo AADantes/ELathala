@@ -5,7 +5,7 @@ import { Paintbrush, CreditCard } from "lucide-react"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/app/shop/ui/card"
 import { Badge } from "@/app/shop/ui/badge"
 import { Button } from "@/app/shop/ui/button"
-import { PurchaseDialog } from "@/app/shop/shop/purchase-dialog"
+import { PurchaseDialog } from "@/app/shop/Shop/purchase-dialog"
 import type { CustomizationFeature } from "@/app/shop/lib/shop-data"
 interface FeatureCardProps {
   feature: CustomizationFeature

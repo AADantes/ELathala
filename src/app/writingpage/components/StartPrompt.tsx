@@ -7,6 +7,7 @@ import { Input } from '../..//writingpage/ui/Input';
 import { Checkbox } from '../../writingpage/ui/CheckBox';
 import { useRouter } from 'next/navigation';
 import { useUuid } from './UUIDContext';
+import { prompts, genres, genreTopics, genreTopicPrompts } from '../lib/writingpage-data';
 
 interface StartPromptProps {
   onStart: (
@@ -20,61 +21,7 @@ interface StartPromptProps {
   ) => void;
 }
 
-const prompts = [
-  "Write about a time when you surprised yourself with your own strength.",
-  "If you could revisit one moment from your past, what would it be and why?",
-  "Imagine meeting a version of yourself from 10 years in the future—what advice would you give them?",
-  "Write about a habit you want to break and how it’s affected your life.",
-  "What does happiness mean to you? Has your definition changed over time?",
-];
 
-const genres = [
-  'Fiction',
-  'Non-Fiction',
-  'Poetry',
-  'Journal Entry',
-  'Creative Writing',
-  'Memoir',
-];
-
-const genreTopics: { [key: string]: string[] } = {
-  Fiction: [
-    'Fantasy Worlds',
-    'Superheroes',
-    'Mystery',
-    'Time Travel',
-    'Alternate Realities',
-  ],
-  'Non-Fiction': [
-    'Personal Growth',
-    'True Stories',
-    'History',
-    'Self-Improvement',
-    'Social Issues',
-  ],
-  Poetry: ['Love', 'Nature', 'Emotion', 'Dreams', 'Time'],
-  Memoir: [
-    'Life Lessons',
-    'Family Stories',
-    'Travel Experiences',
-    'Overcoming Challenges',
-    'Personal Milestones',
-  ],
-  'Creative Writing': [
-    'Imagination Unleashed',
-    'The Unknown',
-    'What if...',
-    'Inner Journeys',
-    'Strange Adventures',
-  ],
-  'Journal Entry': [
-    'Daily Reflections',
-    'Personal Growth',
-    'Current Events',
-    'Dreams and Goals',
-    'Thoughts on Society',
-  ],
-};
 
 export default function StartPrompt({ onStart }: StartPromptProps) {
   const [step, setStep] = useState(1);
@@ -109,9 +56,17 @@ export default function StartPrompt({ onStart }: StartPromptProps) {
     const words = Number(wordCount);
     if (time < 1 || time > 60 || words < 50 || !genre || !topic || !title) return;
   
-    const finalPrompt = generatePrompt
-      ? prompts[Math.floor(Math.random() * prompts.length)]
-      : '';
+    let finalPrompt = '';
+  
+    // Check if the user wants a random prompt and if the genre and topic are set
+    if (generatePrompt && genre && topic && genreTopicPrompts[genre] && genreTopicPrompts[genre][topic]) {
+      // Get the prompts for the selected genre and topic
+      const topicPrompts = genreTopicPrompts[genre][topic];
+      finalPrompt = topicPrompts[Math.floor(Math.random() * topicPrompts.length)];
+    } else if (generatePrompt) {
+      // Fall back to a random general prompt if no genre/topic is selected
+      finalPrompt = prompts[Math.floor(Math.random() * prompts.length)];
+    }
   
     // Call onStart function for starting the process
     onStart(time, words, generatePrompt, finalPrompt, genre, topic, title);
@@ -129,7 +84,7 @@ export default function StartPrompt({ onStart }: StartPromptProps) {
           {
             timelimitSet: time,
             noOfWordsSet: words,
-            workPrompt: finalPrompt,
+            workPrompt: generatePrompt,
             workGenre: genre,
             workTopic: topic,
             workTitle: title,

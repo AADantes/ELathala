@@ -15,6 +15,7 @@ export default function HomePage() {
   const [works, setWorks] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [isExperienceDialogOpen, setIsExperienceDialogOpen] = useState(false); // Add this state
+  const [userId, setUserId] = useState<string | null>(null); // State to store userId
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -33,7 +34,8 @@ export default function HomePage() {
       }
   
       console.log("Authenticated UID:", authUser.id);
-  
+      setUserId(authUser.id); // Set the userId state
+
       // Fetch user profile from User table using auth_user_id
       const { data, error } = await supabase
         .from("User") // Or "user" depending on your table naming
@@ -59,9 +61,9 @@ export default function HomePage() {
 
       // Fetch written works
       const { data: writtenWorks, error: worksError } = await supabase
-        .from("Written Works")
-        .select("workID, numberofWords, noOfWordsSet, timelimitSet, timeRendered")
-        .eq("id", authUser.id);
+        .from("written_works")
+        .select("workID, workTitle, numberofWords, noOfWordsSet, timelimitSet")
+        .eq("UserID", authUser.id);
 
       if (worksError) {
         console.error("Error fetching written works:", worksError);
@@ -96,14 +98,14 @@ export default function HomePage() {
             isExperienceDialogOpen={isExperienceDialogOpen} 
             setIsExperienceDialogOpen={setIsExperienceDialogOpen} 
           />
-          <WritingHistoryPanel works={works} />
-        </div>
-        <div className="mt-8">
-          {/* Add the DailyStreak component */}
-          <DailyStreak />
+          <WritingHistoryPanel works={works} /> {/* Pass works here */}
         </div>
         <div className="mt-8 flex justify-center">
           <StartWritingButton />
+        </div>
+        <div className="mt-8">
+          {/* Pass userId to DailyStreak component */}
+          {userId && <DailyStreak userId={userId} />}
         </div>
       </main>
     </div>

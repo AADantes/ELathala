@@ -178,54 +178,129 @@ export default function WritingPage({
 
   const HandleResult = async () => {
     try {
-      // Update written_works table
-      const { error: writtenWorksError } = await supabase
-        .from('written_works')
-        .update({
-          numberofWords: currentWords,
-        })
-        .eq('workID', generatedUuid);
-
-      if (writtenWorksError) {
-        console.error('Error updating written_works in Supabase:', writtenWorksError.message);
-      } else {
-        console.log('written_works updated successfully.');
-      }
-
+      // Calculate earned EXP and Credits
+      const earnedExp = currentWords;
+      const earnedCredits = currentWords * 0.5;
+  
+      // Call the function to update the written_works table
+      await updateWrittenWorks(earnedExp);
+  
       // Get current authenticated user
       const {
         data: { user },
         error: userFetchError,
       } = await supabase.auth.getUser();
-
+  
       if (userFetchError) {
         console.error('Error fetching user from Supabase auth:', userFetchError.message);
         return;
       }
-
+  
       if (!user) {
         console.warn('No authenticated user found.');
         return;
       }
-
-      // Update User table with usercurrentExp and userCredits using user.id
-      const { error: userError } = await supabase
-        .from('User')
-        .update({
-          usercurrentExp: currentWords,
-          userCredits: currentWords * 0.5,
-        })
-        .eq('id', user.id);
-
-      if (userError) {
-        console.error('Error updating User in Supabase:', userError.message);
-      } else {
-        console.log('User updated successfully.');
-      }
+  
+      // Call the function to handle EXP and Credits gain
+      await HandleExpCreditGain(earnedExp, earnedCredits);
     } catch (err) {
-      console.error('Unexpected error updating data in Supabase:', err);
+      console.error('Unexpected error:', err);
     }
   };
+  
+  // Function to update written_works table
+  const updateWrittenWorks = async (earnedExp: number) => {
+    try {
+      // Update written_works table with the earned EXP and currentWords
+      const { error: writtenWorksError } = await supabase
+        .from('written_works')
+        .update({
+          numberofWords: currentWords, // Assuming currentWords is available
+        })
+        .eq('workID', generatedUuid);
+  
+      if (writtenWorksError) {
+        console.error('Error updating written_works in Supabase:', writtenWorksError.message);
+      } else {
+        console.log('written_works updated successfully.');
+      }
+    } catch (err) {
+      console.error('Error updating written_works:', err);
+    }
+  };
+  
+  // Function to handle user EXP and Credits gain
+  const HandleExpCreditGain = async (earnedExp: number, earnedCredits: number) => {
+    try {
+      // Get current authenticated user
+      const {
+        data: { user },
+        error: userFetchError,
+      } = await supabase.auth.getUser();
+  
+      if (userFetchError) {
+        console.error('Error fetching user from Supabase auth:', userFetchError.message);
+        return;
+      }
+  
+      if (!user) {
+        console.warn('No authenticated user found.');
+        return;
+      }
+  
+      // Fetch the current EXP and Credits for the authenticated user from the User table
+      const { data: userData, error: userDataError } = await supabase
+        .from('User')
+        .select('usercurrentExp, userCredits')
+        .eq('id', user.id)
+        .single();  // Use .single() to get a single record
+  
+      if (userDataError) {
+        console.error('Error fetching user data from User table:', userDataError.message);
+        return;
+      }
+  
+      if (!userData) {
+        console.warn('No user data found.');
+        return;
+      }
+  
+      // Calculate new EXP and Credits
+      const newExp = (userData.usercurrentExp || 0) + earnedExp; // Add earnedExp to existing EXP
+      const newCredits = (userData.userCredits || 0) + earnedCredits; // Add earnedCredits to existing Credits
+  
+      // Update the User table with the new EXP and Credits
+      const { error: userUpdateError } = await supabase
+        .from('User')
+        .update({
+          usercurrentExp: newExp,  // Store the new total EXP
+          userCredits: newCredits,  // Store the new total Credits
+        })
+        .eq('id', user.id);
+  
+      if (userUpdateError) {
+        console.error('Error updating User in Supabase:', userUpdateError.message);
+        return;
+      }
+  
+      console.log('User updated successfully.');
+  
+      // Construct the query string to pass as searchParams
+      const searchParams = new URLSearchParams({
+        earnedExp: earnedExp.toString(),
+        earnedCredits: earnedCredits.toString(),
+      }).toString();
+  
+      // Navigate to the next page and pass the query string as search params
+      router.push(`/writingresults?${searchParams}`);
+  
+      // Log the gained EXP and Credits for debugging
+      console.log(`User gained ${earnedExp} EXP and ${earnedCredits} Credits.`);
+    } catch (err) {
+      console.error('Unexpected error:', err);
+    }
+  };
+  
 
   const toggleBlurEffect = (word: string) => {
     setBlurredWords((prev) =>
@@ -319,7 +394,6 @@ export default function WritingPage({
                 Back to Home
               </Button>
 
-              {/* New Button - Next Level */}
               <Button
                 onClick={async () => {
                   await HandleResult()
@@ -402,7 +476,7 @@ export default function WritingPage({
                   if (confirmed) {
                     await HandleResult();
                     alert('Session deleted!');
-                    router.push('/homepage');
+                    router.push('/writingresults');
                   }
                 }}
                 className="bg-white text-red-600 border-2 border-red-600 text-md rounded-md transition-all duration-300 transform hover:scale-105 hover:shadow-lg w-36 py-3"

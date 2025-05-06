@@ -1,6 +1,6 @@
 "use client";
 
-import { FontCard } from "@/app/shop/shop/font-card"
+import { FontCard } from "@/app/shop/Shop/font-card"
 import { fonts } from "@/app/shop/lib/shop-data"
 
 export function FontsList() {

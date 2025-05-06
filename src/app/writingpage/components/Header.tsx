@@ -29,9 +29,8 @@ export default function Header({ onMenuClick, bgColor, setBgColor }: HeaderProps
   const [user, setUser] = useState<{
     username: string;
     userLevel: number;
-    xp: string;
-    credits: number;
-    avatar_url?: string;
+    usercurrentExp: string;
+    userCredits: number;
   } | null>(null);
 
   useEffect(() => {
@@ -56,7 +55,7 @@ export default function Header({ onMenuClick, bgColor, setBgColor }: HeaderProps
 
         const { data, error } = await supabase
           .from('User')
-          .select('username, userLevel, xp, credits, avatar_url')
+          .select('username, userLevel, usercurrentExp, userCredits')
           .eq('id', user.id)
           .single();
 
@@ -130,7 +129,7 @@ export default function Header({ onMenuClick, bgColor, setBgColor }: HeaderProps
           {/* XP */}
           <div className="flex items-center justify-center w-20 h-8 px-2 py-1 bg-white rounded-full shadow-sm">
             <span className="text-sm text-blue-600 font-semibold mr-1">XP</span>
-            <span className="text-sm font-bold text-black">{user?.xp ?? '0.0'}</span>
+            <span className="text-sm font-bold text-black">{user?.usercurrentExp ?? '0.0'}</span>
           </div>
         </div>
 
