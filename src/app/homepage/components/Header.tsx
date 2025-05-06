@@ -103,7 +103,7 @@ export function Header() {
 
           </div>
 
-          {/* Shop Button */}
+          {/* components Button */}
           <button
             onClick={() => router.push('/shop')}
             className="text-white hover:text-sky-950 transition-transform transform hover:scale-110 duration-300"

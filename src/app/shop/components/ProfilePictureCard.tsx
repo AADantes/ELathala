@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { Card, CardHeader, CardFooter, CardTitle } from '@/app/shop/ui/card';
 import { Button } from '@/app/shop/ui/button';
-import { PurchaseDialog } from '@/app/shop/Shop/purchase-dialog';
+import { PurchaseDialog } from '@/app/shop/components/purchase-dialog';
 import supabase from '../../../../config/supabaseClient';
 
 interface ProfilePicture {
@@ -44,8 +44,8 @@ export function ProfilePictureCard({ picture }: { picture: ProfilePicture }) {
   );
 }
 
-// Main Shop Component
-export default function ProfilePictureShop() {
+// Main components Component
+export default function ProfilePicturecomponents() {
   const [pictures, setPictures] = useState<ProfilePicture[]>([]);
   const [loading, setLoading] = useState(true);
 

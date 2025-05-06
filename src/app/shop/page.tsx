@@ -3,10 +3,10 @@
 import { Button } from "../shop/ui/button"
 import { useState, useEffect } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../shop/ui/tabs"
-import { CreditDisplay } from "../shop/Shop/credit-display"
-import { ProfilePicturesList } from "../shop/Shop/ProfilePictureList"
-import { FontsList } from "../shop/Shop/fonts-list"
-import { FeaturesList } from "../shop/Shop/features-list"
+import { CreditDisplay } from "../shop/components/credit-display"
+import { ProfilePicturesList } from "../shop/components/ProfilePictureList"
+import { FontsList } from "../shop/components/fonts-list"
+import { FeaturesList } from "../shop/components/features-list"
 import supabase from "../../../config/supabaseClient"
 
 export default function Shop() {
@@ -62,7 +62,7 @@ export default function Shop() {
     <div className="container mx-auto py-8 px-4">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Shop</h1>
+          <h1 className="text-3xl font-bold tracking-tight">components</h1>
           <p className="text-muted-foreground mt-1">
           </p>
         </div>

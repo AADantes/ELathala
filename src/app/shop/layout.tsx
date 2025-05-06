@@ -7,7 +7,7 @@ import { ThemeProvider } from "../shop/theme-provider"
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  title: "Writer's Hub - Shop",
+  title: "Writer's Hub - components",
   description: "Purchase credits and unlock premium features for your writing experience",
     generator: 'v0.dev'
 }

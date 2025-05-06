@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { ProfilePictureCard } from "@/app/shop/Shop/ProfilePictureCard";
+import { ProfilePictureCard } from "@/app/shop/components/ProfilePictureCard";
 import supabase from "../../../../config/supabaseClient";
 
 interface ProfilePicture {
