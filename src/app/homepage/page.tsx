@@ -1,4 +1,4 @@
-"use client";
+'use client'
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -14,42 +14,46 @@ export default function HomePage() {
   const [userData, setUserData] = useState<any>(null);
   const [works, setWorks] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isExperienceDialogOpen, setIsExperienceDialogOpen] = useState(false); // Add this state
 
   useEffect(() => {
     const fetchUserData = async () => {
       setLoading(true);
-
+  
       // Get the currently authenticated user
       const {
-        data: { user },
+        data: { user: authUser },
         error: authError,
       } = await supabase.auth.getUser();
-
-      if (authError || !user) {
-        console.error("Error fetching user:", authError);
+  
+      if (authError || !authUser) {
+        console.error("Error fetching auth user:", authError);
         router.push("/login");
         return;
       }
-
-      // Fetch user profile data
+  
+      console.log("Authenticated UID:", authUser.id);
+  
+      // Fetch user profile from User table using auth_user_id
       const { data, error } = await supabase
-        .from("User")
-        .select("id, username, userLevel, usercurrentExp, targetExp")
-        .eq("id", user.id)
+        .from("User") // Or "user" depending on your table naming
+        .select("username, userLevel, usercurrentExp, targetExp, userCredits")
+        .eq("id", authUser.id) // <-- Match by UID
         .single();
-
+  
       if (error) {
-        console.error("Error fetching user data:", error);
+        console.error("Error fetching user profile:", error);
         setLoading(false);
         return;
       }
-
+  
       if (data) {
         setUserData({
           username: data.username ?? "Unknown User",
           experience: data.usercurrentExp ?? 0,
           level: data.userLevel ?? 1,
           totalExperience: data.targetExp ?? 100,
+          credits: data.userCredits ?? 0, // Add this if needed
         });
       }
 
@@ -57,7 +61,7 @@ export default function HomePage() {
       const { data: writtenWorks, error: worksError } = await supabase
         .from("Written Works")
         .select("workID, numberofWords, noOfWordsSet, timelimitSet, timeRendered")
-        .eq("id", user.id);
+        .eq("id", authUser.id);
 
       if (worksError) {
         console.error("Error fetching written works:", worksError);
@@ -86,7 +90,12 @@ export default function HomePage() {
       <Header />
       <main className="container mx-auto px-4 py-8">
         <div className="grid gap-6 md:grid-cols-2">
-          <UserPanel userData={userData} />
+          {/* Pass the necessary props to UserPanel */}
+          <UserPanel 
+            userData={userData} 
+            isExperienceDialogOpen={isExperienceDialogOpen} 
+            setIsExperienceDialogOpen={setIsExperienceDialogOpen} 
+          />
           <WritingHistoryPanel works={works} />
         </div>
         <div className="mt-8">

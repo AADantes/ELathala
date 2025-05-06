@@ -17,47 +17,52 @@ const bebasNeue = Bebas_Neue({
 
 export function Header() {
   const [showSidebar, setShowSidebar] = useState(false);
+  const router = useRouter();
   const [user, setUser] = useState<{
     username: string;
     userLevel: number;
-    xp: string;
-    credits: number;
+    usercurrentExp: string;
+    userCredits: number;
     avatar_url?: string;
   } | null>(null);
-  const router = useRouter();
-
-  useEffect(() => {
-    const fetchUser = async () => {
-      const {
-        data: { user },
-        error: authError,
-      } = await supabase.auth.getUser();
-
-      if (authError || !user) {
-        console.error('Error fetching auth user:', authError);
-        return;
-      }
-
-      const { data, error } = await supabase
-        .from('User')
-        .select('username, userLevel, xp, credits, avatar_url')
-        .eq('id', user.id)
-        .single();
-
-      if (error) {
-        console.error('Error fetching user data:', error);
-      } else {
-        setUser(data);
-      }
-    };
-
-    fetchUser();
-  }, []);
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
     router.push('/landingpage');
   };
+
+  
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      const {
+        data: { user: authUser },
+        error: authError,
+      } = await supabase.auth.getUser();
+  
+      if (authError || !authUser) {
+        console.error('Error fetching auth user:', authError);
+        return;
+      }
+  
+      console.log('Authenticated user UID:', authUser.id);
+  
+      const { data, error } = await supabase
+        .from('User') // or from('"User"') if case-sensitive
+        .select('username, userLevel, usercurrentExp, userCredits')
+        .eq('id', authUser.id) // ✅ filter by UID column in your table
+        .single();
+  
+      if (error) {
+        console.error('Error fetching user data:', error);
+      } else {
+        console.log('Fetched user data:', data);
+        setUser(data);
+      }
+    };
+  
+    fetchUser();
+  }, []);
 
   return (
     <header className="border-b border-transparent bg-[#4F8FB7]">
@@ -83,17 +88,19 @@ export function Header() {
         <div className="flex items-center space-x-4">
           {/* Stats Display */}
           <div className="flex items-center space-x-2">
-            {/* Level */}
-            <div className="flex items-center justify-center w-20 h-8 px-2 py-1 bg-white rounded-full shadow-sm">
-              <span className="text-lg mr-1">✒️</span>
-              <span className="text-sm font-bold">{user?.userLevel ?? 1}</span>
-            </div>
+  {/* Level */}
+  <div className="flex items-center justify-center w-20 h-8 px-2 py-1 bg-white rounded-full shadow-sm">
+    <span className="text-lg mr-1">✒️</span>
+    <span className="text-sm font-bold">{user?.userLevel}</span>
+  </div>
 
-            {/* XP */}
-            <div className="flex items-center justify-center w-20 h-8 px-2 py-1 bg-white rounded-full shadow-sm">
-              <span className="text-sm text-blue-600 font-semibold mr-1">XP</span>
-              <span className="text-sm font-bold">{user?.xp ?? "0.0"}</span>
-            </div>
+  {/* Credits */}
+  <div className="flex items-center justify-center w-24 h-8 px-2 py-1 bg-white rounded-full shadow-sm">
+    <span className="text-sm text-green-600 font-semibold mr-1">Credits</span>
+    <span className="text-sm font-bold">{user?.userCredits}</span>
+  </div>
+
+
           </div>
 
           {/* Shop Button */}
