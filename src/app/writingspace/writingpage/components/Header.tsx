@@ -104,7 +104,7 @@ export default function Header({ onMenuClick, bgColor, setBgColor }: HeaderProps
           <Menu className="h-7 w-7 text-white" />
         </Button>
         <Link href="/" className="flex items-center space-x-1 ml-2">
-          <img src="/logos/logo.png" alt="E-Lathala Logo" className="h-12 w-12" />
+          <img src="https://ueagmtscbdirqgbjxaqb.supabase.co/storage/v1/object/public/elathala-logo//logo.png" alt="E-Lathala Logo" className="h-12 w-12" />
           <span
             className={`font-bold text-3xl text-white ${bebasNeue.className} ml-1`}
             style={{
