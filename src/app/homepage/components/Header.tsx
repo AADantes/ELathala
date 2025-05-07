@@ -174,7 +174,7 @@ export function Header() {
                     href="/homepage"
                     className="flex items-center px-6 py-3 text-lg text-black transition-all duration-300 hover:bg-gray-100 hover:scale-105 hover:shadow-lg rounded-xl"
                   >
-                    <Home className="h-7 w-7 mr-4 text-blue-500" />
+                    <Home className="h-7 w-7 mr-4 text-black" />
                     Home
                   </Link>
                 </li>
@@ -183,7 +183,7 @@ export function Header() {
                     href="/works"
                     className="flex items-center px-6 py-3 text-lg text-black transition-all duration-300 hover:bg-gray-100 hover:scale-105 hover:shadow-lg rounded-xl"
                   >
-                    <Edit className="h-7 w-7 mr-4 text-violet-500" />
+                    <Edit className="h-7 w-7 mr-4 text-black" />
                     Works
                   </Link>
                 </li>
@@ -192,7 +192,7 @@ export function Header() {
                     href="/account-settings"
                     className="flex items-center px-6 py-3 text-lg text-black transition-all duration-300 hover:bg-gray-100 hover:scale-105 hover:shadow-lg rounded-xl"
                   >
-                    <User className="h-7 w-7 mr-4 text-teal-500" />
+                    <User className="h-7 w-7 mr-4 text-black" />
                     Account Settings
                   </Link>
                 </li>
@@ -201,7 +201,7 @@ export function Header() {
                     href="/writingrewards"
                     className="flex items-center px-6 py-3 text-lg text-black transition-all duration-300 hover:bg-gray-100 hover:scale-105 hover:shadow-lg rounded-xl"
                   >
-                    <Award className="h-7 w-7 mr-4 text-yellow-500" />
+                    <Award className="h-7 w-7 mr-4 text-black" />
                     Level Rewards
                   </Link>
                 </li>
@@ -210,16 +210,16 @@ export function Header() {
                     href="/help"
                     className="flex items-center px-6 py-3 text-lg text-black transition-all duration-300 hover:bg-gray-100 hover:scale-105 hover:shadow-lg rounded-xl"
                   >
-                    <HelpCircle className="h-7 w-7 mr-4 text-red-500" />
+                    <HelpCircle className="h-7 w-7 mr-4 text-black" />
                     Help & Support
                   </Link>
                 </li>
                 <li>
                   <button
                     onClick={handleLogout}
-                    className="flex items-center w-full text-left px-6 py-3 text-red-600 transition-all duration-300 hover:bg-red-200 hover:scale-105 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-red-600 focus:ring-opacity-50"
+                    className="flex items-center w-full text-left px-6 py-3 text-black transition-all duration-300 hover:bg-gray-100 hover:scale-105 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-black focus:ring-opacity-50"
                   >
-                    <LogOut className="h-7 w-7 mr-4 text-red-600 transition-transform duration-300 transform hover:scale-110" />
+                    <LogOut className="h-7 w-7 mr-4 text-black transition-transform duration-300 transform hover:scale-110" />
                     Log Out
                   </button>
                 </li>

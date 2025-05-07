@@ -82,73 +82,56 @@ export default function Sidebar({ isOpen, onClose, bgColor }: SidebarProps) {
             <li>
               <Link
                 href="/homepage"
-                className={`flex items-center space-x-4 py-3 px-4 rounded-lg bg-white shadow-md shadow-black/30 transition-all duration-300 ease-in-out transform hover:scale-105 hover:bg-[${hoverBgColor}] group`}
+                className={`flex items-center space-x-4 py-3 px-4 rounded-lg bg-white shadow-md shadow-black/30 transition-all duration-300 ease-in-out transform hover:scale-105 hover:bg-gray-100 group`}
               >
-                <Home className="h-5 w-5 text-[#005B88] transition-all duration-300 group-hover:text-[#005B88]" />
-                <span className="text-black font-bold transition-all duration-300 group-hover:text-black">
-                  Home
-                </span>
+                <Home className="h-5 w-5 text-black" />
+                <span className="text-black font-bold">Home</span>
               </Link>
             </li>
             <li>
               <Link
                 href="/works"
-                className={`flex items-center space-x-4 py-3 px-4 rounded-lg bg-white shadow-md shadow-black/30 transition-all duration-300 ease-in-out transform hover:scale-105 hover:bg-[${hoverBgColor}] group`}
+                className={`flex items-center space-x-4 py-3 px-4 rounded-lg bg-white shadow-md shadow-black/30 transition-all duration-300 ease-in-out transform hover:scale-105 hover:bg-gray-100 group`}
               >
-                <BookOpen className="h-5 w-5 text-[#9D79FF] transition-all duration-300 group-hover:text-[#9D79FF]" />
-                <span className="text-black font-bold transition-all duration-300 group-hover:text-black">
-                  Works
-                </span>
+                <BookOpen className="h-5 w-5 text-black" />
+                <span className="text-black font-bold">Works</span>
               </Link>
             </li>
             <li>
               <Link
-                href="/account-settings" // Updated path to route to the Account Settings page
-                className={`flex items-center space-x-4 py-3 px-4 rounded-lg bg-white shadow-md shadow-black/30 transition-all duration-300 ease-in-out transform hover:scale-105 hover:bg-[${hoverBgColor}] group`}
+                href="/account-settings"
+                className={`flex items-center space-x-4 py-3 px-4 rounded-lg bg-white shadow-md shadow-black/30 transition-all duration-300 ease-in-out transform hover:scale-105 hover:bg-gray-100 group`}
               >
-                <User
-                  className="h-5 w-5"
-                  style={{
-                    color: bgColor, // Dynamically set the icon color to match the background color
-                  }}
-                />
-                <span className="text-black font-bold transition-all duration-300 group-hover:text-black">
-                  Account Settings
-                </span>
+                <User className="h-5 w-5 text-black" />
+                <span className="text-black font-bold">Account Settings</span>
               </Link>
             </li>
             <li>
               <Link
-                href="/writingrewards"
-                className={`flex items-center space-x-4 py-3 px-4 rounded-lg bg-white shadow-md shadow-black/30 transition-all duration-300 ease-in-out transform hover:scale-105 hover:bg-[${hoverBgColor}] group`}
+                href="/levels-rewards"
+                className={`flex items-center space-x-4 py-3 px-4 rounded-lg bg-white shadow-md shadow-black/30 transition-all duration-300 ease-in-out transform hover:scale-105 hover:bg-gray-100 group`}
               >
-                <Star className="h-5 w-5 text-[#FFD700] transition-all duration-300 group-hover:text-[#FFD700]" />
-                <span className="text-black font-bold transition-all duration-300 group-hover:text-black">
-                  Level Rewards
-                </span>
+                <Star className="h-5 w-5 text-black" />
+                <span className="text-black font-bold">Levels and Rewards</span>
               </Link>
             </li>
             <li>
               <Link
                 href="/help"
-                className={`flex items-center space-x-4 py-3 px-4 rounded-lg bg-white shadow-md shadow-black/30 transition-all duration-300 ease-in-out transform hover:scale-105 hover:bg-[${hoverBgColor}] group`}
+                className={`flex items-center space-x-4 py-3 px-4 rounded-lg bg-white shadow-md shadow-black/30 transition-all duration-300 ease-in-out transform hover:scale-105 hover:bg-gray-100 group`}
               >
-                <HelpCircle className="h-5 w-5 text-[#FF6B6B] transition-all duration-300 group-hover:text-[#FF6B6B]" />
-                <span className="text-black font-bold transition-all duration-300 group-hover:text-black">
-                  Help & Support
-                </span>
+                <HelpCircle className="h-5 w-5 text-black" />
+                <span className="text-black font-bold">Help & Support</span>
               </Link>
             </li>
             <li>
               <Button
                 variant="ghost"
-                className={`w-full flex items-center space-x-4 justify-start py-5 px-4 rounded-lg text-left text-red-500 bg-white shadow-sm shadow-black/20 transition-all duration-300 ease-in-out transform hover:bg-[${hoverBgColor}] group`}
-                onClick={handleLogout} // Call the logout function
+                className={`w-full flex items-center space-x-4 justify-start py-5 px-4 rounded-lg text-left text-black bg-white shadow-sm shadow-black/20 transition-all duration-300 ease-in-out transform hover:bg-gray-100 group`}
+                onClick={handleLogout}
               >
-                <LogOut className="h-5 w-5 text-[#FF6B6B] transition-all duration-300 group-hover:text-[#FF6B6B]" />
-                <span className="text-red-500 font-bold transition-all duration-300 group-hover:text-red-500">
-                  Logout
-                </span>
+                <LogOut className="h-5 w-5 text-black" />
+                <span className="text-black font-bold">Logout</span>
               </Button>
             </li>
           </ul>
