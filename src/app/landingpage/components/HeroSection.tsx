@@ -1,10 +1,31 @@
 'use client';
 
-import { motion } from 'framer-motion';
+import { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/app/landingpage/ui/button';
-import { Feather } from 'lucide-react';
+import { Feather, AlertTriangle } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
-export default function HeroSection() {
+export default function HeroSection({
+  openSignUpDialog,
+  user,
+}: {
+  openSignUpDialog: () => void;
+  user?: any;
+}) {
+  const router = useRouter();
+  const [showWarning, setShowWarning] = useState(false);
+
+  const handleStartWriting = () => {
+    if (user) {
+      router.push('/writingspace');
+    } else {
+      setShowWarning(true);
+      openSignUpDialog();
+      setTimeout(() => setShowWarning(false), 3500);
+    }
+  };
+
   return (
     <section className="relative w-full min-h-screen pt-32 md:pt-40 lg:pt-48 xl:pt-56 pb-12 md:pb-24 lg:pb-32 xl:pb-48 overflow-hidden bg-white">
       {/* Background Feathers */}
@@ -145,27 +166,47 @@ export default function HeroSection() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.2 }}
+            className="w-full flex flex-col items-center"
           >
-            <Button
-              className="bg-gradient-to-r from-sky-800 to-sky-900 text-white hover:bg-sky-900 font-bold rounded-lg shadow-lg transform transition-all hover:scale-105 px-8 py-4 text-lg border-none flex items-center gap-3"
-            >
-              Start Writing
-              <motion.div
-                animate={{
-                  x: [0, 10, -10, 0],
-                  y: [0, -5, 5, 0],
-                  rotate: [0, 5, -5, 0],
-                }}
-                transition={{
-                  duration: 2,
-                  repeat: Infinity,
-                  repeatType: 'loop',
-                  ease: 'easeInOut',
-                }}
+            <div className="relative w-full flex flex-col items-center">
+              <Button
+                className="bg-gradient-to-r from-sky-800 to-sky-900 text-white hover:bg-sky-900 font-bold rounded-lg shadow-lg transform transition-all hover:scale-105 px-8 py-4 text-lg border-none flex items-center gap-3"
+                onClick={handleStartWriting}
               >
-                <Feather className="w-4 h-4" />
-              </motion.div>
-            </Button>
+                Start Writing
+                <motion.div
+                  animate={{
+                    x: [0, 10, -10, 0],
+                    y: [0, -5, 5, 0],
+                    rotate: [0, 5, -5, 0],
+                  }}
+                  transition={{
+                    duration: 2,
+                    repeat: Infinity,
+                    repeatType: 'loop',
+                    ease: 'easeInOut',
+                  }}
+                >
+                  <Feather className="w-4 h-4" />
+                </motion.div>
+              </Button>
+              <AnimatePresence>
+                {showWarning && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 10 }}
+                    transition={{ duration: 0.4 }}
+                    className="absolute left-1/2 top-full -translate-x-1/2 mt-3 w-auto max-w-full flex items-center justify-center gap-2 bg-red-50 border border-red-300 rounded-lg px-3 py-2 shadow-lg z-[100]"
+                  >
+                    <AlertTriangle className="text-red-500 w-5 h-5 animate-bounce shrink-0" />
+                    <span className="text-red-700 font-semibold text-xs sm:text-sm text-center whitespace-nowrap">
+                      Please <span className="underline underline-offset-2">sign up</span> or <span className="underline underline-offset-2">log in</span> to start writing!
+                    </span>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
           </motion.div>
         </div>
       </div>

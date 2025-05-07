@@ -15,12 +15,11 @@ const bebasNeue = Bebas_Neue({
   weight: '400',
 });
 
-export default function Header() {
+export default function Header({ isSignUpOpen, setIsSignUpOpen }: { isSignUpOpen: boolean, setIsSignUpOpen: (open: boolean) => void }) {
   const [loginEmail, setLoginEmail] = useState('');
   const [loginPassword, setLoginPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isLoginOpen, setIsLoginOpen] = useState(false);
-  const [isSignUpOpen, setIsSignUpOpen] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [signUpEmail, setSignUpEmail] = useState('');
   const [signUpUsername, setSignUpUsername] = useState('');
