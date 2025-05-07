@@ -18,8 +18,24 @@ export interface UserData {
   totalExperience: number
 }
 
+export interface WrittenWork {
+  workTitle: string
+  numberofWords: number
+  noOfWordsSet: number
+  timelimitSet: number
+}
+
 export function UserPanel() {
   const [userData, setUserData] = useState<UserData | null>(null)
+  const [writtenWorks, setWrittenWorks] = useState<WrittenWork[]>([])
+  const [bestPerformance, setBestPerformance] = useState<{
+    highestWords: WrittenWork
+    highestTarget: WrittenWork
+    lowestTime: WrittenWork
+  } | null>(null)
+
+  
+
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -51,6 +67,40 @@ export function UserPanel() {
           level: data.userLevel ?? 1,
           totalExperience: parseFloat(data.targetExp),
         })
+      }
+
+      const { data: writtenWorksData, error: writtenWorksError } = await supabase
+        .from("written_works")
+        .select("workTitle, numberofWords, noOfWordsSet, timelimitSet")
+        .eq("UserID", authUser.id)
+
+      if (writtenWorksError) {
+        console.error("Error fetching written works:", writtenWorksError)
+        return
+      }
+
+      if (writtenWorksData) {
+        setWrittenWorks(writtenWorksData)
+
+        
+  const highestWords = writtenWorksData.reduce((max, work) =>
+    work.numberofWords > max.numberofWords ? work : max
+  )
+
+  const highestTarget = writtenWorksData.reduce((max, work) =>
+    work.noOfWordsSet > max.noOfWordsSet ? work : max
+  )
+
+  const lowestTime = writtenWorksData.reduce((min, work) =>
+    work.timelimitSet < min.timelimitSet ? work : min
+  )
+
+  setBestPerformance({
+    highestWords,
+    highestTarget,
+    lowestTime,
+  })
+  
       }
     }
 
@@ -94,6 +144,64 @@ export function UserPanel() {
             {userData.experience} / {userData.totalExperience} XP
           </p>
         </div>
+
+        {/* Scrollable Table with Borders */}
+        <div className="overflow-y-auto max-h-[300px] mt-4 border border-gray-300 rounded">
+          <table className="min-w-full table-fixed border-collapse">
+            <thead className="bg-gray-100">
+              <tr>
+                <th className="px-4 py-2 text-left text-sm font-semibold text-gray-900 border border-gray-300">Work Title</th>
+                <th className="px-4 py-2 text-left text-sm font-semibold text-gray-900 border border-gray-300">Number of Words</th>
+                <th className="px-4 py-2 text-left text-sm font-semibold text-gray-900 border border-gray-300">Target Word Count</th>
+                <th className="px-4 py-2 text-left text-sm font-semibold text-gray-900 border border-gray-300">Time Limit (min)</th>
+              </tr>
+            </thead>
+            <tbody>
+  {writtenWorks.length === 0 ? (
+    <tr>
+      <td colSpan={4} className="px-4 py-2 text-center text-sm text-gray-700 border border-gray-300">
+        No written works found.
+      </td>
+    </tr>
+  ) : (
+    writtenWorks.map((work, index) => (
+      <tr key={index} className="bg-white hover:bg-gray-50">
+        <td className="px-4 py-2 text-sm text-gray-700 border border-gray-300">{work.workTitle}</td>
+        <td
+          className={`px-4 py-2 text-sm text-gray-700 border border-gray-300 ${
+            work.numberofWords >= work.noOfWordsSet
+              ? "bg-green-100"
+              : "bg-red-100"
+          }`}
+        >
+          {work.numberofWords}
+        </td>
+        <td className="px-4 py-2 text-sm text-gray-700 border border-gray-300">{work.noOfWordsSet}</td>
+        <td className="px-4 py-2 text-sm text-gray-700 border border-gray-300">{work.timelimitSet}</td>
+      </tr>
+    ))
+  )}
+</tbody>
+          </table>
+
+
+
+        </div>
+
+        {bestPerformance && (
+  <div className="mt-4 text-sm text-gray-800 space-y-2">
+    <p>
+      🏆 <strong>Most Words Written:</strong> {bestPerformance.highestWords.workTitle} ({bestPerformance.highestWords.numberofWords} words)
+    </p>
+    <p>
+      🎯 <strong>Highest Target Word Count:</strong> {bestPerformance.highestTarget.workTitle} ({bestPerformance.highestTarget.noOfWordsSet} words)
+    </p>
+    <p>
+      ⏱️ <strong>Lowest Time Limit:</strong> {bestPerformance.lowestTime.workTitle} ({bestPerformance.lowestTime.timelimitSet} min)
+    </p>
+  </div>
+)}
+
       </CardContent>
     </Card>
   )

@@ -8,8 +8,8 @@ import { Award, BookText, Star } from 'lucide-react'
 import supabase from '../../../../../config/supabaseClient'
 
 type PerformanceCardProps = {
-  earnedExp: string;
-  earnedCredits: string;
+  earnedExp: number;
+  earnedCredits: number;
   noOfWordsSet: number;
   numberofWords: number;
 };

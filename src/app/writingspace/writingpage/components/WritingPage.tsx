@@ -8,7 +8,8 @@ import supabase from '../../../../../config/supabaseClient';
 import { useRouter } from 'next/navigation';
 import { useUuid } from '../../UUIDContext';
 import { jsPDF } from "jspdf";
-import { Dispatch, SetStateAction } from 'react';
+import { useResults } from '../../resultsContext';
+
 
 interface WritingPageProps {
   timeLimit: number;
@@ -60,6 +61,9 @@ export default function WritingPage({
   const [userCredits, setUserCredits] = useState<number>(0);
   const [canSave, setCanSave] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+  const { setEarnedExp, setEarnedCredits } = useResults();
+  const [localWords, setLocalWords] = useState(currentWords); // Local state for input/output binding
+
 
 
   useEffect(() => {
@@ -113,10 +117,26 @@ export default function WritingPage({
   
       // Generate the PDF
       const doc = new jsPDF();
+      const marginLeft = 10;
+      const marginTop = 30;
+      const pageHeight = doc.internal.pageSize.height;
+      const lineHeight = 10;
+      const maxLineWidth = 180; // A4 width minus margins (210 - 2*15)
+
       doc.setFontSize(18);
-      doc.text(title || "Untitled Work", 10, 20);
+      doc.text(title || "Untitled Work", marginLeft, 20);
       doc.setFontSize(12);
-      doc.text(writtenContent, 10, 30);
+      const lines = doc.splitTextToSize(writtenContent, maxLineWidth);
+        let currentY = marginTop;
+
+        for (let i = 0; i < lines.length; i++) {
+        if (currentY + lineHeight > pageHeight - 10) {
+         doc.addPage();
+        currentY = 20;
+        }
+        doc.text(lines[i], marginLeft, currentY);
+        currentY += lineHeight;
+        }
   
       const pdfBlob = doc.output("blob");
   
@@ -398,9 +418,14 @@ export default function WritingPage({
     };
   }, [text, isTyping, currentWords, idleWarning, wordCount, isTimeUp]);
 
+  useEffect(() => {
+    // If you need to update local state with currentWords from context
+    setLocalWords(currentWords);
+  }, [currentWords]);
+
   const HandleResult = async () => {
     try {
-      // Get current authenticated user
+      // 1. Get authenticated user
       const {
         data: { user },
         error: userFetchError,
@@ -418,10 +443,10 @@ export default function WritingPage({
   
       const userId = user.id;
   
-      // ✅ Fetch multipliers from User table
+      // 2. Fetch user multipliers
       const { data: multiplierData, error: multiplierError } = await supabase
         .from('User')
-        .select('userExpMultiplier, userCreditMultiplier')
+        .select('userExpMultiplier, userCreditMultiplier, usercurrentExp, userCredits')
         .eq('id', userId)
         .single();
   
@@ -430,76 +455,25 @@ export default function WritingPage({
         return;
       }
   
-      const { userExpMultiplier, userCreditMultiplier } = multiplierData;
+      const {
+        userExpMultiplier,
+        userCreditMultiplier,
+        usercurrentExp,
+        userCredits,
+      } = multiplierData;
   
-      // ✅ Calculate earned EXP and credits using multipliers
+      // 3. Calculate earned EXP and credits
       const earnedExp = currentWords * userExpMultiplier;
       const earnedCredits = currentWords * userCreditMultiplier;
   
-      // Update written_works table
-      await updateWrittenWorks(earnedExp);
+      
+      setEarnedExp(earnedExp); // set the earnedExp in context
+      setEarnedCredits(earnedCredits); // set the earnedCredits in context
+      setCurrentWords(currentWords);
   
-      // Redirect to results page
-      router.push(`/results?earnedExp=${earnedExp}&earnedCredits=${earnedCredits}`);
-    } catch (error) {
-      console.error('Error in HandleResult:', error);
-    }
-  };
-  
-  const updateWrittenWorks = async (earnedExp: number) => {
-    try {
-      const { error: writtenWorksError } = await supabase
-        .from('written_works')
-        .update({
-          numberofWords: currentWords,
-        })
-        .eq('workID', workID);
-  
-      if (writtenWorksError) {
-        console.error('Error updating written_works in Supabase:', writtenWorksError.message);
-      } else {
-        console.log('written_works updated successfully.');
-      }
-    } catch (err) {
-      console.error('Error updating written_works:', err);
-    }
-  };
-  
-  const HandleExpCreditGain = async (earnedExp: number, earnedCredits: number) => {
-    try {
-      const {
-        data: { user },
-        error: userFetchError,
-      } = await supabase.auth.getUser();
-  
-      if (userFetchError) {
-        console.error('Error fetching user from Supabase auth:', userFetchError.message);
-        return;
-      }
-  
-      if (!user) {
-        console.warn('No authenticated user found.');
-        return;
-      }
-  
-      const { data: userData, error: userDataError } = await supabase
-        .from('User')
-        .select('usercurrentExp, userCredits')
-        .eq('id', user.id)
-        .single();
-  
-      if (userDataError) {
-        console.error('Error fetching user data from User table:', userDataError.message);
-        return;
-      }
-  
-      if (!userData) {
-        console.warn('No user data found.');
-        return;
-      }
-  
-      const newExp = (userData.usercurrentExp || 0) + earnedExp;
-      const newCredits = (userData.userCredits || 0) + earnedCredits;
+      // 5. Update User table
+      const newExp = (usercurrentExp || 0) + earnedExp;
+      const newCredits = (userCredits || 0) + earnedCredits;
   
       const { error: userUpdateError } = await supabase
         .from('User')
@@ -507,20 +481,23 @@ export default function WritingPage({
           usercurrentExp: newExp,
           userCredits: newCredits,
         })
-        .eq('id', user.id);
+        .eq('id', userId);
   
       if (userUpdateError) {
-        console.error('Error updating User in Supabase:', userUpdateError.message);
+        console.error('Error updating User:', userUpdateError.message);
         return;
       }
   
-      console.log('User updated successfully.');
-  
       console.log(`User gained ${earnedExp} EXP and ${earnedCredits} Credits.`);
-    } catch (err) {
-      console.error('Unexpected error:', err);
+  
+      // 6. Navigate to results page (no need to use searchParams now)
+      router.push(`/resultspage`);
+  
+    } catch (error) {
+      console.error('Error in HandleResult:', error);
     }
   };
+  
 
   
 

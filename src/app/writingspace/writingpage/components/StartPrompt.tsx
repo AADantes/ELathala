@@ -308,6 +308,7 @@ export default function StartPrompt({ onStart }: StartPromptProps) {
                 value={wordCount}
                 onChange={(e) => setWordCount(e.target.value)}
                 min={50}
+                max={1000}
               />
               {wordCount && Number(wordCount) < 50 && (
                 <p className="text-red-500 text-sm mt-2">
