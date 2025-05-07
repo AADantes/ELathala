@@ -467,6 +467,16 @@ export default function WritingPage({
       const earnedCredits = currentWords * userCreditMultiplier;
   
       
+      const { error: updateWordsError } = await supabase
+  .from('written_works')
+  .update({ numberofWords: currentWords })
+  .eq('workID', workID);
+
+if (updateWordsError) {
+  console.error('Error updating numberofWords in written_works:', updateWordsError.message);
+  return;
+}
+
       setEarnedExp(earnedExp); // set the earnedExp in context
       setEarnedCredits(earnedCredits); // set the earnedCredits in context
       setCurrentWords(currentWords);
@@ -490,8 +500,6 @@ export default function WritingPage({
   
       console.log(`User gained ${earnedExp} EXP and ${earnedCredits} Credits.`);
   
-      // 6. Navigate to results page (no need to use searchParams now)
-      router.push(`/resultspage`);
   
     } catch (error) {
       console.error('Error in HandleResult:', error);
@@ -499,9 +507,6 @@ export default function WritingPage({
   };
   
 
-  
-
-  
   useEffect(() => {
     if (isTimeUp && currentWords >= wordCount) {
       setShowDoneModal(true);
