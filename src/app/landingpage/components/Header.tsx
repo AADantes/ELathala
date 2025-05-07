@@ -80,7 +80,6 @@ export default function Header({ isSignUpOpen, setIsSignUpOpen }: { isSignUpOpen
           isVerified: data.user?.email_confirmed_at ? true : false,
           isAdmin: false,
           dateRegistered: new Date(),
-          lastLoggedIn: null,
           created_at: new Date(),
         },
       ]);
