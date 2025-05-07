@@ -15,8 +15,8 @@ export function RewardsGallery({ rewardsData }: RewardsGalleryProps) {
   return (
     <Card className="border-none shadow-xl overflow-hidden bg-white">
       <CardHeader className="relative z-10 border-b border-slate-100 pb-6 bg-white">
-        <CardTitle className="text-2xl font-bold text-sky-800 flex items-center">
-          <Gift className="h-6 w-6 mr-2 text-black" /> {/* Ensuring Gift icon is black */}
+        <CardTitle className="text-2xl font-bold text-black flex items-center">
+          <Gift className="h-6 w-6 mr-2 text-black" />
           Rewards Gallery
         </CardTitle>
         <CardDescription className="text-black/80">
@@ -42,41 +42,38 @@ function RewardCard({ reward }: { reward: Reward }) {
       transition={{ type: "spring", stiffness: 300, damping: 20 }}
       className={`flex flex-col p-5 rounded-xl border transition-all duration-300 ${
         reward.unlocked
-          ? "border-sky-100 bg-gradient-to-br from-sky-50/60 to-white"
-          : "border-slate-100 bg-gradient-to-br from-slate-50/60 to-white"
+          ? "border-gray-200 bg-white"
+          : "border-gray-200 bg-white"
       }`}
     >
       <div className="flex justify-between items-start mb-4">
         <div
-          className={`p-3 rounded-xl shadow-inner ${
-            reward.unlocked
-              ? "bg-white" // Ensure the background is white when unlocked
-              : "bg-white" // Ensure the background is white when locked
+          className={`p-3 rounded-lg shadow-inner ${
+            reward.unlocked ? "bg-white" : "bg-white"
           }`}
         >
-          {/* Ensure the icon itself is black */}
           <span className="text-black">{reward.icon}</span>
         </div>
         {reward.unlocked ? (
-          <Badge className="bg-gradient-to-r from-yellow-500 to-yellow-400 text-white border-none shadow-sm py-1">
-            <Unlock className="h-3 w-3 mr-1.5 text-black" /> {/* Unlock icon color changed to black */}
+          <Badge className="bg-gradient-to-r from-yellow-500 to-yellow-400 text-white border-none shadow-sm py-1 rounded-md">
+            <Unlock className="h-3 w-3 mr-1.5 text-black" />
             Unlocked
           </Badge>
         ) : (
-          <Badge variant="outline" className="bg-white text-black border-slate-200 py-1">
-            <Lock className="h-3 w-3 mr-1.5 text-black" /> {/* Lock icon color changed to black */}
+          <Badge variant="outline" className="bg-white text-black border-gray-200 py-1">
+            <Lock className="h-3 w-3 mr-1.5 text-black" />
             Level {reward.level}
           </Badge>
         )}
       </div>
 
-      <h4 className="font-semibold text-sky-800 text-lg mb-2">{reward.name}</h4>
+      <h4 className="font-semibold text-black text-lg mb-2">{reward.name}</h4>
       <p className="text-sm text-black/80 mb-4 flex-grow">{reward.description}</p>
 
       {reward.unlocked ? (
         <Button
           size="sm"
-          className="mt-auto bg-gradient-to-r from-sky-700 to-sky-600 hover:from-sky-800 hover:to-sky-700 text-white shadow-md hover:shadow-lg transition-all"
+          className="mt-auto bg-black text-white hover:bg-gray-800 shadow-md hover:shadow-lg transition-all"
         >
           Use Reward
         </Button>
@@ -85,9 +82,9 @@ function RewardCard({ reward }: { reward: Reward }) {
           size="sm"
           variant="outline"
           disabled
-          className="mt-auto border-sky-600 text-sky-700 opacity-50 cursor-not-allowed"
+          className="mt-auto border-gray-600 text-gray-700 opacity-50 cursor-not-allowed"
         >
-          <Lock className="h-3.5 w-3.5 mr-1.5 text-black" /> {/* Lock icon color changed to black */}
+          <Lock className="h-3.5 w-3.5 mr-1.5 text-black" />
           Locked
         </Button>
       )}

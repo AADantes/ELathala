@@ -31,7 +31,7 @@ export function UserProfileCard({ userData, levelMilestones, progressValue }: Us
               Level {userData.level} • {levelMilestones[userData.level - 1].name}
             </CardDescription>
           </div>
-          <Badge className="bg-gradient-to-r from-amber-500 to-amber-400 hover:from-amber-600 hover:to-amber-500 border-none shadow text-white py-1.5">
+          <Badge className="bg-gradient-to-r from-amber-500 to-amber-400 hover:from-amber-600 hover:to-amber-500 border-none shadow text-white py-1.5 rounded-md">
             <Star className="h-4 w-4 mr-1.5" fill="white" />
             Level {userData.level}
           </Badge>
@@ -52,10 +52,10 @@ export function UserProfileCard({ userData, levelMilestones, progressValue }: Us
               </span>
             </div>
 
-            {/* Sky blue gradient XP bar */}
+            {/* Black gradient XP bar */}
             <div className="h-3 w-full bg-slate-100 rounded-full overflow-hidden shadow-sm">
               <div
-                className="h-full bg-gradient-to-r from-sky-200 to-sky-600 transition-all duration-700 ease-out"
+                className="h-full bg-gradient-to-r from-black to-gray-800 transition-all duration-700 ease-out"
                 style={{ width: `${progressValue}%` }}
               ></div>
             </div>

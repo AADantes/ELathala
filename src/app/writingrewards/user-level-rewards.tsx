@@ -25,7 +25,7 @@ export function UserLevelRewards() {
   }, [progressPercentage])
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 bg-white"> {/* Set the background to white */}
       {/* User Profile Card */}
       <UserProfileCard userData={userData} levelMilestones={levelMilestones} progressValue={progressValue} />
 
@@ -35,7 +35,7 @@ export function UserLevelRewards() {
           {/* Overview Tab Button */}
           <TabsTrigger
             value="overview"
-            className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-sky-600 data-[state=active]:to-sky-500 data-[state=active]:text-white data-[state=inactive]:bg-transparent data-[state=inactive]:text-sky-600 font-medium text-sm py-1.5 px-4 rounded-md transition-all duration-300 hover:bg-sky-600 hover:text-white"
+            className="data-[state=active]:bg-black data-[state=active]:text-white data-[state=inactive]:bg-transparent data-[state=inactive]:text-black font-medium text-sm py-1.5 px-4 rounded-md transition-all duration-300 hover:bg-black hover:text-white"
           >
             Overview
           </TabsTrigger>
@@ -43,7 +43,7 @@ export function UserLevelRewards() {
           {/* Rewards Tab Button */}
           <TabsTrigger
             value="rewards"
-            className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-sky-600 data-[state=active]:to-sky-500 data-[state=active]:text-white data-[state=inactive]:bg-transparent data-[state=inactive]:text-sky-600 font-medium text-sm py-1.5 px-4 rounded-md transition-all duration-300 hover:bg-sky-600 hover:text-white"
+            className="data-[state=active]:bg-black data-[state=active]:text-white data-[state=inactive]:bg-transparent data-[state=inactive]:text-black font-medium text-sm py-1.5 px-4 rounded-md transition-all duration-300 hover:bg-black hover:text-white"
           >
             Rewards
           </TabsTrigger>
@@ -51,7 +51,7 @@ export function UserLevelRewards() {
           {/* Level Path Tab Button */}
           <TabsTrigger
             value="levels"
-            className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-sky-600 data-[state=active]:to-sky-500 data-[state=active]:text-white data-[state=inactive]:bg-transparent data-[state=inactive]:text-sky-600 font-medium text-sm py-1.5 px-4 rounded-md transition-all duration-300 hover:bg-sky-600 hover:text-white"
+            className="data-[state=active]:bg-black data-[state=active]:text-white data-[state=inactive]:bg-transparent data-[state=inactive]:text-black font-medium text-sm py-1.5 px-4 rounded-md transition-all duration-300 hover:bg-black hover:text-white"
           >
             Level Path
           </TabsTrigger>

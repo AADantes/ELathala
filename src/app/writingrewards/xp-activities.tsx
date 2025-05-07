@@ -10,23 +10,23 @@ export function XPActivities() {
   return (
     <Card className="border-none shadow-lg overflow-hidden bg-white relative">
       {/* Decorative background blur */}
-      <div className="absolute bottom-0 left-0 w-64 h-64 bg-gradient-to-tr from-blue-100/20 to-blue-300/10 rounded-full translate-y-1/2 -translate-x-1/2 blur-3xl pointer-events-none"></div>
+      <div className="absolute bottom-0 left-0 w-64 h-64 bg-gradient-to-tr from-gray-200/30 to-gray-400/10 rounded-full translate-y-1/2 -translate-x-1/2 blur-3xl pointer-events-none"></div>
 
       <CardHeader className="relative z-10 border-b pb-6">
-        <CardTitle className="text-2xl font-bold text-slate-800 flex items-center">
-          <Zap className="h-5 w-5 mr-2 text-amber-500" />
+        <CardTitle className="text-2xl font-bold text-gray-900 flex items-center tracking-tight">
+          <Zap className="h-5 w-5 mr-2 text-yellow-500" />
           How to Earn XP
         </CardTitle>
-        <CardDescription className="text-slate-500">
+        <CardDescription className="text-gray-500">
           Complete these activities to level up faster
         </CardDescription>
       </CardHeader>
 
       <CardContent className="relative z-10 pt-6 space-y-4">
-        <XPActivity icon={<Edit3 className="h-5 w-5" />} activity="Write 500 words" xp={50} color="blue" />
-        <XPActivity icon={<Clock className="h-5 w-5" />} activity="Daily writing streak" xp={20} color="amber" />
-        <XPActivity icon={<BookOpen className="h-5 w-5" />} activity="Publish an article" xp={100} color="emerald" />
-        <XPActivity icon={<Heart className="h-5 w-5" />} activity="Receive 10 likes" xp={30} color="rose" />
+        <XPActivity icon={<Edit3 className="h-5 w-5 text-blue-500" />} activity="Write 500 words" xp={50} />
+        <XPActivity icon={<Clock className="h-5 w-5 text-purple-500" />} activity="Daily writing streak" xp={20} />
+        <XPActivity icon={<BookOpen className="h-5 w-5 text-green-600" />} activity="Publish an article" xp={100} />
+        <XPActivity icon={<Heart className="h-5 w-5 text-red-500" />} activity="Receive 10 likes" xp={30} />
       </CardContent>
     </Card>
   )
@@ -36,40 +36,23 @@ interface XPActivityProps {
   icon: React.ReactNode
   activity: string
   xp: number
-  color: "blue" | "amber" | "emerald" | "rose"
 }
 
-function XPActivity({ icon, activity, xp, color }: XPActivityProps) {
-  const colorClasses = {
-    blue: "bg-blue-100 text-blue-600",
-    amber: "bg-amber-100 text-amber-600",
-    emerald: "bg-emerald-100 text-emerald-600",
-    rose: "bg-rose-100 text-rose-600",
-  }
-
-  const badgeClasses = {
-    blue: "bg-gradient-to-r from-blue-600 to-blue-500",
-    amber: "bg-gradient-to-r from-amber-500 to-amber-400",
-    emerald: "bg-gradient-to-r from-emerald-600 to-emerald-500",
-    rose: "bg-gradient-to-r from-rose-600 to-rose-500",
-  }
-
+function XPActivity({ icon, activity, xp }: XPActivityProps) {
   return (
     <motion.div
-      whileHover={{ y: -4 }}
-      transition={{ type: "spring", stiffness: 300, damping: 15 }}
-      className="flex justify-between items-center p-4 border border-slate-100 rounded-xl bg-gradient-to-r from-white to-slate-50 shadow-sm hover:shadow-md transition-all group"
+      whileHover={{ y: -2, scale: 1.01 }}
+      transition={{ type: "spring", stiffness: 200, damping: 20 }}
+      className="flex justify-between items-center p-4 border border-gray-200 rounded-xl bg-white shadow-sm hover:shadow-md transition-all group"
     >
       <div className="flex items-center gap-4">
-        <motion.div
-          whileHover={{ scale: 1.1 }}
-          className={`${colorClasses[color]} p-2 rounded-lg transition-transform`}
-        >
+        <div className="bg-gray-100 p-2 rounded-lg border border-gray-200 shadow-inner">
           {icon}
-        </motion.div>
-        <span className="text-base font-medium text-slate-700">{activity}</span>
+        </div>
+        <span className="text-base font-semibold text-gray-800 tracking-tight">{activity}</span>
       </div>
-      <Badge className={`${badgeClasses[color]} text-white text-sm px-2.5 py-1 rounded-md shadow`}>
+      <Badge className="bg-yellow-500 text-white text-xs px-3 py-1 rounded-sm shadow-md border-2 border-yellow-600 tracking-wide flex items-center gap-1">
+        <Zap className="h-3.5 w-3.5 text-white" />
         +{xp} XP
       </Badge>
     </motion.div>
