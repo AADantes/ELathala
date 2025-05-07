@@ -43,7 +43,7 @@ export default function HelpPage() {
     },
     {
       title: "Rewards",
-      content: "Use earned credits to save work, unlock bonus themes, or view performance insights.",
+      content: "Claim rewards when leveling up!.",
       icon: <Star className="text-pink-600" size={24} />
     },
     {
@@ -57,7 +57,7 @@ export default function HelpPage() {
       icon: <CheckCircle className="text-green-600" size={24} />
     },
     {
-      title: "Daily Prompts",
+      title: "Topic Aligned Prompts",
       content: "Get fresh ideas and themes to keep writing fun.",
       icon: <Bell className="text-yellow-600" size={24} />
     },

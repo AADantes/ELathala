@@ -1,6 +1,7 @@
 "use client";
 
-import { Type, Zap, CreditCard } from "lucide-react"
+import { useState, useContext, useEffect } from "react";
+import { Type, Zap, CreditCard } from "lucide-react";
 import {
   Card,
   CardContent,
@@ -8,16 +9,74 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@/app/shop/ui/card"
-import { Button } from "@/app/shop/ui/button"
-import { PurchaseDialog } from "@/app/shop/Shop/purchase-dialog"
-import type { Font } from "@/app/shop/lib/shop-data"
+} from "@/app/shop/ui/card";
+import { Button } from "@/app/shop/ui/button";
+import supabase from "../../../../config/supabaseClient";
+import { UserContext } from "../userContext";
+import type { Font } from "@/app/shop/lib/shop-data"; // Import the Font type
 
 interface FontCardProps {
-  font: Font
+  font: Font; // Define the 'font' prop type as Font
 }
 
 export function FontCard({ font }: FontCardProps) {
+  const { userID } = useContext(UserContext); // Assuming this provides the user's ID
+  const [userCredits, setUserCredits] = useState<number>(0);
+  const [hasFont, setHasFont] = useState(false);
+  const [loading, setLoading] = useState(true);
+
+  // Fetch user credits and font ownership
+  useEffect(() => {
+    const fetchData = async () => {
+      if (!userID) return;
+
+      const { data: userData, error: userError } = await supabase
+        .from("User")
+        .select("userCredits")
+        .eq("uuid", userID)
+        .single();
+
+      const { data: fontData } = await supabase
+        .from("user_fonts")
+        .select("font_id")
+        .eq("user_id", userID)
+        .eq("font_id", font.id);
+
+      if (userData) setUserCredits(userData.userCredits);
+      if (fontData && fontData.length > 0) setHasFont(true);
+
+      setLoading(false);
+    };
+
+    fetchData();
+  }, [userID, font.id]);
+
+  // Handle font purchase
+  const handleBuyFont = async () => {
+    if (userCredits < font.credits) {
+      alert("You don't have enough credits to purchase this font.");
+      return;
+    }
+
+    const { error: creditError } = await supabase
+      .from("User")
+      .update({ userCredits: userCredits - font.credits })
+      .eq("uuid", userID);
+
+    const { error: fontError } = await supabase
+      .from("user_fonts")
+      .insert([{ user_id: userID, font_id: font.id }]);
+
+    if (!creditError && !fontError) {
+      setUserCredits((prev) => prev - font.credits);
+      setHasFont(true);
+      alert("Font purchased successfully!");
+    } else {
+      console.error("Purchase error:", creditError || fontError);
+      alert("Failed to purchase font. Please try again.");
+    }
+  };
+
   return (
     <Card key={font.id}>
       <CardHeader>
@@ -49,19 +108,15 @@ export function FontCard({ font }: FontCardProps) {
           <CreditCard className="h-4 w-4 mr-1 text-primary" />
           <span className="font-bold">{font.credits} credits</span>
         </div>
-        <PurchaseDialog
-          title={`Purchase ${font.name} Font`}
-          description="Add this premium font to your writing toolkit."
-          credits={font.credits}
-          itemType="font"
+        <Button
+          size="sm"
+          disabled={loading || hasFont || userCredits < font.credits}
+          onClick={handleBuyFont}
         >
-          <Button size="sm">
-            <Type className="h-4 w-4 mr-2" />
-            Buy Font
-          </Button>
-        </PurchaseDialog>
+          <Type className="h-4 w-4 mr-2" />
+          {hasFont ? "Owned" : "Buy Font"}
+        </Button>
       </CardFooter>
     </Card>
-  )
+  );
 }
-

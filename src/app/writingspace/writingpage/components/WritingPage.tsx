@@ -603,45 +603,47 @@ if (updateWordsError) {
               You're Done Writing!
             </h1>
 
-            <div className="flex justify-center gap-4">
-              <Button
-                onClick={() => (router.push('/homepage'))}
-                className="bg-sky-900 hover:bg-sky-700 text-white px-6 py-3 text-md rounded-full transition-all duration-300 transform hover:scale-105 hover:shadow-lg"
-              >
-                Back to Home
-              </Button>
+            <div className="flex flex-col md:flex-row justify-center gap-4 md:gap-6 mt-4">
+  {/* Back to Home Button */}
+  <Button
+    onClick={() => router.push('/homepage')}
+    className="bg-sky-900 hover:bg-sky-700 text-white px-6 py-3 text-md md:text-lg rounded-full transition-all duration-300 transform hover:scale-105 hover:shadow-lg w-auto max-w-xs"
+  >
+    Back to Home
+  </Button>
+              {/* Save Work Button */}
+  <Button
+    onClick={async () => {
+      const confirmed = window.confirm("Do you want to save your progress using credits?");
+      if (confirmed) {
+        try {
+          await HandleSaveClick();
+        } catch (err) {
+          console.error("Error during save:", err);
+          alert("An unexpected error occurred while saving.");
+        }
+      }
+    }}
+    disabled={!canSave}
+    className={`${
+      !canSave
+        ? "bg-gray-300 cursor-not-allowed border-gray-300 text-gray-500"
+        : "bg-white text-sky-600 border-2 border-sky-600"
+    } text-md md:text-lg rounded-md transition-all duration-300 transform hover:scale-105 hover:shadow-lg w-auto max-w-xs py-3`}
+  >
+    Save your Work
+  </Button>
 
-              <Button
-                  onClick={async () => {
-                 const confirmed = window.confirm("Do you want to save your progress using credits?");
-                  if (confirmed) {
-                  try {
-                   await HandleSaveClick();
-        
-                     } catch (err) {
-                   console.error("Error during save:", err);
-                      alert("An unexpected error occurred while saving.");
-                      }
-                    }
-                 }}
-                disabled={!canSave}
-              className={`${
-               !canSave ? "bg-gray-300 cursor-not-allowed border-gray-300 text-gray-500" : "bg-white text-sky-600 border-2 border-sky-600"
-                } text-md rounded-md transition-all duration-300 transform hover:scale-105 hover:shadow-lg w-36 py-3`}
-                    >
-                    Save your Work
-                  </Button>
-
-
-              <Button
-                onClick={async () => {
-                  await HandleResult()
-                  router.push('/writingspace/writingresults');
-                }}
-                className="bg-sky-900 text-white px-6 py-3 text-md rounded-full transition-all duration-400 transform hover:scale-105 hover:rotate-1 hover:shadow-2xl hover:bg-sky-600 focus:ring-4 focus:ring-sky-300 focus:outline-none"
-              >
-                View Results
-              </Button>
+               {/* View Results Button */}
+  <Button
+    onClick={async () => {
+      await HandleResult();
+      router.push('/writingspace/writingresults');
+    }}
+    className="bg-sky-900 text-white px-6 py-3 text-md md:text-lg rounded-full transition-all duration-400 transform hover:scale-105 hover:rotate-1 hover:shadow-2xl hover:bg-sky-600 focus:ring-4 focus:ring-sky-300 focus:outline-none w-auto max-w-xs"
+  >
+    View Results
+  </Button>
             </div>
           </div>
         </div>

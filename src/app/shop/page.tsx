@@ -67,41 +67,18 @@ export default function Shop() {
         <Tabs defaultValue="premium-articles" className="w-full">
           <TabsList className="flex w-full gap-4 mb-8">
             <TabsTrigger 
-              value="premium-articles" 
-              className="flex-1 text-center bg-white text-black border border-gray-300 rounded-lg px-4 py-2 font-semibold shadow-sm hover:bg-gray-200 hover:shadow-sm transition-all duration-200 transform data-[state=active]:scale-100 data-[state=active]:bg-gray-900 data-[state=active]:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              <FaUserCircle className="inline-block mr-2 w-4 h-4" /> {/* Profile Picture icon */}
-              Profile Pictures
-            </TabsTrigger>
-            <TabsTrigger 
               value="fonts" 
               className="flex-1 text-center bg-white text-black border border-gray-300 rounded-lg px-4 py-2 font-semibold shadow-sm hover:bg-gray-200 hover:shadow-sm transition-all duration-200 transform data-[state=active]:scale-100 data-[state=active]:bg-gray-900 data-[state=active]:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <FaFont className="inline-block mr-2 w-4 h-4" /> {/* Font icon */}
               Writing Fonts
             </TabsTrigger>
-            <TabsTrigger 
-              value="customization" 
-              className="flex-1 text-center bg-white text-black border border-gray-300 rounded-lg px-4 py-2 font-semibold shadow-sm hover:bg-gray-200 hover:shadow-sm transition-all duration-200 transform data-[state=active]:scale-100 data-[state=active]:bg-gray-900 data-[state=active]:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              <FaCogs className="inline-block mr-2 w-4 h-4" /> {/* Customization icon */}
-              Customization
-            </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="premium-articles" className="space-y-6">
-            <h2 className="text-2xl font-semibold mb-4">Profile Pictures</h2>
-            <ProfilePicturesList />
-          </TabsContent>
 
           <TabsContent value="fonts" className="space-y-6">
             <h2 className="text-2xl font-semibold mb-4">Writing Fonts</h2>
             <FontsList />
-          </TabsContent>
-
-          <TabsContent value="customization" className="space-y-6">
-            <h2 className="text-2xl font-semibold mb-4">Customization Features</h2>
-            <FeaturesList />
           </TabsContent>
         </Tabs>
       </main>
