@@ -119,12 +119,12 @@ export default function Sidebar({ isOpen, onClose, bgColor }: SidebarProps) {
             </li>
             <li>
               <Link
-                href="/levels-rewards"
+                href="/writingrewards"
                 className={`flex items-center space-x-4 py-3 px-4 rounded-lg bg-white shadow-md shadow-black/30 transition-all duration-300 ease-in-out transform hover:scale-105 hover:bg-[${hoverBgColor}] group`}
               >
                 <Star className="h-5 w-5 text-[#FFD700] transition-all duration-300 group-hover:text-[#FFD700]" />
                 <span className="text-black font-bold transition-all duration-300 group-hover:text-black">
-                  Levels and Rewards
+                  Level Rewards
                 </span>
               </Link>
             </li>

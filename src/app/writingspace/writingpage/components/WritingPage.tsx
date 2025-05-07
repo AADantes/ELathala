@@ -7,6 +7,7 @@ import { Button } from '../../writingpage/ui/Button';
 import supabase from '../../../../../config/supabaseClient';
 import { useRouter } from 'next/navigation';
 import { useUuid } from '../../UUIDContext';
+import { Home, BarChart2 } from "lucide-react";
 
 interface WritingPageProps {
   timeLimit: number;
@@ -444,11 +445,28 @@ export default function WritingPage({
       </div>
 
       {showDoneModal && (
-        <div className="fixed inset-0 flex items-center justify-center bg-sky-100 z-50 p-6">
-          <div className="text-center bg-white rounded-2xl shadow-xl p-10 max-w-md w-full border border-sky-200 animate-fadeIn">
-            <div className="mx-auto mb-6 w-16 h-16 bg-gradient-to-br from-sky-400 to-sky-600 rounded-full flex items-center justify-center shadow-lg animate-pop">
+        <div className="fixed inset-0 flex items-center justify-center bg-gradient-to-br from-sky-100 via-white to-sky-200 z-50 p-0 overflow-hidden">
+          <div
+            className="relative text-center bg-white rounded-2xl shadow-2xl p-12 w-full max-w-2xl border border-sky-200 animate-fadeIn flex flex-col items-center"
+            style={{
+              maxHeight: "92vh",
+              justifyContent: "center",
+            }}
+          >
+            {/* Decorative Confetti */}
+            <div className="absolute left-0 top-0 w-full flex justify-center pointer-events-none select-none">
+              <svg width="120" height="40" viewBox="0 0 120 40" fill="none">
+                <circle cx="10" cy="10" r="3" fill="#38bdf8" />
+                <circle cx="40" cy="20" r="2" fill="#facc15" />
+                <circle cx="80" cy="12" r="2.5" fill="#f472b6" />
+                <circle cx="110" cy="8" r="2" fill="#34d399" />
+                <circle cx="60" cy="30" r="2.5" fill="#f59e42" />
+              </svg>
+            </div>
+
+            <div className="mx-auto mb-8 w-20 h-20 bg-gradient-to-br from-sky-400 to-sky-600 rounded-full flex items-center justify-center shadow-lg animate-pop border-4 border-white">
               <svg
-                className="w-8 h-8 text-white"
+                className="w-10 h-10 text-white"
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
@@ -460,25 +478,30 @@ export default function WritingPage({
               </svg>
             </div>
 
-            <h1 className="text-2xl md:text-3xl font-semibold text-black mb-2">
-              You're Done Writing!
+            <h1 className="text-3xl md:text-4xl font-extrabold text-sky-900 mb-6 drop-shadow">
+              🎉 You're Done Writing!
             </h1>
+            <p className="text-lg text-gray-700 mb-10">
+              Congratulations on finishing your writing session. You can now view your results or return home.
+            </p>
 
-            <div className="flex justify-center gap-4">
+            <div className="flex flex-col sm:flex-row justify-center gap-5 mt-8 w-full">
               <Button
-                onClick={() => (router.push('/homepage'))}
-                className="bg-sky-900 hover:bg-sky-700 text-white px-6 py-3 text-md rounded-full transition-all duration-300 transform hover:scale-105 hover:shadow-lg"
+                onClick={() => router.push('/homepage')}
+                className="bg-sky-900 hover:bg-sky-700 text-white px-10 py-5 text-lg rounded-full transition-all duration-300 transform hover:scale-105 hover:shadow-lg flex items-center gap-2 w-full sm:w-80 font-semibold shadow"
               >
+                <Home className="h-6 w-6 mr-2" />
                 Back to Home
               </Button>
 
               <Button
                 onClick={async () => {
-                  await HandleResult()
+                  await HandleResult();
                   router.push('/writingspace/writingresults');
                 }}
-                className="bg-sky-900 text-white px-6 py-3 text-md rounded-full transition-all duration-400 transform hover:scale-105 hover:rotate-1 hover:shadow-2xl hover:bg-sky-600 focus:ring-4 focus:ring-sky-300 focus:outline-none"
+                className="bg-yellow-400 text-sky-900 px-10 py-5 text-lg rounded-full transition-all duration-400 transform hover:scale-105 hover:rotate-1 hover:shadow-2xl hover:bg-yellow-300 focus:ring-4 focus:ring-yellow-200 focus:outline-none flex items-center gap-2 w-full sm:w-80 font-semibold shadow"
               >
+                <BarChart2 className="h-6 w-6 mr-2" />
                 View Results
               </Button>
             </div>
@@ -486,69 +509,96 @@ export default function WritingPage({
         </div>
       )}
 
-      {isTimeUp && currentWords < wordCount && (
-        <div className="fixed inset-0 flex items-center justify-center bg-red-50 z-50 p-6">
-          <div className="text-center bg-white rounded-2xl shadow-xl p-10 max-w-md w-full border border-red-200 animate-fadeIn">
-            <div className="mx-auto mb-6 w-16 h-16 bg-gradient-to-br from-red-400 to-red-600 rounded-full flex items-center justify-center shadow-lg animate-pop">
-              <svg
-                className="w-8 h-8 text-white"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth={2.5}
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <path d="M18 6L6 18M6 6l12 12" />
-              </svg>
-            </div>
+{isTimeUp && currentWords < wordCount && (
+  <div className="fixed inset-0 flex items-center justify-center bg-gradient-to-br from-red-100 via-white to-red-200 z-50 p-0 overflow-hidden">
+    <div
+      className="relative text-center bg-white rounded-2xl shadow-2xl p-12 w-full max-w-2xl border border-red-200 animate-fadeIn flex flex-col items-center"
+      style={{
+        maxHeight: "92vh",
+        justifyContent: "center",
+      }}
+    >
+      {/* Decorative Confetti */}
+      <div className="absolute left-0 top-0 w-full flex justify-center pointer-events-none select-none">
+        <svg width="120" height="40" viewBox="0 0 120 40" fill="none">
+          <circle cx="10" cy="10" r="3" fill="#f87171" />
+          <circle cx="40" cy="20" r="2" fill="#facc15" />
+          <circle cx="80" cy="12" r="2.5" fill="#f472b6" />
+          <circle cx="110" cy="8" r="2" fill="#34d399" />
+          <circle cx="60" cy="30" r="2.5" fill="#f59e42" />
+        </svg>
+      </div>
 
-            <h1 className="text-2xl md:text-3xl font-semibold text-gray-900 mb-2">
-              Time’s up!
-            </h1>
-            <p className="text-gray-600 mb-6">
-              You wrote {currentWords} words. You didn’t finish your writing in time. Try again or keep practicing!
-            </p>
+      <div className="mx-auto mb-8 w-20 h-20 bg-gradient-to-br from-red-400 to-red-600 rounded-full flex items-center justify-center shadow-lg animate-pop border-4 border-white">
+        <svg
+          className="w-10 h-10 text-white"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth={2.5}
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          <path d="M18 6L6 18M6 6l12 12" />
+        </svg>
+      </div>
 
-            <div className="flex justify-center mb-6">
-              <Button
-                onClick={() => alert('Continue writing with credits.')}
-                className="bg-sky-700 hover:bg-sky-800 text-white text-md font-semibold rounded-full transition-all duration-300 transform hover:scale-105 hover:shadow-xl w-64 py-3"
-              >
-                Continue (Buy with Credits)
-              </Button>
-            </div>
+      <h1 className="text-3xl md:text-4xl font-extrabold text-red-700 mb-6 drop-shadow">
+        ⏰ Time’s Up!
+      </h1>
+      <p className="text-lg text-gray-700 mb-10">
+        You wrote <span className="font-bold text-red-600">{currentWords}</span> words.<br />
+        You didn’t finish your writing in time.<br />
+        Try again or keep practicing!
+      </p>
 
-            <div className="flex justify-center space-x-4 mb-6">
-              <Button
-                onClick={() => {
-                  const confirmed = window.confirm('Do you want to save your progress using credits?');
-                  if (confirmed) {
-                    alert('Progress saved!');
-                  }
-                }}
-                className="bg-white text-sky-600 border-2 border-sky-600 text-md rounded-md transition-all duration-300 transform hover:scale-105 hover:shadow-lg w-36 py-3"
-              >
-                Save (Credits)
-              </Button>
-
-              <Button
-                onClick={async () => {
-                  const confirmed = window.confirm('Are you sure you want to delete this session? This action cannot be undone.');
-                  if (confirmed) {
-                    await HandleResult();
-                    alert('Session deleted!');
-                    router.push('/writingspace/writingresults');
-                  }
-                }}
-                className="bg-white text-red-600 border-2 border-red-600 text-md rounded-md transition-all duration-300 transform hover:scale-105 hover:shadow-lg w-36 py-3"
-              >
-                Delete Session
-              </Button>
-            </div>
-          </div>
-        </div>
-      )}
+      <div className="flex flex-col gap-5 mt-8 w-full items-center">
+  <Button
+    onClick={() => alert('Continue writing with credits.')}
+    className="bg-red-600 hover:bg-red-700 text-white px-10 py-5 text-lg rounded-full transition-all duration-300 transform hover:scale-105 hover:shadow-lg flex items-center gap-2 font-semibold shadow w-full sm:w-[440px] justify-center"
+  >
+    Continue (Buy with Credits)
+  </Button>
+  <div className="flex flex-row justify-center gap-5 w-full">
+    <Button
+      onClick={() => {
+        const confirmed = window.confirm('Do you want to save your progress using credits?');
+        if (confirmed) {
+          alert('Progress saved!');
+        }
+      }}
+      className="bg-white text-gray-600 border-2 border-gray-400 text-lg rounded-full transition-all duration-300 transform hover:scale-105 hover:shadow-lg w-full sm:w-[220px] py-5 font-semibold flex items-center justify-center"
+      title="Save Credits"
+    >
+      {/* Save icon */}
+      <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l-4 4m0 0l-4-4m4 4V4" />
+      </svg>
+      Save Credits
+    </Button>
+    <Button
+      onClick={async () => {
+        const confirmed = window.confirm('Are you sure you want to delete this session? This action cannot be undone.');
+        if (confirmed) {
+          await HandleResult();
+          alert('Session deleted!');
+          router.push('/writingspace/writingresults');
+        }
+      }}
+      className="bg-white text-red-600 border-2 border-red-600 text-lg rounded-full transition-all duration-300 transform hover:scale-105 hover:shadow-lg w-full sm:w-[220px] py-5 font-semibold flex items-center justify-center"
+      title="Delete Session"
+    >
+      {/* Delete/Trash icon */}
+      <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6M9 7V4a1 1 0 011-1h4a1 1 0 011 1v3m-7 0h10" />
+      </svg>
+      Delete Session
+    </Button>
+  </div>
+</div>
+    </div>
+  </div>
+)}
 
       {/* --- WRITING AREA AND GRAMMAR SUGGESTION --- */}
       <div className="flex flex-col flex-grow items-center">
@@ -646,4 +696,4 @@ export default function WritingPage({
       </div>
     </div>
   );
-} 
+}
