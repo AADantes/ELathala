@@ -604,13 +604,6 @@ if (updateWordsError) {
             </h1>
 
             <div className="flex flex-col md:flex-row justify-center gap-4 md:gap-6 mt-4">
-  {/* Back to Home Button */}
-  <Button
-    onClick={() => router.push('/homepage')}
-    className="bg-sky-900 hover:bg-sky-700 text-white px-6 py-3 text-md md:text-lg rounded-full transition-all duration-300 transform hover:scale-105 hover:shadow-lg w-auto max-w-xs"
-  >
-    Back to Home
-  </Button>
               {/* Save Work Button */}
   <Button
     onClick={async () => {
