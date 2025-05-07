@@ -463,7 +463,6 @@ export default function WritingPage({
             <h1 className="text-2xl md:text-3xl font-semibold text-black mb-2">
               You're Done Writing!
             </h1>
-            <p className="text-black mb-6">Your progress has been saved</p>
 
             <div className="flex justify-center gap-4">
               <Button
@@ -539,7 +538,7 @@ export default function WritingPage({
                   if (confirmed) {
                     await HandleResult();
                     alert('Session deleted!');
-                    router.push('/writingresults');
+                    router.push('/writingspace/writingresults');
                   }
                 }}
                 className="bg-white text-red-600 border-2 border-red-600 text-md rounded-md transition-all duration-300 transform hover:scale-105 hover:shadow-lg w-36 py-3"

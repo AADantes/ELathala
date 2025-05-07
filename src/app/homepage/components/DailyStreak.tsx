@@ -6,7 +6,6 @@ import { motion } from "framer-motion";
 import { twMerge } from "tailwind-merge";
 import supabase from "../../../../config/supabaseClient";
 
-// Define the types for the subscription payload
 interface UserPayload {
   new: { userStreak: number };
   old: { userStreak: number };
@@ -16,51 +15,94 @@ export default function DailyStreak({ userId }: { userId: string }) {
   const [streak, setStreak] = useState(0);
   const [lastCheckIn, setLastCheckIn] = useState<Date | null>(null);
   const [reward, setReward] = useState<string | null>(null);
+  const [hasCheckedInToday, setHasCheckedInToday] = useState(false);
+  const [countdown, setCountdown] = useState("");
 
   useEffect(() => {
     const fetchStreakData = async () => {
       if (!userId) return;
-
+  
       const { data, error } = await supabase
         .from("User")
-        .select("userStreak")
+        .select("userStreak, lastCheckIn")
         .eq("id", userId)
         .single();
-
+  
       if (error) {
         console.error("Error fetching user data:", error.message);
         return;
       }
-
+  
       if (data) {
         setStreak(data.userStreak || 0);
+        const last = data.lastCheckIn ? new Date(data.lastCheckIn) : null;
+        setLastCheckIn(last);
+  
+        if (last) {
+          const diff = Date.now() - last.getTime();
+          setHasCheckedInToday(diff < 24 * 60 * 60 * 1000);
+        }
       }
     };
-
+  
     fetchStreakData();
   }, [userId]);
+  
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (lastCheckIn) {
+        const nextEligible = new Date(lastCheckIn.getTime() + 24 * 60 * 60 * 1000);
+        const diff = nextEligible.getTime() - Date.now();
+  
+        if (diff <= 0) {
+          setHasCheckedInToday(false);
+          setCountdown("");
+        } else {
+          const hours = Math.floor(diff / (1000 * 60 * 60));
+          const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+          const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+          setCountdown(`${hours}h ${minutes}m ${seconds}s`);
+        }
+      }
+    }, 1000);
+  
+    return () => clearInterval(interval);
+  }, [lastCheckIn]);
 
   const handleCheckIn = async () => {
     const today = new Date();
-    const isSameDay =
-      lastCheckIn && today.toDateString() === new Date(lastCheckIn).toDateString();
+    const todayDate = today.toDateString();
 
-    if (isSameDay) {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+
+    const { data: userData, error: userDataError } = await supabase
+      .from("User")
+      .select("userStreak, lastCheckIn, usercurrentExp, userCredits")
+      .eq("id", user.id)
+      .single();
+
+    if (userDataError) {
+      console.error("Error fetching user data:", userDataError.message);
+      return;
+    }
+
+    const lastCheckInDate = userData?.lastCheckIn
+      ? new Date(userData.lastCheckIn).toDateString()
+      : null;
+
+    if (lastCheckInDate === todayDate) {
       alert("🔥 You've already checked in today!");
       return;
     }
 
     const isConsecutive =
-      lastCheckIn && today.getDate() - new Date(lastCheckIn).getDate() === 1;
+      lastCheckInDate &&
+      new Date(todayDate).getTime() - new Date(lastCheckInDate).getTime() ===
+        86400000;
 
-    const newStreak = isConsecutive ? streak + 1 : 1;
-    setStreak(newStreak);
-    setLastCheckIn(today);
+    const newStreak = isConsecutive ? userData.userStreak + 1 : 1;
 
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return;
-
-    // Calculate bonus based on streak
     let bonusExp = 0;
     let bonusCredits = 0;
     let bonusMessage = "🎁 +10 XP!";
@@ -78,34 +120,16 @@ export default function DailyStreak({ userId }: { userId: string }) {
       bonusCredits = 5;
     }
 
-    // Fetch current user data from the "User" table to update their EXP and Credits
-    const { data: userData, error: userDataError } = await supabase
-      .from("User")
-      .select("usercurrentExp, userCredits")
-      .eq("id", user.id)
-      .single();
-
-    if (userDataError) {
-      console.error("Error fetching user data from User table:", userDataError.message);
-      return;
-    }
-
-    if (!userData) {
-      console.warn("No user data found.");
-      return;
-    }
-
-    // Calculate new user EXP and Credits based on bonus
     const newExp = (userData.usercurrentExp || 0) + bonusExp;
     const newCredits = (userData.userCredits || 0) + bonusCredits;
 
-    // Update user data in the User table (including userStreak and LastLoggedIn)
     const { error: userUpdateError } = await supabase
       .from("User")
       .update({
         usercurrentExp: newExp,
         userCredits: newCredits,
-        userStreak: newStreak,  // Update the streak
+        userStreak: newStreak,
+        lastCheckIn: today,
       })
       .eq("id", user.id);
 
@@ -114,13 +138,15 @@ export default function DailyStreak({ userId }: { userId: string }) {
       return;
     }
 
+    setStreak(newStreak);
+    setLastCheckIn(today);
     setReward(bonusMessage);
     alert(`✅ Check-in successful! ${bonusMessage}`);
+    window.location.reload();
   };
 
   return (
     <div className="bg-white p-4 w-full max-w-4xl mx-auto mt-6 text-black border border-gray-200 rounded-md shadow-md relative overflow-hidden">
-      {/* Fire icon */}
       <motion.div
         animate={{ scale: [1, 1.2, 1] }}
         transition={{ repeat: Infinity, duration: 1.2 }}
@@ -152,7 +178,6 @@ export default function DailyStreak({ userId }: { userId: string }) {
               transition={{ repeat: Infinity, duration: 1.5 }}
             >
               <div className="text-xs font-medium">Day {i + 1}</div>
-
               <div className="absolute bottom-full mb-2 hidden group-hover:block bg-black text-white text-xs px-2 py-1 rounded shadow">
                 {isUnlocked ? "Completed" : "Locked"} — Day {i + 1}
               </div>
@@ -172,14 +197,20 @@ export default function DailyStreak({ userId }: { userId: string }) {
 
       <div className="text-center">
         <motion.button
-          whileTap={{ scale: 0.98 }}
-          whileHover={{ scale: 1.01 }}
+          whileTap={!hasCheckedInToday ? { scale: 0.98 } : {}}
+          whileHover={!hasCheckedInToday ? { scale: 1.01 } : {}}
           onClick={handleCheckIn}
-          className="w-full py-2.5 px-4 bg-gradient-to-r from-sky-600 to-sky-500 text-white font-semibold 
-                     rounded-lg shadow-md hover:shadow-lg transition duration-300 ease-in-out 
-                     focus:outline-none focus:ring-2 focus:ring-sky-400 focus:ring-offset-2"
+          disabled={hasCheckedInToday}
+          className={twMerge(
+            "w-full py-2.5 px-4 font-semibold rounded-lg shadow-md transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2",
+            hasCheckedInToday
+              ? "bg-gray-400 cursor-not-allowed"
+              : "bg-gradient-to-r from-sky-600 to-sky-500 text-white hover:shadow-lg focus:ring-sky-400"
+          )}
         >
-          🔥 Check In Today
+{hasCheckedInToday
+  ? `✅ Checked In — Next in ${countdown}`
+  : "🔥 Check In Today"}
         </motion.button>
       </div>
 

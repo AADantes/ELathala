@@ -1,70 +1,73 @@
-"use client";
+'use client';
 
 import { useEffect, useState } from "react";
 import { ProfilePictureCard } from "@/app/shop/Shop/ProfilePictureCard";
 import supabase from "../../../../config/supabaseClient";
 
+// Define the interface for a profile picture
 interface ProfilePicture {
   id: string;
+  picFilename: string;
   title: string;
-  imageUrl: string;
+  picUrl: string;
   credits: number;
-  name: string; // filename
 }
 
-export function ProfilePicturesList() {
+// Define the type for the props, including the logData function
+interface ProfilePicturesListProps {
+  logData: (data: ProfilePicture[]) => void;
+}
+
+export function ProfilePicturesList({ logData }: ProfilePicturesListProps) {
   const [pictures, setPictures] = useState<ProfilePicture[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchImages = async () => {
       setLoading(true);
+      setError(null); // Reset error state before starting the fetch
 
       const { data: records, error: fetchError } = await supabase
         .from("ProfilePictures")
-        .select("id, picFilename, title, picPrice");
+        .select("id, picFilename, title, picPrice, picUrl");
 
       if (fetchError || !records) {
         console.error("Error fetching metadata from table:", fetchError);
+        setError("Failed to load profile pictures.");
         setLoading(false);
         return;
       }
 
-      const imagesWithUrls = await Promise.all(
-        records.map(async (record) => {
-          const { data: urlData } = supabase
-            .storage
-            .from("profile-pictures")
-            .getPublicUrl(record.picFilename);
+      // Map directly using picUrl from the database
+      const validPictures: ProfilePicture[] = records.map((record) => ({
+        id: record.id,
+        picFilename: record.picFilename,
+        title: record.title,
+        picUrl: record.picUrl,
+        credits: record.picPrice, // Ensure `picPrice` is available and is a number
+      }));
 
-          if (!urlData?.publicUrl) {
-            console.warn(`Missing public URL for: ${record.picFilename}`);
-            return null;
-          }
-
-          return {
-            id: record.id,
-            title: record.title,
-            name: record.picFilename,
-            imageUrl: urlData.publicUrl,
-            credits: record.picPrice,
-          };
-        })
-      );
-
-      const validPictures = imagesWithUrls.filter(
-        (pic): pic is ProfilePicture => pic !== null
-      );
+      // Log the data to the console
+      logData(validPictures);  // Call the logData function passed from parent
 
       setPictures(validPictures);
       setLoading(false);
     };
 
     fetchImages();
-  }, []);
+  }, [logData]);  // Dependency array includes logData to ensure it's used properly
 
   if (loading) {
     return <div>Loading profile pictures...</div>;
+  }
+
+  if (error) {
+    return <div>{error}</div>;  // Show error message if there's an issue with fetching
+  }
+
+  if (pictures.length === 0) {
+    return <div>No profile pictures available.</div>; // Show empty state if no pictures exist
   }
 
   return (

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from 'framer-motion';
+import { Coins } from 'lucide-react';
 import {
   Menu, LogOut, Home, Edit, User, Award, HelpCircle, X, Store
 } from 'lucide-react';
@@ -94,11 +95,10 @@ export function Header() {
     <span className="text-sm font-bold">{user?.userLevel}</span>
   </div>
 
-  {/* Credits */}
   <div className="flex items-center justify-center w-24 h-8 px-2 py-1 bg-white rounded-full shadow-sm">
-    <span className="text-sm text-green-600 font-semibold mr-1">Credits</span>
-    <span className="text-sm font-bold">{user?.userCredits}</span>
-  </div>
+  <Coins className="text-yellow-500 h-5 w-5 mr-1" />
+  <span className="text-sm font-bold">{user?.userCredits}</span>
+</div>
 
 
           </div>
@@ -192,7 +192,7 @@ export function Header() {
                 </li>
                 <li>
                   <Link
-                    href="/level-rewards"
+                    href="/writingrewards"
                     className="flex items-center px-6 py-3 text-lg text-black transition-all duration-300 hover:bg-gray-100 hover:scale-105 hover:shadow-lg rounded-xl"
                   >
                     <Award className="h-7 w-7 mr-4 text-yellow-500" />

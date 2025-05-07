@@ -101,6 +101,7 @@ export default function Header() {
           highestNumOfWords: 0,
           userLevel: 1,
           usercurrentExp: 0,
+          userCredits: 0,
           targetExp: 100,
           worksDone: 0,
           created_at: new Date(),
