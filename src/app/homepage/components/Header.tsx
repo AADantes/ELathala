@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation"; // Add this import
 import { motion, AnimatePresence } from 'framer-motion';
 import { Coins } from 'lucide-react';
 import {
@@ -19,6 +19,7 @@ const bebasNeue = Bebas_Neue({
 export function Header() {
   const [showSidebar, setShowSidebar] = useState(false);
   const router = useRouter();
+  const pathname = usePathname(); // Add this line
   const [user, setUser] = useState<{
     username: string;
     userLevel: number;
@@ -31,8 +32,6 @@ export function Header() {
     await supabase.auth.signOut();
     router.push('/landingpage');
   };
-
-  
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -89,26 +88,33 @@ export function Header() {
         <div className="flex items-center space-x-4">
           {/* Stats Display */}
           <div className="flex items-center space-x-2">
-  {/* Level */}
-  <div className="flex items-center justify-center w-20 h-8 px-2 py-1 bg-white rounded-full shadow-sm">
-    <Award className="text-yellow-500 h-5 w-5 mr-1" /> {/* Changed to a level icon */}
-    <span className="text-sm font-bold">{user?.userLevel}</span>
-  </div>
+            {/* Level */}
+            <div className="flex items-center justify-center w-20 h-8 px-2 py-1 bg-white rounded-full shadow-sm">
+              <Award className="text-yellow-500 h-5 w-5 mr-1" />
+              <span className="text-sm font-bold">{user?.userLevel}</span>
+            </div>
 
-  <div className="flex items-center justify-center w-24 h-8 px-2 py-1 bg-white rounded-full shadow-sm">
-  <Coins className="text-yellow-500 h-5 w-5 mr-1" />
-  <span className="text-sm font-bold">{user?.userCredits}</span>
-</div>
-
-
+            <div className="flex items-center justify-center w-24 h-8 px-2 py-1 bg-white rounded-full shadow-sm">
+              <Coins className="text-yellow-500 h-5 w-5 mr-1" />
+              <span className="text-sm font-bold">{user?.userCredits}</span>
+            </div>
           </div>
 
-          {/* components Button */}
+          {/* Shop/Home Button */}
           <button
-            onClick={() => router.push('/shop')}
+            onClick={() =>
+              pathname === "/shop"
+                ? router.push("/homepage")
+                : router.push("/shop")
+            }
             className="text-white hover:text-sky-950 transition-transform transform hover:scale-110 duration-300"
+            aria-label={pathname === "/shop" ? "Go to homepage" : "Go to shop"}
           >
-            <Store className="h-7 w-7" />
+            {pathname === "/shop" ? (
+              <Home className="h-7 w-7" />
+            ) : (
+              <Store className="h-7 w-7" />
+            )}
           </button>
         </div>
       </div>

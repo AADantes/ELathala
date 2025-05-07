@@ -60,10 +60,10 @@ export default function PerformanceCard({
 
   if (loading) {
     return (
-      <Card>
+      <Card className="transition-transform transform hover:scale-105">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Award className="h-5 w-5" />
+            <Award className="h-5 w-5 text-blue-600" />
             Your Performance
           </CardTitle>
           <CardDescription>How you did in this challenge</CardDescription>
@@ -76,19 +76,43 @@ export default function PerformanceCard({
   }
 
   return (
-    <Card>
+    <Card className="transition-transform transform hover:scale-105">
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-          <Award className="h-5 w-5" />
+          <Award className="h-5 w-5 text-blue-600" />
           Your Performance
         </CardTitle>
         <CardDescription>How you did in this challenge</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
-        <IconLabel icon={<BookText className="h-5 w-5" />} label="Number of Words Set" value={`${wordsSet ?? 0} words`} />
-        <IconLabel icon={<BookText className="h-5 w-5" />} label="Words Written" value={`${wordsWritten ?? 0} words`} />
-        <IconLabel icon={<Award className="h-5 w-5" />} label="Credits Gained" value={`${earnedCredits ?? '0'} credits`} />
-        <IconLabel icon={<Star className="h-5 w-5" />} label="Experience Gained" value={`${earnedExp ?? '0'} XP`} />
+        <div className="p-4 bg-white rounded-md shadow-md transition-all hover:shadow-lg">
+          <IconLabel 
+            icon={<BookText className="h-5 w-5 text-green-500" />}
+            label="Number of Words Set" 
+            value={`${wordsSet ?? 0} words`} 
+          />
+        </div>
+        <div className="p-4 bg-white rounded-md shadow-md transition-all hover:shadow-lg">
+          <IconLabel 
+            icon={<BookText className="h-5 w-5 text-green-500" />}
+            label="Words Written" 
+            value={`${wordsWritten ?? 0} words`} 
+          />
+        </div>
+        <div className="p-4 bg-white rounded-md shadow-md transition-all hover:shadow-lg">
+          <IconLabel 
+            icon={<Award className="h-5 w-5 text-yellow-500" />}
+            label="Credits Gained" 
+            value={`${earnedCredits ?? '0'} credits`} 
+          />
+        </div>
+        <div className="p-4 bg-white rounded-md shadow-md transition-all hover:shadow-lg">
+          <IconLabel 
+            icon={<Star className="h-5 w-5 text-purple-500" />}
+            label="Experience Gained" 
+            value={`${earnedExp ?? '0'} XP`} 
+          />
+        </div>
       </CardContent>
     </Card>
   )

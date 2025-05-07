@@ -1,23 +1,19 @@
+'use client';
 
-"use client";
-
-import { Paintbrush, CreditCard } from "lucide-react"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/app/shop/ui/card"
-import { Badge } from "@/app/shop/ui/badge"
-import { Button } from "@/app/shop/ui/button"
-import { PurchaseDialog } from "@/app/shop/components/purchase-dialog"
-import type { CustomizationFeature } from "@/app/shop/lib/shop-data"
-interface FeatureCardProps {
-  feature: CustomizationFeature
-}
+import { Paintbrush, CreditCard } from "lucide-react";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/app/shop/ui/card";
+import { Badge } from "@/app/shop/ui/badge";
+import { Button } from "@/app/shop/ui/button";
+import { PurchaseDialog } from "@/app/shop/components/purchase-dialog";
+import type { CustomizationFeature } from "@/app/shop/lib/shop-data";
 
 interface FeatureCardProps {
-  feature: CustomizationFeature
+  feature: CustomizationFeature;
 }
 
 export function FeatureCard({ feature }: FeatureCardProps) {
   return (
-    <Card key={feature.id}>
+    <Card key={feature.id} className="transition-shadow hover:shadow-xl border border-muted-foreground/10">
       <CardHeader>
         <div className="flex items-center justify-between">
           <CardTitle>{feature.name}</CardTitle>
@@ -44,12 +40,15 @@ export function FeatureCard({ feature }: FeatureCardProps) {
           credits={feature.credits}
           itemType="feature"
         >
-          <Button size="sm">
+          <Button
+            size="sm"
+            className="bg-black text-white border border-transparent rounded-md px-5 py-2.5 font-medium shadow-md hover:bg-gray-800 hover:shadow-lg active:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-300 ease-in-out"
+          >
             <Paintbrush className="h-4 w-4 mr-2" />
             Unlock Feature
           </Button>
         </PurchaseDialog>
       </CardFooter>
     </Card>
-  )
+  );
 }

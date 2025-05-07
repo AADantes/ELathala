@@ -8,6 +8,7 @@ import { ProfilePicturesList } from "../shop/components/ProfilePictureList";
 import { FontsList } from "../shop/components/fonts-list";
 import { FeaturesList } from "../shop/components/features-list";
 import { Header } from "../homepage/components/Header";
+import { FaUserCircle, FaFont, FaCogs } from "react-icons/fa"; // Import icons from react-icons
 import supabase from "../../../config/supabaseClient";
 
 export default function Shop() {
@@ -60,15 +61,32 @@ export default function Shop() {
             <h1 className="text-3xl font-bold tracking-tight">Welcome to the ELathala Shop!</h1>
             <p className="text-muted-foreground mt-1"></p>
           </div>
-          {/* Pass actual credits to CreditDisplay */}
           <CreditDisplay credits={userCredits ?? 0} />
         </div>
 
         <Tabs defaultValue="premium-articles" className="w-full">
-          <TabsList className="grid grid-cols-3 mb-8">
-            <TabsTrigger value="premium-articles">Profile Pictures</TabsTrigger>
-            <TabsTrigger value="fonts">Writing Fonts</TabsTrigger>
-            <TabsTrigger value="customization">Customization</TabsTrigger>
+          <TabsList className="flex w-full gap-4 mb-8">
+            <TabsTrigger 
+              value="premium-articles" 
+              className="flex-1 text-center bg-white text-black border border-gray-300 rounded-lg px-4 py-2 font-semibold shadow-sm hover:bg-gray-200 hover:shadow-sm transition-all duration-200 transform data-[state=active]:scale-100 data-[state=active]:bg-gray-900 data-[state=active]:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <FaUserCircle className="inline-block mr-2 w-4 h-4" /> {/* Profile Picture icon */}
+              Profile Pictures
+            </TabsTrigger>
+            <TabsTrigger 
+              value="fonts" 
+              className="flex-1 text-center bg-white text-black border border-gray-300 rounded-lg px-4 py-2 font-semibold shadow-sm hover:bg-gray-200 hover:shadow-sm transition-all duration-200 transform data-[state=active]:scale-100 data-[state=active]:bg-gray-900 data-[state=active]:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <FaFont className="inline-block mr-2 w-4 h-4" /> {/* Font icon */}
+              Writing Fonts
+            </TabsTrigger>
+            <TabsTrigger 
+              value="customization" 
+              className="flex-1 text-center bg-white text-black border border-gray-300 rounded-lg px-4 py-2 font-semibold shadow-sm hover:bg-gray-200 hover:shadow-sm transition-all duration-200 transform data-[state=active]:scale-100 data-[state=active]:bg-gray-900 data-[state=active]:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <FaCogs className="inline-block mr-2 w-4 h-4" /> {/* Customization icon */}
+              Customization
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="premium-articles" className="space-y-6">

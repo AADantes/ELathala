@@ -72,11 +72,6 @@ export default function HelpPage() {
       icon: <Star className="text-red-600" size={24} />
     },
     {
-      title: "Admin Support (if applicable)",
-      content: "Reporting Issues – Found a bug or error? Use the 'Report Issue' form.\n\nFeedback & Suggestions – Help us improve by submitting your thoughts in the 'Feedback' tab.\n\nNeed More Help? – Contact our team at support@elathala.com or chat with us via the message icon.",
-      icon: <User className="text-gray-600" size={24} />
-    },
-    {
       title: "Tips:",
       content: "Keep writing consistently to maintain your streaks.\n\nCustomize tasks to match your writing goals.\n\nExplore your performance report to track improvement over time.",
       icon: <Bell className="text-green-600" size={24} />

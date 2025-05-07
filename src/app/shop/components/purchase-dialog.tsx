@@ -12,7 +12,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/app/shop/ui/dialog";
-import supabase from "../../../../config/supabaseClient"; // Import your Supabase client
+import supabase from "../../../../config/supabaseClient";
 
 interface PurchaseDialogProps {
   children: React.ReactNode;
@@ -31,14 +31,13 @@ export function PurchaseDialog({
   itemType,
   currentBalance = 250,
 }: PurchaseDialogProps) {
-  const [userCredits, setUserCredits] = useState<number>(currentBalance); // Default to 250 if not fetched
+  const [userCredits, setUserCredits] = useState<number>(currentBalance);
   const [loading, setLoading] = useState<boolean>(true);
+  const [isProcessing, setIsProcessing] = useState<boolean>(false);  // To track if purchase is being processed
 
   useEffect(() => {
     const fetchUserCredits = async () => {
       setLoading(true);
-
-      // Get the currently authenticated user
       const { data: { user: authUser }, error: authError } = await supabase.auth.getUser();
 
       if (authError || !authUser) {
@@ -47,13 +46,10 @@ export function PurchaseDialog({
         return;
       }
 
-      console.log("Authenticated UID:", authUser.id);
-
-      // Fetch user credits from User table using auth_user_id
       const { data, error } = await supabase
         .from("User")
         .select("userCredits")
-        .eq("id", authUser.id) // Match by UID
+        .eq("id", authUser.id)
         .single();
 
       if (error) {
@@ -63,7 +59,7 @@ export function PurchaseDialog({
       }
 
       if (data) {
-        setUserCredits(data.userCredits || 250); // Use 250 as fallback if credits are not set
+        setUserCredits(data.userCredits || 250);
       }
 
       setLoading(false);
@@ -73,34 +69,92 @@ export function PurchaseDialog({
   }, []);
 
   if (loading) {
-    return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
+    return <div className="min-h-screen flex items-center justify-center text-muted-foreground">Loading...</div>;
   }
+
+  const newBalance = userCredits - credits;
+  const isInsufficient = newBalance < 0;
+
+  const handleConfirmPurchase = async () => {
+    if (isInsufficient || isProcessing) return;
+    
+    setIsProcessing(true);  // Set processing to true
+
+    // Here you would make the request to confirm the purchase
+    const { data: { user: authUser }, error: authError } = await supabase.auth.getUser();
+    if (authError || !authUser) {
+      console.error("Error fetching auth user:", authError);
+      setIsProcessing(false);
+      return;
+    }
+
+    const { error } = await supabase
+      .from("User")
+      .update({ userCredits: newBalance })
+      .eq("id", authUser.id);
+
+    if (error) {
+      console.error("Error updating user credits:", error);
+      setIsProcessing(false);
+      return;
+    }
+
+    setUserCredits(newBalance);  // Update the state to reflect the new balance
+    setIsProcessing(false);  // Reset processing
+    alert("Purchase successful!");
+  };
 
   return (
     <Dialog>
       <DialogTrigger asChild>{children}</DialogTrigger>
-      <DialogContent>
+      <DialogContent className="rounded-2xl shadow-xl border border-border bg-white text-black">
         <DialogHeader>
-          <DialogTitle>{title}</DialogTitle>
-          <DialogDescription>{description}</DialogDescription>
+          <DialogTitle className="text-2xl font-semibold">{title}</DialogTitle>
+          <DialogDescription className="text-sm text-muted-foreground mt-1">
+            {description}
+          </DialogDescription>
         </DialogHeader>
-        <div className="py-4">
-          <div className="flex items-center justify-between py-2 border-b">
-            <span>Your current balance:</span>
-            <span className="font-bold">{userCredits} credits</span>
+
+        <div className="py-6 space-y-4 text-sm">
+          <div className="flex items-center justify-between border-b pb-2">
+            <span className="text-muted-foreground">Your current balance:</span>
+            <span className="font-semibold">{userCredits} credits</span>
           </div>
-          <div className="flex items-center justify-between py-2 border-b">
-            <span>Cost:</span>
-            <span className="font-bold text-primary">-{credits} credits</span>
+          <div className="flex items-center justify-between border-b pb-2">
+            <span className="text-muted-foreground">Cost of this {itemType}:</span>
+            <span className="font-semibold text-destructive">- {credits} credits</span>
           </div>
-          <div className="flex items-center justify-between py-2">
-            <span>New balance after purchase:</span>
-            <span className="font-bold">{userCredits - credits} credits</span>
+          <div className="flex items-center justify-between">
+            <span className="text-muted-foreground">New balance:</span>
+            <span
+              className={`font-bold ${isInsufficient ? "text-destructive" : "text-green-600"}`}
+            >
+              {newBalance} credits
+            </span>
           </div>
+          {isInsufficient && (
+            <p className="text-sm text-destructive mt-2">
+              Not enough credits to complete this purchase.
+            </p>
+          )}
         </div>
-        <DialogFooter>
-          <Button variant="outline">Cancel</Button>
-          <Button>Confirm Purchase</Button>
+
+        <DialogFooter className="mt-4 flex gap-2">
+          <Button
+            variant="outline"
+            className="w-full bg-white text-black border border-gray-400 rounded-lg py-2 px-4 transition-colors duration-300 hover:bg-black hover:text-white hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-black"
+            onClick={() => alert("Canceled")}
+            disabled={isProcessing}
+          >
+            Cancel
+          </Button>
+          <Button
+            disabled={isInsufficient || isProcessing}
+            className="w-full bg-black text-white rounded-lg py-2 px-4 transition-colors duration-300 hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-black"
+            onClick={handleConfirmPurchase}
+          >
+            {isProcessing ? "Processing..." : "Confirm Purchase"}
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
