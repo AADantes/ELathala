@@ -16,7 +16,7 @@ const Home = () => {
 
   return (
     <>
-      <Header isSignUpOpen={isSignUpOpen} setIsSignUpOpen={setIsSignUpOpen} />
+      <Header  />
       <HeroSection openSignUpDialog={() => setIsSignUpOpen(true)} />
       <div 
         className="flex flex-col min-h-screen bg-cover bg-center bg-no-repeat" 
@@ -28,8 +28,7 @@ const Home = () => {
         <div className="flex-grow bg-white bg-opacity-80">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <main>
-              <FeaturesSection />
-              <HowItWorksSection />
+              <HowItWorksSection/>
               <About />
             </main>
           </div>

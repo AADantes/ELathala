@@ -9,7 +9,7 @@ import ResultsActions from "../../writingresults/results/results-actions"
 import { useSearchParams } from "next/navigation"
 
 export default function ResultsPage() {
-  const { generatedUuid } = useUuid()
+  const { workID } = useUuid()
   const searchParams = useSearchParams()
   const earnedExp = searchParams.get('earnedExp') || '0'
   const earnedCredits = searchParams.get('earnedCredits') || '0'

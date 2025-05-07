@@ -15,11 +15,18 @@ const bebasNeue = Bebas_Neue({
   weight: '400',
 });
 
-export default function Header({ isSignUpOpen, setIsSignUpOpen }: { isSignUpOpen: boolean, setIsSignUpOpen: (open: boolean) => void }) {
+interface HeaderProps {
+  isSignUpOpen: boolean;
+  setIsSignUpOpen: React.Dispatch<React.SetStateAction<boolean>>;
+}
+
+
+export default function Header() {
   const [loginEmail, setLoginEmail] = useState('');
   const [loginPassword, setLoginPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isLoginOpen, setIsLoginOpen] = useState(false);
+  const [isSignUpOpen, setIsSignUpOpen] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [signUpEmail, setSignUpEmail] = useState('');
   const [signUpUsername, setSignUpUsername] = useState('');
@@ -80,6 +87,7 @@ export default function Header({ isSignUpOpen, setIsSignUpOpen }: { isSignUpOpen
           isVerified: data.user?.email_confirmed_at ? true : false,
           isAdmin: false,
           dateRegistered: new Date(),
+          lastLoggedIn: null,
           created_at: new Date(),
         },
       ]);
@@ -100,9 +108,11 @@ export default function Header({ isSignUpOpen, setIsSignUpOpen }: { isSignUpOpen
           userLevel: 1,
           usercurrentExp: 0,
           userCredits: 0,
-          targetExp: 100,
-          worksDone: 0,
+          targetExp: 2000,
           created_at: new Date(),
+          userCreditMultiplier: 0.5,
+          userExpMultiplier: 1,
+
         },
       ]);
   
@@ -146,7 +156,7 @@ export default function Header({ isSignUpOpen, setIsSignUpOpen }: { isSignUpOpen
           {/* Logo and Text */}
           <Link className="flex items-center space-x-3" href="/">
             <img
-              src="/logos/logo.png"
+              src="https://ueagmtscbdirqgbjxaqb.supabase.co/storage/v1/object/public/elathala-logo//logo.png"
               alt="E-Lathala Logo"
               className="h-12 w-auto"
             />
@@ -165,7 +175,7 @@ export default function Header({ isSignUpOpen, setIsSignUpOpen }: { isSignUpOpen
           <nav className="hidden lg:flex flex-1 justify-center space-x-6">
             <Link href="/" className="text-white font-bold hover:text-black">Home</Link>
             <Link href="#about" className="text-white font-bold hover:text-black">About</Link>
-            <Link href="#features" className="text-white font-bold hover:text-black">Features</Link>
+            {/* <Link href="#features" className="text-white font-bold hover:text-black">Features</Link> */}
             <Link href="#how-it-works" className="text-white font-bold hover:text-black">How it Works</Link>
           </nav>
 
@@ -275,10 +285,6 @@ export default function Header({ isSignUpOpen, setIsSignUpOpen }: { isSignUpOpen
       {isMenuOpen && (
         <div className="fixed top-20 left-0 w-full bg-white text-[#4F8FB7] z-40 shadow-lg lg:hidden">
           <nav className="flex flex-col items-center space-y-4 py-4">
-            <Link href="/" className="text-gray-700 font-bold hover:text-black" onClick={() => setIsMenuOpen(false)}>Home</Link>
-            <Link href="#about" className="text-gray-700 font-bold hover:text-black" onClick={() => setIsMenuOpen(false)}>About</Link>
-            <Link href="#features" className="text-gray-700 font-bold hover:text-black" onClick={() => setIsMenuOpen(false)}>Features</Link>
-            <Link href="#how-it-works" className="text-gray-700 font-bold hover:text-black" onClick={() => setIsMenuOpen(false)}>How it Works</Link>
           </nav>
         </div>
       )}

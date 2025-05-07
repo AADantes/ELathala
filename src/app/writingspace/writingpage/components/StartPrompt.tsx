@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import supabase from '../../../../../config/supabaseClient';
 import { Button } from '../../writingpage/ui/Button';
 import { Input } from '../..//writingpage/ui/Input';
@@ -32,9 +32,41 @@ export default function StartPrompt({ onStart }: StartPromptProps) {
   const [timeIsUp, setTimeIsUp] = useState(false);
   const [showStepMessage, setShowStepMessage] = useState(false);
   const [title, setTitle] = useState<string>(''); // Title state
-  const { setGeneratedUuid } = useUuid()
+  const { workID, setWorkID, setUserID } = useUuid();
   const router = useRouter();
+  
+  useEffect(() => {
+    const fetchUserUUID = async () => {
+      const {
+        data: { user },
+        error: authError,
+      } = await supabase.auth.getUser();
+  
+      if (authError) {
+        console.error("Auth error:", authError);
+        return;
+      }
+  
+      if (user) {
+        const { data, error } = await supabase
+          .from('User') // Replace with your actual user table name if different
+          .select('id') // Assuming 'userID' is the UUID you're using
+          .eq('id', user.id) // Replace 'authID' with your actual column if named differently
+          .single();
+  
+        if (error) {
+          console.error("Error fetching user UUID from DB:", error);
+        } else if (data?.id) {
+          setUserID(data.id); // Save to context
+          console.log("Current User UUID:", data.id);
+        }
+      }
+    };
+  
+    fetchUserUUID();
+  }, [setUserID]);
 
+  
 
   const handleNext = () => {
     if (step < 6) {
@@ -54,9 +86,9 @@ export default function StartPrompt({ onStart }: StartPromptProps) {
     const time = Number(timeLimit);
     const words = Number(wordCount);
     if (time < 1 || time > 60 || words < 50 || !genre || !topic || !title) return;
-  
+
     let finalPrompt = '';
-  
+
     // Check if the user wants a random prompt and if the genre and topic are set
     if (generatePrompt && genre && topic && genreTopicPrompts[genre] && genreTopicPrompts[genre][topic]) {
       // Get the prompts for the selected genre and topic
@@ -66,15 +98,15 @@ export default function StartPrompt({ onStart }: StartPromptProps) {
       // Fall back to a random general prompt if no genre/topic is selected
       finalPrompt = prompts[Math.floor(Math.random() * prompts.length)];
     }
-  
+
     // Call onStart function for starting the process
     onStart(time, words, generatePrompt, finalPrompt, genre, topic, title);
-  
+
     // Set a timeout for when time is up
     setTimeout(() => {
       setTimeIsUp(true);
     }, time * 60 * 1000);
-  
+
     // Insert the record into Supabase and retrieve the UUID
     try {
       const { data, error } = await supabase
@@ -91,24 +123,23 @@ export default function StartPrompt({ onStart }: StartPromptProps) {
         ])
         .select('workID');
   
-        if (error) {
-          console.error('Error inserting data into Supabase:', error);
-          return;
-        }
-    
-        const generatedUuid = data?.[0]?.workID;
-        console.log('Inserted new written work with UUID:', generatedUuid);
-    
-        // Save the UUID to context
-        if (generatedUuid) {
-          setGeneratedUuid(generatedUuid);
-          console.log("UUID of Work: ", generatedUuid);
-        }
-    
-      } catch (err) {
-        console.error('Unexpected error inserting data into Supabase:', err);
+      if (error) {
+        console.error('Error inserting data into Supabase:', error);
+        return;
       }
-    };
+    
+      const workID = data?.[0]?.workID;
+      console.log('Inserted new written work with UUID:', workID);
+    
+      // Save the workID to context
+      if (workID) {
+        setWorkID(workID); // Save to context
+        console.log("UUID of Work: ", workID);
+      }
+    } catch (err) {
+      console.error('Unexpected error inserting data into Supabase:', err);
+    }
+  };
 
   const isNextDisabled = () => {
     const isTimeInvalid = Number(timeLimit) < 1 || Number(timeLimit) > 60;

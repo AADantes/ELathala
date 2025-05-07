@@ -18,7 +18,7 @@ export default function PerformanceCard({
   earnedExp,
   earnedCredits,
 }: PerformanceCardProps) {
-  const { generatedUuid } = useUuid()
+  const { workID } = useUuid()
   const [loading, setLoading] = useState(true)
   const [wordsSet, setWordsSet] = useState<number>(0)
   const [wordsWritten, setWordsWritten] = useState<number>(0)
@@ -30,7 +30,7 @@ export default function PerformanceCard({
   }, [earnedExp, earnedCredits])
 
   useEffect(() => {
-    if (!generatedUuid) return
+    if (!workID) return
 
     const fetchPerformanceData = async () => {
       setLoading(true)
@@ -38,7 +38,7 @@ export default function PerformanceCard({
       const { data, error } = await supabase
         .from('written_works')
         .select('noOfWordsSet, numberofWords')
-        .eq('workID', generatedUuid)
+        .eq('workID', workID)
         .single()
 
       if (error) {
@@ -56,14 +56,14 @@ export default function PerformanceCard({
     }
 
     fetchPerformanceData()
-  }, [generatedUuid])
+  }, [workID])
 
   if (loading) {
     return (
-      <Card className="transition-transform transform hover:scale-105">
+      <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Award className="h-5 w-5 text-blue-600" />
+            <Award className="h-5 w-5" />
             Your Performance
           </CardTitle>
           <CardDescription>How you did in this challenge</CardDescription>
@@ -76,43 +76,19 @@ export default function PerformanceCard({
   }
 
   return (
-    <Card className="transition-transform transform hover:scale-105">
+    <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-          <Award className="h-5 w-5 text-blue-600" />
+          <Award className="h-5 w-5" />
           Your Performance
         </CardTitle>
         <CardDescription>How you did in this challenge</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
-        <div className="p-4 bg-white rounded-md shadow-md transition-all hover:shadow-lg">
-          <IconLabel 
-            icon={<BookText className="h-5 w-5 text-green-500" />}
-            label="Number of Words Set" 
-            value={`${wordsSet ?? 0} words`} 
-          />
-        </div>
-        <div className="p-4 bg-white rounded-md shadow-md transition-all hover:shadow-lg">
-          <IconLabel 
-            icon={<BookText className="h-5 w-5 text-green-500" />}
-            label="Words Written" 
-            value={`${wordsWritten ?? 0} words`} 
-          />
-        </div>
-        <div className="p-4 bg-white rounded-md shadow-md transition-all hover:shadow-lg">
-          <IconLabel 
-            icon={<Award className="h-5 w-5 text-yellow-500" />}
-            label="Credits Gained" 
-            value={`${earnedCredits ?? '0'} credits`} 
-          />
-        </div>
-        <div className="p-4 bg-white rounded-md shadow-md transition-all hover:shadow-lg">
-          <IconLabel 
-            icon={<Star className="h-5 w-5 text-purple-500" />}
-            label="Experience Gained" 
-            value={`${earnedExp ?? '0'} XP`} 
-          />
-        </div>
+        <IconLabel icon={<BookText className="h-5 w-5" />} label="Number of Words Set" value={`${wordsSet ?? 0} words`} />
+        <IconLabel icon={<BookText className="h-5 w-5" />} label="Words Written" value={`${wordsWritten ?? 0} words`} />
+        <IconLabel icon={<Award className="h-5 w-5" />} label="Credits Gained" value={`${earnedCredits ?? '0'} credits`} />
+        <IconLabel icon={<Star className="h-5 w-5" />} label="Experience Gained" value={`${earnedExp ?? '0'} XP`} />
       </CardContent>
     </Card>
   )

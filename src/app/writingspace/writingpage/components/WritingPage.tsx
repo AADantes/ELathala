@@ -7,7 +7,8 @@ import { Button } from '../../writingpage/ui/Button';
 import supabase from '../../../../../config/supabaseClient';
 import { useRouter } from 'next/navigation';
 import { useUuid } from '../../UUIDContext';
-import { Home, BarChart2 } from "lucide-react";
+import { jsPDF } from "jspdf";
+import { Dispatch, SetStateAction } from 'react';
 
 interface WritingPageProps {
   timeLimit: number;
@@ -48,11 +49,149 @@ export default function WritingPage({
   const [repeatedWordsWarning, setRepeatedWordsWarning] = useState<string | null>(null);
   const [showDoneModal, setShowDoneModal] = useState(false); // Track when writing is done
   const router = useRouter();
-  const { generatedUuid } = useUuid();
-
+  const [content, setContent] = useState('');
+  const { userID, workID } = useUuid();
+  const [uploading, setUploading] = useState(false);
+  const [pdfBlob, setPdfBlob] = useState<Blob | null>(null);
+  const safeUserID = userID || "unknown";
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
   const idleTimeLimit = 30000;
   const badWords = ['fuck', 'shit', 'bitch', 'asshole', 'damn', 'crap'];
+  const [userCredits, setUserCredits] = useState<number>(0);
+  const [canSave, setCanSave] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
+
+
+  useEffect(() => {
+    const fetchUserCredits = async () => {
+      try {
+        const { data, error } = await supabase
+          .from("User")
+          .select("userCredits")
+          .eq("id", userID)
+          .single();
+  
+        if (error) {
+          setError("Error fetching user credits: " + error.message);
+          return;
+        }
+  
+        const credits = data?.userCredits || 0;
+        setUserCredits(credits);
+        setCanSave(credits >= 5000);
+      } catch (err) {
+        if (err instanceof Error) {
+          setError("Error fetching user credits: " + err.message);
+        } else {
+          setError("An unknown error occurred while fetching user credits.");
+        }
+      }
+    };
+  
+    if (userID) {
+      fetchUserCredits();
+    }
+  }, [userID]);
+  
+  // Remove the useEffect for `isTimeUp` to avoid automatic saving
+  // Use a click event to trigger the save process
+  
+  const HandleSaveClick = async () => {
+    if (canSave) {
+      console.log("User has enough credits. Proceeding to save...");
+      // Call your save logic here
+      saveWork(); // Assuming saveWork is the function that does the actual saving
+    } else {
+      console.log("User does not have enough credits to save work.");
+    }
+  };
+  
+  // Handle the save functionality (generate PDF, upload to Supabase, insert record)
+  const saveWork = async () => {
+    try {
+      const writtenContent = textAreaRef.current?.value || ""; // Get content from text area
+  
+      // Generate the PDF
+      const doc = new jsPDF();
+      doc.setFontSize(18);
+      doc.text(title || "Untitled Work", 10, 20);
+      doc.setFontSize(12);
+      doc.text(writtenContent, 10, 30);
+  
+      const pdfBlob = doc.output("blob");
+  
+      // Create a filename using title, workID, and userID
+      const fileName = `${title || "Untitled Work"}-${workID}-${userID}.pdf`;
+  
+      console.log("Uploading file with name:", fileName);
+  
+      // Upload the PDF to Supabase
+      const { data: uploadData, error: uploadError } = await supabase.storage
+        .from("written-works")
+        .upload(`Saved Works/${fileName}`, pdfBlob, {
+          cacheControl: "3600",
+          upsert: true,
+          contentType: "application/pdf",
+        });
+  
+      if (uploadError) {
+        console.error("Upload error:", uploadError.message);
+        return;
+      }
+  
+      console.log("Upload successful. File path:", uploadData?.path);
+      alert("Progress saved!");
+      
+      // Get the public URL
+      const { data: signedUrlData } = await supabase
+        .storage
+        .from("written-works")
+        .getPublicUrl(uploadData?.path || '');
+  
+      const fileUrl = signedUrlData?.publicUrl || '';
+      if (!fileUrl) {
+        console.error("File URL not available.");
+        return;
+      }
+  
+      // Insert into worksFolder table
+      const { data, error: insertError } = await supabase
+        .from("worksFolder")
+        .insert([
+          {
+            workID,
+            userID,
+            title,
+            filename: fileName,
+            fileUrl,
+          },
+        ]);
+  
+      if (insertError) {
+        console.error("Insert error:", insertError.message);
+        return;
+      }
+  
+      console.log("Work saved successfully:", data);
+  
+      // Now deduct credits after saving
+      const { data: updateData, error: updateError } = await supabase
+        .from("User")
+        .update({
+          userCredits: userCredits - 5000, // Deduct 5000 credits
+        })
+        .eq("id", userID);
+  
+      if (updateError) {
+        console.error("Error updating credits:", updateError.message);
+      } else {
+        console.log("User credits updated successfully:", updateData);
+      }
+    } catch (err) {
+      console.error("Error saving work:", err);
+    }
+  };
+
 
   const containsBadWords = (text: string): string[] => {
     const words = text.toLowerCase().split(/\s+/);
@@ -79,39 +218,6 @@ export default function WritingPage({
     }
   };
 
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setTimeLeft((prevTime) => {
-        if (prevTime <= 1) {
-          clearInterval(timer);
-          setIsTimeUp(true);
-          return 0;
-        }
-        return prevTime - 1;
-      });
-    }, 1000);
-    return () => clearInterval(timer);
-  }, [timeLimit]);
-
-  useEffect(() => {
-    const typingTimer = setTimeout(() => {
-      if (!isTyping && currentWords > 0 && !idleWarning && currentWords < wordCount && !isTimeUp) {
-        setIdleWarning(true);
-        const wordArray = text.trim().split(/\s+/);
-        wordArray.pop();
-        setText(wordArray.join(' '));
-        setIsIdle(true);
-      } else if (isTyping || currentWords >= wordCount || isTimeUp) {
-        setIdleWarning(false);
-      }
-    }, idleTimeLimit);
-
-    return () => {
-      clearTimeout(typingTimer);
-      setIsIdle(false);
-      setIdleWarning(false);
-    };
-  }, [text, isTyping, currentWords, idleWarning, wordCount, isTimeUp]);
 
   const checkGrammar = async (text: string) => {
     try {
@@ -216,6 +322,37 @@ export default function WritingPage({
     }
   };
 
+  const toggleBlurEffect = (word: string) => {
+    setBlurredWords((prev) =>
+      prev.includes(word) ? prev.filter((w) => w !== word) : [...prev, word]
+    );
+  };
+
+  const splitTextWithEffects = () => {
+    return text.split(/\s+/).map((word, index) => {
+      const isDeleted = deletedWords.includes(word);
+      const isBlurred = blurredWords.includes(word);
+      const isRepeated = word.toLowerCase() === repeatedWordsWarning?.toLowerCase();
+
+      return (
+        <span
+          key={index}
+          onClick={() => toggleBlurEffect(word)}
+          className={`inline-block mr-2 transition-all duration-200 ${isDeleted ? 'blink-text text-red-500' : ''} ${
+            isRepeated ? 'bg-yellow-200 text-yellow-800 font-bold underline animate-pulse px-1 rounded-sm' : ''
+          } ${shakeEffect ? 'animate-shake' : ''}`}
+          style={{
+            color: textColor,
+            filter: isBlurred ? 'blur(5px)' : 'none',
+            cursor: 'pointer',
+          }}
+        >
+          {word}
+        </span>
+      );
+    });
+  };
+
   const handleKeyPress = () => setIsTyping(true);
   const handleKeyUp = () => setIsTyping(false);
   const handleCopy = (e: React.ClipboardEvent<HTMLTextAreaElement>) => e.preventDefault();
@@ -223,15 +360,46 @@ export default function WritingPage({
   const handleCut = (e: React.ClipboardEvent<HTMLTextAreaElement>) => e.preventDefault();
   const handleColorChange = (color: string) => setTextColor(color);
 
+//---------------------------------------//
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setTimeLeft((prevTime) => {
+        if (prevTime <= 1) {
+          clearInterval(timer);
+          setIsTimeUp(true);
+          return 0;
+        }
+        return prevTime - 1;
+      });
+    }, 1000);
+  
+    return () => clearInterval(timer);
+  }, [timeLimit, text]);
+  
+
+  useEffect(() => {
+    const typingTimer = setTimeout(() => {
+      if (!isTyping && currentWords > 0 && !idleWarning && currentWords < wordCount && !isTimeUp) {
+        setIdleWarning(true);
+        const wordArray = text.trim().split(/\s+/);
+        wordArray.pop();
+        setText(wordArray.join(' '));
+        setIsIdle(true);
+      } else if (isTyping || currentWords >= wordCount || isTimeUp) {
+        setIdleWarning(false);
+      }
+    }, idleTimeLimit);
+
+    return () => {
+      clearTimeout(typingTimer);
+      setIsIdle(false);
+      setIdleWarning(false);
+    };
+  }, [text, isTyping, currentWords, idleWarning, wordCount, isTimeUp]);
+
   const HandleResult = async () => {
     try {
-      // Calculate earned EXP and Credits
-      const earnedExp = currentWords;
-      const earnedCredits = currentWords * 0.5;
-  
-      // Call the function to update the written_works table
-      await updateWrittenWorks(earnedExp);
-  
       // Get current authenticated user
       const {
         data: { user },
@@ -248,10 +416,33 @@ export default function WritingPage({
         return;
       }
   
-      // Call the function to handle EXP and Credits gain
-      await HandleExpCreditGain(earnedExp, earnedCredits);
-    } catch (err) {
-      console.error('Unexpected error:', err);
+      const userId = user.id;
+  
+      // ✅ Fetch multipliers from User table
+      const { data: multiplierData, error: multiplierError } = await supabase
+        .from('User')
+        .select('userExpMultiplier, userCreditMultiplier')
+        .eq('id', userId)
+        .single();
+  
+      if (multiplierError) {
+        console.error('Error fetching multipliers:', multiplierError.message);
+        return;
+      }
+  
+      const { userExpMultiplier, userCreditMultiplier } = multiplierData;
+  
+      // ✅ Calculate earned EXP and credits using multipliers
+      const earnedExp = currentWords * userExpMultiplier;
+      const earnedCredits = currentWords * userCreditMultiplier;
+  
+      // Update written_works table
+      await updateWrittenWorks(earnedExp);
+  
+      // Redirect to results page
+      router.push(`/results?earnedExp=${earnedExp}&earnedCredits=${earnedCredits}`);
+    } catch (error) {
+      console.error('Error in HandleResult:', error);
     }
   };
   
@@ -262,7 +453,7 @@ export default function WritingPage({
         .update({
           numberofWords: currentWords,
         })
-        .eq('workID', generatedUuid);
+        .eq('workID', workID);
   
       if (writtenWorksError) {
         console.error('Error updating written_works in Supabase:', writtenWorksError.message);
@@ -325,50 +516,15 @@ export default function WritingPage({
   
       console.log('User updated successfully.');
   
-      const searchParams = new URLSearchParams({
-        earnedExp: earnedExp.toString(),
-        earnedCredits: earnedCredits.toString(),
-      }).toString();
-  
-      router.push(`/writingresults?${searchParams}`);
-  
       console.log(`User gained ${earnedExp} EXP and ${earnedCredits} Credits.`);
     } catch (err) {
       console.error('Unexpected error:', err);
     }
   };
 
-  const toggleBlurEffect = (word: string) => {
-    setBlurredWords((prev) =>
-      prev.includes(word) ? prev.filter((w) => w !== word) : [...prev, word]
-    );
-  };
+  
 
-  const splitTextWithEffects = () => {
-    return text.split(/\s+/).map((word, index) => {
-      const isDeleted = deletedWords.includes(word);
-      const isBlurred = blurredWords.includes(word);
-      const isRepeated = word.toLowerCase() === repeatedWordsWarning?.toLowerCase();
-
-      return (
-        <span
-          key={index}
-          onClick={() => toggleBlurEffect(word)}
-          className={`inline-block mr-2 transition-all duration-200 ${isDeleted ? 'blink-text text-red-500' : ''} ${
-            isRepeated ? 'bg-yellow-200 text-yellow-800 font-bold underline animate-pulse px-1 rounded-sm' : ''
-          } ${shakeEffect ? 'animate-shake' : ''}`}
-          style={{
-            color: textColor,
-            filter: isBlurred ? 'blur(5px)' : 'none',
-            cursor: 'pointer',
-          }}
-        >
-          {word}
-        </span>
-      );
-    });
-  };
-
+  
   useEffect(() => {
     if (isTimeUp && currentWords >= wordCount) {
       setShowDoneModal(true);
@@ -445,28 +601,11 @@ export default function WritingPage({
       </div>
 
       {showDoneModal && (
-        <div className="fixed inset-0 flex items-center justify-center bg-gradient-to-br from-sky-100 via-white to-sky-200 z-50 p-0 overflow-hidden">
-          <div
-            className="relative text-center bg-white rounded-2xl shadow-2xl p-12 w-full max-w-2xl border border-sky-200 animate-fadeIn flex flex-col items-center"
-            style={{
-              maxHeight: "92vh",
-              justifyContent: "center",
-            }}
-          >
-            {/* Decorative Confetti */}
-            <div className="absolute left-0 top-0 w-full flex justify-center pointer-events-none select-none">
-              <svg width="120" height="40" viewBox="0 0 120 40" fill="none">
-                <circle cx="10" cy="10" r="3" fill="#38bdf8" />
-                <circle cx="40" cy="20" r="2" fill="#facc15" />
-                <circle cx="80" cy="12" r="2.5" fill="#f472b6" />
-                <circle cx="110" cy="8" r="2" fill="#34d399" />
-                <circle cx="60" cy="30" r="2.5" fill="#f59e42" />
-              </svg>
-            </div>
-
-            <div className="mx-auto mb-8 w-20 h-20 bg-gradient-to-br from-sky-400 to-sky-600 rounded-full flex items-center justify-center shadow-lg animate-pop border-4 border-white">
+        <div className="fixed inset-0 flex items-center justify-center bg-sky-100 z-50 p-6">
+          <div className="text-center bg-white rounded-2xl shadow-xl p-10 max-w-md w-full border border-sky-200 animate-fadeIn">
+            <div className="mx-auto mb-6 w-16 h-16 bg-gradient-to-br from-sky-400 to-sky-600 rounded-full flex items-center justify-center shadow-lg animate-pop">
               <svg
-                className="w-10 h-10 text-white"
+                className="w-8 h-8 text-white"
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
@@ -478,30 +617,47 @@ export default function WritingPage({
               </svg>
             </div>
 
-            <h1 className="text-3xl md:text-4xl font-extrabold text-sky-900 mb-6 drop-shadow">
-              🎉 You're Done Writing!
+            <h1 className="text-2xl md:text-3xl font-semibold text-black mb-2">
+              You're Done Writing!
             </h1>
-            <p className="text-lg text-gray-700 mb-10">
-              Congratulations on finishing your writing session. You can now view your results or return home.
-            </p>
 
-            <div className="flex flex-col sm:flex-row justify-center gap-5 mt-8 w-full">
+            <div className="flex justify-center gap-4">
               <Button
-                onClick={() => router.push('/homepage')}
-                className="bg-sky-900 hover:bg-sky-700 text-white px-10 py-5 text-lg rounded-full transition-all duration-300 transform hover:scale-105 hover:shadow-lg flex items-center gap-2 w-full sm:w-80 font-semibold shadow"
+                onClick={() => (router.push('/homepage'))}
+                className="bg-sky-900 hover:bg-sky-700 text-white px-6 py-3 text-md rounded-full transition-all duration-300 transform hover:scale-105 hover:shadow-lg"
               >
-                <Home className="h-6 w-6 mr-2" />
                 Back to Home
               </Button>
 
               <Button
+                  onClick={async () => {
+                 const confirmed = window.confirm("Do you want to save your progress using credits?");
+                  if (confirmed) {
+                  try {
+                   await HandleSaveClick();
+        
+                     } catch (err) {
+                   console.error("Error during save:", err);
+                      alert("An unexpected error occurred while saving.");
+                      }
+                    }
+                 }}
+                disabled={!canSave}
+              className={`${
+               !canSave ? "bg-gray-300 cursor-not-allowed border-gray-300 text-gray-500" : "bg-white text-sky-600 border-2 border-sky-600"
+                } text-md rounded-md transition-all duration-300 transform hover:scale-105 hover:shadow-lg w-36 py-3`}
+                    >
+                    Save your Work
+                  </Button>
+
+
+              <Button
                 onClick={async () => {
-                  await HandleResult();
+                  await HandleResult()
                   router.push('/writingspace/writingresults');
                 }}
-                className="bg-yellow-400 text-sky-900 px-10 py-5 text-lg rounded-full transition-all duration-400 transform hover:scale-105 hover:rotate-1 hover:shadow-2xl hover:bg-yellow-300 focus:ring-4 focus:ring-yellow-200 focus:outline-none flex items-center gap-2 w-full sm:w-80 font-semibold shadow"
+                className="bg-sky-900 text-white px-6 py-3 text-md rounded-full transition-all duration-400 transform hover:scale-105 hover:rotate-1 hover:shadow-2xl hover:bg-sky-600 focus:ring-4 focus:ring-sky-300 focus:outline-none"
               >
-                <BarChart2 className="h-6 w-6 mr-2" />
                 View Results
               </Button>
             </div>
@@ -509,96 +665,66 @@ export default function WritingPage({
         </div>
       )}
 
-{isTimeUp && currentWords < wordCount && (
-  <div className="fixed inset-0 flex items-center justify-center bg-gradient-to-br from-red-100 via-white to-red-200 z-50 p-0 overflow-hidden">
-    <div
-      className="relative text-center bg-white rounded-2xl shadow-2xl p-12 w-full max-w-2xl border border-red-200 animate-fadeIn flex flex-col items-center"
-      style={{
-        maxHeight: "92vh",
-        justifyContent: "center",
-      }}
-    >
-      {/* Decorative Confetti */}
-      <div className="absolute left-0 top-0 w-full flex justify-center pointer-events-none select-none">
-        <svg width="120" height="40" viewBox="0 0 120 40" fill="none">
-          <circle cx="10" cy="10" r="3" fill="#f87171" />
-          <circle cx="40" cy="20" r="2" fill="#facc15" />
-          <circle cx="80" cy="12" r="2.5" fill="#f472b6" />
-          <circle cx="110" cy="8" r="2" fill="#34d399" />
-          <circle cx="60" cy="30" r="2.5" fill="#f59e42" />
-        </svg>
-      </div>
+      {isTimeUp && currentWords < wordCount && (
+        <div className="fixed inset-0 flex items-center justify-center bg-red-50 z-50 p-6">
+          <div className="text-center bg-white rounded-2xl shadow-xl p-10 max-w-md w-full border border-red-200 animate-fadeIn">
+            <div className="mx-auto mb-6 w-16 h-16 bg-gradient-to-br from-red-400 to-red-600 rounded-full flex items-center justify-center shadow-lg animate-pop">
+              <svg
+                className="w-8 h-8 text-white"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth={2.5}
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M18 6L6 18M6 6l12 12" />
+              </svg>
+            </div>
 
-      <div className="mx-auto mb-8 w-20 h-20 bg-gradient-to-br from-red-400 to-red-600 rounded-full flex items-center justify-center shadow-lg animate-pop border-4 border-white">
-        <svg
-          className="w-10 h-10 text-white"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth={2.5}
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        >
-          <path d="M18 6L6 18M6 6l12 12" />
-        </svg>
-      </div>
+            <h1 className="text-2xl md:text-3xl font-semibold text-gray-900 mb-2">
+              Time’s up!
+            </h1>
+            <p className="text-gray-600 mb-6">
+              You wrote {currentWords} words. You didn’t finish your writing in time. Try again or keep practicing!
+            </p>
 
-      <h1 className="text-3xl md:text-4xl font-extrabold text-red-700 mb-6 drop-shadow">
-        ⏰ Time’s Up!
-      </h1>
-      <p className="text-lg text-gray-700 mb-10">
-        You wrote <span className="font-bold text-red-600">{currentWords}</span> words.<br />
-        You didn’t finish your writing in time.<br />
-        Try again or keep practicing!
-      </p>
+            <div className="flex justify-center space-x-4 mb-6">
+            <Button
+  onClick={async () => {
+    const confirmed = window.confirm("Do you want to save your progress using credits?");
+    if (confirmed) {
+      try {
+        await HandleSaveClick();
+        
+      } catch (err) {
+        console.error("Error during save:", err);
+        alert("An unexpected error occurred while saving.");
+      }
+    }
+  }}
+  disabled={!canSave}
+  className={`${
+    !canSave ? "bg-gray-300 cursor-not-allowed border-gray-300 text-gray-500" : "bg-white text-sky-600 border-2 border-sky-600"
+  } text-md rounded-md transition-all duration-300 transform hover:scale-105 hover:shadow-lg w-36 py-3`}
+>
+  Save your Work
+</Button>
 
-      <div className="flex flex-col gap-5 mt-8 w-full items-center">
-  <Button
-    onClick={() => alert('Continue writing with credits.')}
-    className="bg-red-600 hover:bg-red-700 text-white px-10 py-5 text-lg rounded-full transition-all duration-300 transform hover:scale-105 hover:shadow-lg flex items-center gap-2 font-semibold shadow w-full sm:w-[440px] justify-center"
-  >
-    Continue (Buy with Credits)
-  </Button>
-  <div className="flex flex-row justify-center gap-5 w-full">
-    <Button
-      onClick={() => {
-        const confirmed = window.confirm('Do you want to save your progress using credits?');
-        if (confirmed) {
-          alert('Progress saved!');
-        }
-      }}
-      className="bg-white text-gray-600 border-2 border-gray-400 text-lg rounded-full transition-all duration-300 transform hover:scale-105 hover:shadow-lg w-full sm:w-[220px] py-5 font-semibold flex items-center justify-center"
-      title="Save Credits"
-    >
-      {/* Save icon */}
-      <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l-4 4m0 0l-4-4m4 4V4" />
-      </svg>
-      Save Credits
-    </Button>
-    <Button
-      onClick={async () => {
-        const confirmed = window.confirm('Are you sure you want to delete this session? This action cannot be undone.');
-        if (confirmed) {
-          await HandleResult();
-          alert('Session deleted!');
-          router.push('/writingspace/writingresults');
-        }
-      }}
-      className="bg-white text-red-600 border-2 border-red-600 text-lg rounded-full transition-all duration-300 transform hover:scale-105 hover:shadow-lg w-full sm:w-[220px] py-5 font-semibold flex items-center justify-center"
-      title="Delete Session"
-    >
-      {/* Delete/Trash icon */}
-      <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6M9 7V4a1 1 0 011-1h4a1 1 0 011 1v3m-7 0h10" />
-      </svg>
-      Delete Session
-    </Button>
-  </div>
-</div>
-    </div>
-  </div>
-)}
+              <Button
+                onClick={async () => {
+                    await HandleResult();
+                    router.push('/writingspace/writingresults');
+                  
+                }}
+                className="bg-white text-red-600 border-2 border-red-600 text-md rounded-md transition-all duration-300 transform hover:scale-105 hover:shadow-lg w-36 py-3"
+              >
+                View Results
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* --- WRITING AREA AND GRAMMAR SUGGESTION --- */}
       <div className="flex flex-col flex-grow items-center">
@@ -696,4 +822,4 @@ export default function WritingPage({
       </div>
     </div>
   );
-}
+} 
