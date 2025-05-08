@@ -16,6 +16,7 @@ export default function AdminPage() {
   const [tableData, setTableData] = useState<any[]>([])
   const [columns, setColumns] = useState<string[]>([])
   const [selectedRow, setSelectedRow] = useState<any>(null)
+  const [columnValue, setColumnValue] = useState<any>(null)
   const [formValues, setFormValues] = useState<Record<string, string>>({})
   const [selectedColumn, setSelectedColumn] = useState<string>("")
 
@@ -70,11 +71,25 @@ export default function AdminPage() {
   }
 
   const handleUpdate = async () => {
-    if (!selectedRow) return alert("Please select a row to update")
-    const { error } = await supabase.from(selectedTable).update(formValues).match({ id: selectedRow.id })
-    if (error) console.error("Error updating record:", error)
-    else alert("Record updated successfully!")
-  }
+    if (!selectedRow) return alert("Please select a row to update");
+    if (!selectedColumn || columnValue === undefined) return alert("Please specify the column and value to match");
+  
+    const matchConditions = {
+      id: selectedRow.id,
+      [selectedColumn]: columnValue
+    };
+  
+    const { error } = await supabase
+      .from(selectedTable)
+      .update(formValues)
+      .match(matchConditions);
+  
+    if (error) {
+      console.error("Error updating record:", error);
+    } else {
+      alert("Record updated successfully!");
+    }
+  };
 
   const handleDelete = async () => {
     if (!selectedRow) return alert("Please select a row to delete")
@@ -85,7 +100,7 @@ export default function AdminPage() {
 
   const handleLogout = () => {
     alert("Logging out...")
-    router.push("/login")
+    router.push("/homepage")
   }
 
   return (

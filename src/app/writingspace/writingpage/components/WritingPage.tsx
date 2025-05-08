@@ -97,6 +97,7 @@ export default function WritingPage(props: WritingPageProps) {
   const checkGrammar = async (text: string) => {
     try {
       const response = await axios.post(
+        
         'https://api.languagetool.org/v2/check',
         null,
         {
