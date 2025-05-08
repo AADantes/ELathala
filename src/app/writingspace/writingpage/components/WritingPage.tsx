@@ -380,8 +380,7 @@ export default function WritingPage({
   const handleCut = (e: React.ClipboardEvent<HTMLTextAreaElement>) => e.preventDefault();
   const handleColorChange = (color: string) => setTextColor(color);
 
-//---------------------------------------//
-
+  // Countdown timer logic
   useEffect(() => {
     const timer = setInterval(() => {
       setTimeLeft((prevTime) => {
@@ -395,9 +394,9 @@ export default function WritingPage({
     }, 1000);
   
     return () => clearInterval(timer);
-  }, [timeLimit, text]);
-  
+  }, [timeLimit]);
 
+  // Typing idle detection logic
   useEffect(() => {
     const typingTimer = setTimeout(() => {
       if (!isTyping && currentWords > 0 && !idleWarning && currentWords < wordCount && !isTimeUp) {
@@ -799,4 +798,4 @@ if (updateWordsError) {
       </div>
     </div>
   );
-} 
+}
