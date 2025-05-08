@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { User, Lock, Menu, X } from 'lucide-react';
+import { User, Lock } from 'lucide-react';
 import { Button } from "@/app/landingpage/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/app/landingpage/ui/dialog";
 import { Input } from "@/app/landingpage/ui/input";
@@ -20,14 +20,12 @@ interface HeaderProps {
   setIsSignUpOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-
 export default function Header() {
   const [loginEmail, setLoginEmail] = useState('');
   const [loginPassword, setLoginPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isLoginOpen, setIsLoginOpen] = useState(false);
   const [isSignUpOpen, setIsSignUpOpen] = useState(false);
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [signUpEmail, setSignUpEmail] = useState('');
   const [signUpUsername, setSignUpUsername] = useState('');
   const [signUpPassword, setSignUpPassword] = useState('');
@@ -143,16 +141,6 @@ export default function Header() {
       <header className="fixed top-0 left-0 w-full h-20 flex items-center bg-[#4F8FB7] text-white z-50">
         <div className="container mx-auto flex items-center justify-between px-4 w-full">
 
-          {/* Mobile Menu Button */}
-          <div className="lg:hidden flex items-center pr-4">
-            <Button
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="text-white bg-transparent border-none focus:outline-none"
-            >
-              {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-            </Button>
-          </div>
-
           {/* Logo and Text */}
           <Link className="flex items-center space-x-3" href="/">
             <img
@@ -167,7 +155,7 @@ export default function Header() {
                 textShadow: '1px 1px 2px rgba(0, 0, 0, 0.3)',
               }}
             >
-              E-LATHALA
+              IWrite
             </span>
           </Link>
 
@@ -192,7 +180,7 @@ export default function Header() {
             <Dialog open={isLoginOpen} onOpenChange={setIsLoginOpen}>
               <DialogContent className="sm:max-w-[425px]">
                 <DialogHeader className="flex flex-col items-center">
-                  <DialogTitle className="text-[#005A8C] text-xl text-center">Log in to E-Lathala</DialogTitle>
+                  <DialogTitle className="text-[#005A8C] text-xl text-center">Log in to IWrite</DialogTitle>
                   <DialogDescription className="text-center">Enter your email and password to access your account.</DialogDescription>
                 </DialogHeader>
                 <form onSubmit={handleLogin} className="space-y-4 mt-4">
@@ -227,7 +215,7 @@ export default function Header() {
               <DialogContent className="sm:max-w-[425px]">
                 <DialogHeader className="flex flex-col items-center">
                   <DialogTitle className="text-[#005A8C] text-xl text-center">Sign Up</DialogTitle>
-                  <DialogDescription className="font-bold text-center">Join E-Lathala by creating an account.</DialogDescription>
+                  <DialogDescription className="font-bold text-center">Join IWrite by creating an account.</DialogDescription>
                 </DialogHeader>
                 <div className="flex flex-col gap-4 mt-4">
                   <div className="space-y-2 relative">
@@ -280,14 +268,6 @@ export default function Header() {
           </nav>
         </div>
       </header>
-
-      {/* Mobile Menu */}
-      {isMenuOpen && (
-        <div className="fixed top-20 left-0 w-full bg-white text-[#4F8FB7] z-40 shadow-lg lg:hidden">
-          <nav className="flex flex-col items-center space-y-4 py-4">
-          </nav>
-        </div>
-      )}
     </>
   );
 }

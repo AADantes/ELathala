@@ -21,7 +21,6 @@ interface StartPromptProps {
   ) => void;
 }
 
-
 export default function StartPrompt({ onStart }: StartPromptProps) {
   const [step, setStep] = useState(1);
   const [genre, setGenre] = useState<string>('');
@@ -66,8 +65,6 @@ export default function StartPrompt({ onStart }: StartPromptProps) {
     fetchUserUUID();
   }, [setUserID]);
 
-  
-
   const handleNext = () => {
     if (step < 6) {
       setStep(step + 1);
@@ -79,8 +76,6 @@ export default function StartPrompt({ onStart }: StartPromptProps) {
   const handleBack = () => {
     if (step > 1) setStep(step - 1);
   };
-
-
 
   const handleStart = async () => {
     const time = Number(timeLimit);
@@ -205,12 +200,6 @@ export default function StartPrompt({ onStart }: StartPromptProps) {
         </h2>
         <p className="text-center text-sm text-[#023e8a] mb-4">Step {step} of 6</p>
 
-        {showStepMessage && (
-          <div className="text-green-600 text-sm mb-2 text-center transition-opacity duration-500">
-            Step {step - 1} complete!
-          </div>
-        )}
-
         {/* STEP 1: Title */}
         {step === 1 && (
           <div className="space-y-3">
@@ -243,6 +232,13 @@ export default function StartPrompt({ onStart }: StartPromptProps) {
                 {g}
               </button>
             ))}
+            <Input
+              type="text"
+              value={genre}
+              onChange={(e) => setGenre(e.target.value)}
+              placeholder="Or type your custom genre"
+              className="w-full py-2 text-sm rounded-xl border-2 border-[#0077b6] mt-2"
+            />
             <button
               onClick={() => {
                 setGenre('None');
@@ -263,15 +259,26 @@ export default function StartPrompt({ onStart }: StartPromptProps) {
                 <button
                   key={t}
                   onClick={() => setTopic(t)}
-                  className={`w-full py-2 text-sm rounded-xl font-semibold border-2 transition-all transform hover:scale-105 ${topic === t ? 'bg-[#0077b6] text-white border-[#0077b6]' : 'bg-white text-[#0077b6] border-[#0077b6]'}`}
+                  className={`w-full py-2 text-sm rounded-xl font-semibold border-2 transition-all transform hover:scale-105 ${
+                    topic === t ? 'bg-[#0077b6] text-white border-[#0077b6]' : 'bg-white text-[#0077b6] border-[#0077b6]'
+                  }`}
                 >
                   {t}
                 </button>
               ))}
+            <Input
+              type="text"
+              value={topic}
+              onChange={(e) => setTopic(e.target.value)}
+              placeholder="Or type your custom topic"
+              className="w-full py-2 text-sm rounded-xl border-2 border-[#0077b6] mt-2"
+            />
             {genre !== 'None' && (
               <button
                 onClick={() => setTopic('None')}
-                className={`w-full py-2 text-sm rounded-xl font-semibold border-2 transition-all transform hover:scale-105 ${topic === 'None' ? 'bg-[#0077b6] text-white border-[#0077b6]' : 'bg-white text-[#0077b6] border-[#0077b6]'}`}
+                className={`w-full py-2 text-sm rounded-xl font-semibold border-2 transition-all transform hover:scale-105 ${
+                  topic === 'None' ? 'bg-[#0077b6] text-white border-[#0077b6]' : 'bg-white text-[#0077b6] border-[#0077b6]'
+                }`}
               >
                 None
               </button>
@@ -405,4 +412,4 @@ export default function StartPrompt({ onStart }: StartPromptProps) {
     </div>
   );
 
-  }
+}

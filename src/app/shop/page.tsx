@@ -58,7 +58,7 @@ export default function Shop() {
       <main className="flex-grow container mx-auto py-8 px-4">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
           <div>
-            <h1 className="text-3xl font-bold tracking-tight">Welcome to the ELathala Shop!</h1>
+            <h1 className="text-3xl font-bold tracking-tight">Welcome to the IWrite Shop!</h1>
             <p className="text-muted-foreground mt-1"></p>
           </div>
           <CreditDisplay credits={userCredits ?? 0} />

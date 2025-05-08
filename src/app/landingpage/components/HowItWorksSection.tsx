@@ -21,7 +21,7 @@ export default function HowItWorksSection() {
               animate={{ y: 0, opacity: 1 }}
               transition={{ delay: 0.2, duration: 0.5 }}
             >
-              How Elathala Works
+              How IWrite Works
             </motion.h2>
 
             <motion.div

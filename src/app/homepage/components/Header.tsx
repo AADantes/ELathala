@@ -79,7 +79,7 @@ export function Header() {
           <div className="flex items-center space-x-2 ml-4">
             <img src="https://ueagmtscbdirqgbjxaqb.supabase.co/storage/v1/object/public/elathala-logo//logo.png" alt="E-Lathala Logo" className="h-12 w-12" />
             <span className={`font-bold text-3xl text-white ${bebasNeue.className}`}>
-              E-LATHALA
+              IWrite
             </span>
           </div>
         </div>

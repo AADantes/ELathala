@@ -3,7 +3,6 @@
 import { useState } from "react";
 import Header from '@/app/landingpage/components/Header';
 import HeroSection from '@/app/landingpage/components/HeroSection';
-import FeaturesSection from '@/app/landingpage/components/FeaturesSection';
 import HowItWorksSection from '@/app/landingpage/components/HowItWorksSection';
 import About from '@/app/landingpage/components/About';
 import Footer from '@/app/landingpage/components/Footer';

@@ -112,7 +112,7 @@ export default function Header({ onMenuClick, bgColor, setBgColor }: HeaderProps
               textShadow: '1px 1px 2px rgba(0, 0, 0, 0.3)',
             }}
           >
-            E-LATHALA
+            IWrite
           </span>
         </Link>
       </div>

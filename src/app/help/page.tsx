@@ -7,7 +7,7 @@ import { HelpCircle, User, FileText, CheckCircle, Star, Bell } from "lucide-reac
 export default function HelpPage() {
   const helpContent = [
     {
-      title: "Welcome to E-LATHALA! Need assistance?",
+      title: "Welcome to IWrite! Need assistance?",
       content: "We're here to help you get started and make the most of your writing journey. Whether you're new or just need a refresher, this guide will walk you through everything you need to know.",
       icon: <HelpCircle className="text-blue-600" size={24} />
     },

@@ -144,20 +144,21 @@ export default function HeroSection({
 
       {/* Foreground Content */}
       <div className="container px-4 md:px-0 relative z-10 flex flex-col items-center justify-center">
-        <div className="flex flex-col items-center space-y-6 sm:space-y-8 text-center w-full max-w-2xl mx-auto">
+        <div className="flex flex-col items-center space-y-8 text-center w-full max-w-4xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
-            className="space-y-4 sm:space-y-5 flex flex-col items-center justify-center text-center w-full"
+            className="space-y-6 flex flex-col items-center justify-center text-center w-full"
           >
-            <h1 className="text-2xl xs:text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-sky-950 leading-tight text-center w-full">
-              Write, Achieve, and Level Up with <span className="text-sky-700">E-Lathala</span>
-            </h1>
-            <p className="mx-auto max-w-xl text-black text-base sm:text-lg leading-relaxed text-center">
-              Transform your writing journey into an exciting adventure. Whether you're chasing a deadline or building a daily habit, E-Lathala keeps you motivated with gamified tools that track your growth and reward consistency.
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-sky-950 whitespace-nowrap font-sans drop-shadow">
+  Write, Achieve, and Level Up with <span className="text-sky-700">IWrite</span>
+</h1>
+
+            <p className="mx-auto max-w-3xl text-black text-base sm:text-lg leading-relaxed text-center">
+              Transform your writing journey into an exciting adventure. Whether you're chasing a deadline or building a daily habit, IWrite keeps you motivated with gamified tools that track your growth and reward consistency.
             </p>
-            <p className="mx-auto max-w-lg text-black text-xs sm:text-sm italic text-center">
+            <p className="mx-auto max-w-2xl text-sky-800 text-sm sm:text-base italic text-center">
               "Your words have power — and now, they can earn you points too."
             </p>
           </motion.div>
@@ -170,7 +171,7 @@ export default function HeroSection({
           >
             <div className="relative w-full flex flex-col items-center justify-center">
               <Button
-                className="bg-gradient-to-r from-sky-800 to-sky-900 text-white hover:bg-sky-900 font-bold rounded-lg shadow-lg transform transition-all hover:scale-105 px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-lg border-none flex items-center gap-3 mx-auto"
+                className="bg-gradient-to-r from-sky-800 to-sky-900 text-white hover:bg-sky-900 font-bold rounded-xl shadow-xl transform transition-all hover:scale-105 px-8 sm:px-12 py-4 sm:py-5 text-lg sm:text-xl border-none flex items-center gap-4 mx-auto"
                 onClick={handleStartWriting}
               >
                 Start Writing
@@ -187,7 +188,7 @@ export default function HeroSection({
                     ease: 'easeInOut',
                   }}
                 >
-                  <Feather className="w-4 h-4" />
+                  <Feather className="w-5 h-5" />
                 </motion.div>
               </Button>
               <AnimatePresence>
@@ -197,10 +198,10 @@ export default function HeroSection({
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: 10 }}
                     transition={{ duration: 0.4 }}
-                    className="absolute left-1/2 top-full -translate-x-1/2 mt-3 w-auto max-w-full flex items-center justify-center gap-2 bg-red-50 border border-red-300 rounded-lg px-3 py-2 shadow-lg z-[100] text-center"
+                    className="absolute left-1/2 top-full -translate-x-1/2 mt-4 w-auto max-w-full flex items-center justify-center gap-2 bg-red-50 border border-red-300 rounded-lg px-4 py-2 shadow-lg z-[100] text-center"
                   >
                     <AlertTriangle className="text-red-500 w-5 h-5 animate-bounce shrink-0" />
-                    <span className="text-red-700 font-semibold text-xs sm:text-sm text-center whitespace-nowrap">
+                    <span className="text-red-700 font-semibold text-sm sm:text-base text-center whitespace-nowrap">
                       Please <span className="underline underline-offset-2">sign up</span> or <span className="underline underline-offset-2">log in</span> to start writing!
                     </span>
                   </motion.div>
