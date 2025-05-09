@@ -232,13 +232,6 @@ export default function StartPrompt({ onStart }: StartPromptProps) {
                 {g}
               </button>
             ))}
-            <Input
-              type="text"
-              value={genre}
-              onChange={(e) => setGenre(e.target.value)}
-              placeholder="Or type your custom genre"
-              className="w-full py-2 text-sm rounded-xl border-2 border-[#0077b6] mt-2"
-            />
             <button
               onClick={() => {
                 setGenre('None');
@@ -248,6 +241,13 @@ export default function StartPrompt({ onStart }: StartPromptProps) {
             >
               None
             </button>
+            <Input
+              type="text"
+              value={genre}
+              onChange={(e) => setGenre(e.target.value)}
+              placeholder="Or type your custom genre"
+              className="w-full py-2 text-sm rounded-xl border-2 border-[#0077b6] mt-2"
+            />
           </div>
         )}
 
@@ -266,13 +266,6 @@ export default function StartPrompt({ onStart }: StartPromptProps) {
                   {t}
                 </button>
               ))}
-            <Input
-              type="text"
-              value={topic}
-              onChange={(e) => setTopic(e.target.value)}
-              placeholder="Or type your custom topic"
-              className="w-full py-2 text-sm rounded-xl border-2 border-[#0077b6] mt-2"
-            />
             {genre !== 'None' && (
               <button
                 onClick={() => setTopic('None')}
@@ -283,6 +276,13 @@ export default function StartPrompt({ onStart }: StartPromptProps) {
                 None
               </button>
             )}
+            <Input
+              type="text"
+              value={topic}
+              onChange={(e) => setTopic(e.target.value)}
+              placeholder="Or type your custom topic"
+              className="w-full py-2 text-sm rounded-xl border-2 border-[#0077b6] mt-2"
+            />
           </div>
         )}
 

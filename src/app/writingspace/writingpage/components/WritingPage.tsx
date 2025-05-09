@@ -328,53 +328,89 @@ export default function WritingPage(props: WritingPageProps) {
     setHighlightedErrorIdx(null);
   };
 
-  const getHighlightedText = () => {
-    if (!text || !grammarErrors.length) return text;
+  // Helper: Split text into sentences with start/end indices
+  function splitTextWithIndices(text: string) {
+    const regex = /[^.!?]+[.!?]*/g;
+    let match;
+    let sentences: { sentence: string; start: number; end: number }[] = [];
+    let lastIndex = 0;
+    while ((match = regex.exec(text)) !== null) {
+      const sentence = match[0];
+      const start = match.index;
+      const end = start + sentence.length;
+      sentences.push({ sentence, start, end });
+      lastIndex = end;
+    }
+    if (lastIndex < text.length) {
+      sentences.push({
+        sentence: text.slice(lastIndex),
+        start: lastIndex,
+        end: text.length,
+      });
+    }
+    return sentences;
+  }
 
-    const sortedErrors = [...grammarErrors].sort((a, b) => a.offset - b.offset);
+  // Replace your applySentenceCorrections with this:
+  function applySentenceCorrectionsByOffset(sentenceStart: number, sentenceEnd: number) {
+    // Find all errors within this sentence's offset range
+    const errorsInSentence = grammarErrors
+      .filter(
+        (err, idx) =>
+          err.offset >= sentenceStart &&
+          err.offset + err.length <= sentenceEnd &&
+          err.replacements &&
+          err.replacements.length > 0 &&
+          !ignoredErrorIdxs.includes(idx)
+      )
+      .sort((a, b) => a.offset - b.offset);
 
-    let lastIdx = 0;
-    const elements = [];
+    let newText = text;
+    let offsetDiff = 0;
 
-    for (let i = 0; i < sortedErrors.length; i++) {
-      if (ignoredErrorIdxs.includes(i)) continue;
-      const err = sortedErrors[i];
-      const start = err.offset;
-      const end = err.offset + err.length;
+    errorsInSentence.forEach((err) => {
+      const replacement = err.replacements[0].value;
+      const start = err.offset + offsetDiff;
+      const end = start + err.length;
+      newText = newText.slice(0, start) + replacement + newText.slice(end);
+      offsetDiff += replacement.length - err.length;
+    });
 
-      if (lastIdx < start) {
-        elements.push(
-          <span key={`text-${lastIdx}`}>{text.slice(lastIdx, start)}</span>
-        );
+    setText(newText);
+    setSelectedError(null);
+    setHighlightedErrorIdx(null);
+  }
+
+  // Replace your renderHighlightedText with this:
+  const renderHighlightedText = () => {
+    if (!text) return text;
+
+    const sentences = splitTextWithIndices(text);
+
+    return sentences.map(({ sentence, start, end }, idx) => {
+      // Check if any grammar error overlaps with this sentence
+      const hasError = grammarErrors.some(
+        (err, errIdx) =>
+          err.offset >= start &&
+          err.offset + err.length <= end &&
+          err.replacements &&
+          err.replacements.length > 0 &&
+          !ignoredErrorIdxs.includes(errIdx)
+      );
+      if (!hasError) {
+        return <span key={idx}>{sentence}</span>;
       }
-
-      elements.push(
+      return (
         <span
-          key={`error-${i}`}
-          className={`bg-yellow-300 text-red-800 font-bold px-1 rounded transition-all duration-200 cursor-pointer`}
-          onClick={() => {
-            setSelectedError(err);
-            setHighlightedErrorIdx(i);
-          }}
-          style={{
-            boxShadow: highlightedErrorIdx === i ? '0 0 0 2px #0077b6' : undefined,
-          }}
-          title={err.message}
+          key={idx}
+          className="bg-yellow-200 text-red-800 font-bold px-1 rounded cursor-pointer underline decoration-wavy decoration-red-500 transition-shadow"
+          title="Click to fix all grammar errors in this sentence"
+          onClick={() => applySentenceCorrectionsByOffset(start, end)}
         >
-          {text.slice(start, end)}
+          {sentence}
         </span>
       );
-
-      lastIdx = end;
-    }
-
-    if (lastIdx < text.length) {
-      elements.push(
-        <span key={`text-end`}>{text.slice(lastIdx)}</span>
-      );
-    }
-
-    return elements;
+    });
   };
 
   useEffect(() => {
@@ -540,6 +576,15 @@ export default function WritingPage(props: WritingPageProps) {
     setShowDoneModal(true);
   };
 
+  function groupErrorsBySentence(errors: any[]) {
+    const map: { [sentence: string]: any[] } = {};
+    errors.forEach((err) => {
+      if (!map[err.sentence]) map[err.sentence] = [];
+      map[err.sentence].push(err);
+    });
+    return map;
+  }
+
   return (
     <div className="container mx-auto px-6 py-8 bg-white text-black min-h-screen flex flex-col relative pb-24">
       {/* --- ENHANCED TITLE, GENRE, TOPIC BOXES --- */}
@@ -620,6 +665,31 @@ export default function WritingPage(props: WritingPageProps) {
       {/* --- WRITING AREA AND GRAMMAR SUGGESTION --- */}
       <div className="flex flex-col flex-grow items-center">
         <div className="w-full max-w-[1800px] flex flex-col gap-2">
+          {/* Warning if grammar errors exist */}
+          {grammarErrors.length - ignoredErrorIdxs.length > 0 && (
+            <div className="mb-2 bg-yellow-100 border-l-4 border-yellow-500 text-yellow-900 p-2 rounded flex items-center gap-2">
+              <span className="text-xl">⚠️</span>
+              <span>
+                <span className="font-semibold">Grammar issues detected.</span> Click any highlighted text below to automatically correct the error.
+              </span>
+            </div>
+          )}
+
+          {/* Highlighted text preview */}
+          <div
+            className="mb-2 p-3 border border-gray-200 rounded bg-gray-50 min-h-[48px] whitespace-pre-wrap break-words"
+            style={{
+              fontFamily: fontStyle,
+              fontSize: `${fontSize}px`,
+              color: textColor,
+              lineHeight: 1.6,
+              minHeight: '48px',
+            }}
+          >
+            {renderHighlightedText()}
+          </div>
+
+          {/* The actual textarea for editing */}
           <textarea
             ref={textAreaRef}
             onChange={handleTextChange}
@@ -667,7 +737,7 @@ export default function WritingPage(props: WritingPageProps) {
 
           {/* --- Enhanced Grammar Suggestion Box --- */}
           <div
-            className="mt-2 bg-white border border-green-200 rounded-xl shadow flex flex-col animate-fadeIn"
+            className="mt-2 bg-white border border-sky-200 rounded-xl shadow flex flex-col animate-fadeIn"
             style={{
               maxHeight: 320,
               overflowY: 'auto',
@@ -677,16 +747,22 @@ export default function WritingPage(props: WritingPageProps) {
             }}
           >
             <div className="flex items-center gap-2 mb-4 border-b pb-2">
-              <span className="font-bold text-xl text-green-700 flex items-center gap-2">📝 Grammar Suggestions</span>
+              <span className="font-bold text-xl text-sky-700 flex items-center gap-2">📝 Grammar Suggestions</span>
               <span className="ml-2 text-sm text-gray-500">
                 {grammarErrors.length - ignoredErrorIdxs.length} issues found
               </span>
               {grammarErrors.length > 0 && (
                 <Button
-                  className="ml-auto px-4 py-1 text-xs bg-green-700 hover:bg-green-800 text-white rounded shadow"
+                  className="ml-auto px-4 py-1 text-xs bg-sky-700 hover:bg-sky-800 text-white rounded shadow flex items-center"
                   onClick={applyAllCorrections}
                 >
-                  <span className="mr-1">✔️</span>Apply All
+                  <span className="mr-1 flex items-center">
+                    {/* White check SVG */}
+                    <svg width="16" height="16" fill="white" viewBox="0 0 20 20">
+                      <path fill="white" d="M7.629 15.314a1 1 0 0 1-1.415 0l-4.243-4.243a1 1 0 1 1 1.415-1.415l3.536 3.536 7.778-7.778a1 1 0 1 1 1.415 1.415l-8.486 8.485z"/>
+                    </svg>
+                  </span>
+                  Apply All
                 </Button>
               )}
             </div>
@@ -696,8 +772,8 @@ export default function WritingPage(props: WritingPageProps) {
                   ignoredErrorIdxs.includes(idx) ? null : (
                     <li
                       key={idx}
-                      className={`flex items-start gap-3 p-3 rounded-lg border border-gray-100 hover:border-green-300 transition-colors shadow-sm
-                        ${highlightedErrorIdx === idx ? 'bg-green-50 border-green-400' : ''}`}
+                      className={`flex items-start gap-3 p-3 rounded-lg border border-gray-100 hover:border-sky-300 transition-colors shadow-sm
+                        ${highlightedErrorIdx === idx ? 'bg-sky-50 border-sky-400' : ''}`}
                       onClick={() => {
                         setSelectedError(err);
                         setHighlightedErrorIdx(idx);
@@ -706,13 +782,13 @@ export default function WritingPage(props: WritingPageProps) {
                       <span className="text-2xl mt-1">{getErrorIcon(err.rule?.category?.name || '')}</span>
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-1">
-                          <span className="font-bold text-green-900">{err.sentence || ''}</span>
+                          <span className="font-bold text-sky-900">{err.sentence || ''}</span>
                           <span className={`ml-2 text-xs px-2 py-0.5 rounded font-semibold
                             ${err.rule?.issueType === 'misspelling'
                               ? 'bg-red-200 text-red-800'
                               : err.rule?.issueType === 'typographical'
                               ? 'bg-yellow-200 text-yellow-800'
-                              : 'bg-green-200 text-green-800'
+                              : 'bg-sky-200 text-sky-800'
                             }`}>
                             {err.rule?.issueType || 'Grammar'}
                           </span>
@@ -727,7 +803,7 @@ export default function WritingPage(props: WritingPageProps) {
                           <div className="flex gap-2 flex-wrap mb-1">
                             <span className="text-xs text-gray-500">Suggestion:</span>
                             {err.replacements.slice(0, 3).map((r: any, i: number) => (
-                              <span key={i} className="bg-green-100 text-green-800 px-2 py-0.5 rounded text-sm font-mono">{r.value}</span>
+                              <span key={i} className="bg-sky-100 text-sky-800 px-2 py-0.5 rounded text-sm font-mono">{r.value}</span>
                             ))}
                             <span className="ml-2 text-xs text-gray-400">
                               <span className="font-semibold">Preview:</span> <span className="italic">{err.sentence.replace(
@@ -740,7 +816,7 @@ export default function WritingPage(props: WritingPageProps) {
                         <div className="flex gap-2 mt-2">
                           {err.replacements && err.replacements.length > 0 && (
                             <Button
-                              className="px-3 py-1 text-xs bg-green-600 hover:bg-green-700 text-white rounded"
+                              className="px-3 py-1 text-xs bg-sky-600 hover:bg-sky-700 text-white rounded"
                               onClick={e => {
                                 e.stopPropagation();
                                 applyGrammarCorrection(idx);
@@ -783,9 +859,9 @@ export default function WritingPage(props: WritingPageProps) {
           {/* --- Error Details Modal/Popup --- */}
           {selectedError && (
             <div className="fixed inset-0 flex items-center justify-center bg-black/40 z-50">
-              <div className="bg-white rounded-xl shadow-2xl p-8 max-w-lg w-full text-center relative border-2 border-green-200 animate-fadeIn">
+              <div className="bg-white rounded-xl shadow-2xl p-8 max-w-lg w-full text-center relative border-2 border-sky-200 animate-fadeIn">
                 <button
-                  className="absolute top-3 right-3 text-gray-400 hover:text-green-700 text-2xl transition-colors"
+                  className="absolute top-3 right-3 text-gray-400 hover:text-sky-700 text-2xl transition-colors"
                   onClick={() => {
                     setSelectedError(null);
                     setHighlightedErrorIdx(null);
@@ -794,10 +870,10 @@ export default function WritingPage(props: WritingPageProps) {
                 >
                   ×
                 </button>
-                <h2 className="text-2xl font-extrabold mb-3 text-green-700 flex items-center justify-center gap-2">
+                <h2 className="text-2xl font-extrabold mb-3 text-sky-700 flex items-center justify-center gap-2">
                   <span>📝</span> Grammar Issue
                 </h2>
-                <div className="mb-2 text-lg text-green-900 font-semibold bg-green-50 rounded p-2 border border-green-100">
+                <div className="mb-2 text-lg text-sky-900 font-semibold bg-sky-50 rounded p-2 border border-sky-100">
                   {selectedError.sentence}
                 </div>
                 <div className="mb-2 text-gray-700 text-base">{selectedError.message}</div>
@@ -806,13 +882,19 @@ export default function WritingPage(props: WritingPageProps) {
                 </div>
                 {selectedError.replacements && selectedError.replacements.length > 0 && (
                   <Button
-                    className="mt-2 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded shadow"
+                    className="mt-2 bg-sky-600 hover:bg-sky-700 text-white px-4 py-2 rounded shadow flex items-center justify-center"
                     onClick={() => {
                       const idx = grammarErrors.findIndex(e => e === selectedError);
                       applyGrammarCorrection(idx);
                     }}
                   >
-                    <span className="mr-2">✔️</span>Apply Correction
+                    <span className="mr-2 flex items-center">
+                      {/* White check SVG */}
+                      <svg width="18" height="18" fill="white" viewBox="0 0 20 20">
+                        <path fill="white" d="M7.629 15.314a1 1 0 0 1-1.415 0l-4.243-4.243a1 1 0 1 1 1.415-1.415l3.536 3.536 7.778-7.778a1 1 0 1 1 1.415 1.415l-8.486 8.485z"/>
+                      </svg>
+                    </span>
+                    Apply Correction
                   </Button>
                 )}
                 <Button
