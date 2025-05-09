@@ -25,7 +25,7 @@ export default function About() {
 
             <div className="mx-auto max-w-3xl text-justify text-gray-700 md:text-lg leading-loose space-y-6">
               <p>
-                <strong>IWrite</strong> is a web-based writing system designed to help users develop consistent writing habits through gamification. By combining writing prompts, customizable challenges, and a progression-based reward system, the platform turns writing into an engaging and motivating experience.
+                <strong>iWrite</strong> is a web-based writing system designed to help users develop consistent writing habits through gamification. By combining writing prompts, customizable challenges, and a progression-based reward system, the platform turns writing into an engaging and motivating experience.
               </p>
 
               <p>
@@ -33,7 +33,7 @@ export default function About() {
               </p>
 
               <p>
-                Whether you're a student, writer, educator, or professional, IWrite offers a space to build your writing skills in a fun, interactive, and user-friendly environment.
+                Whether you're a student, writer, educator, or professional, iWrite offers a space to build your writing skills in a fun, interactive, and user-friendly environment.
               </p>
             </div>
           </motion.div>

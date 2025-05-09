@@ -419,8 +419,15 @@ export default function WritingPage(props: WritingPageProps) {
         // Highlight the error part
         elements.push(
           <span
-            key={`${sIdx}-err-${i}`}
-            className="bg-yellow-200 text-red-800 font-bold px-1 rounded cursor-pointer underline decoration-wavy decoration-red-500 transition-shadow relative group"
+            key={`err-${sIdx}-${i}`}
+            className="relative font-semibold text-red-700 cursor-pointer transition-all group"
+            style={{
+              borderBottom: '2.5px solid #ef4444', // solid underline
+              background: 'rgba(255, 237, 213, 0.7)',
+              borderRadius: '0.25rem',
+              padding: '0 2px',
+              boxShadow: '0 1px 6px 0 rgba(255, 0, 0, 0.07)',
+            }}
             title={err.message}
             tabIndex={0}
             onClick={() => applySentenceCorrectionsByOffset(start, end)}
@@ -431,13 +438,46 @@ export default function WritingPage(props: WritingPageProps) {
             }}
           >
             {text.slice(err.offset, err.offset + err.length)}
-            <span className="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 w-64 bg-white border border-blue-300 text-blue-900 text-xs rounded shadow-lg p-2 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">
+            <span
+              className="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 w-72 max-w-[90vw] bg-white border border-red-300 text-red-900 text-xs rounded shadow-lg p-2 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-auto z-50"
+              style={{
+                minWidth: 180,
+                whiteSpace: 'normal',
+                wordBreak: 'break-word',
+                boxSizing: 'border-box',
+                right: 'auto',
+                left: '50%',
+                transform: 'translateX(-50%)',
+              }}
+            >
               <span className="font-semibold">Suggestion:</span>{" "}
               {err.replacements && err.replacements.length > 0
                 ? err.replacements.slice(0, 3).map((r: any) => r.value).join(", ")
                 : "No suggestion"}
               <br />
               <span className="text-gray-500">{err.message}</span>
+              <br />
+              <span className="italic text-gray-400">Click to auto-correct this sentence.</span>
+              <div className="flex gap-2 mt-2 justify-center">
+                <button
+                  className="px-3 py-1 text-xs bg-sky-600 hover:bg-sky-700 text-white rounded"
+                  onClick={e => {
+                    e.stopPropagation();
+                    applyGrammarCorrection(err.idx);
+                  }}
+                >
+                  Apply
+                </button>
+                <button
+                  className="px-3 py-1 text-xs bg-gray-200 hover:bg-gray-300 text-gray-800 rounded"
+                  onClick={e => {
+                    e.stopPropagation();
+                    setIgnoredErrorIdxs(prev => [...prev, err.idx]);
+                  }}
+                >
+                  Ignore
+                </button>
+              </div>
             </span>
           </span>
         );
@@ -450,7 +490,26 @@ export default function WritingPage(props: WritingPageProps) {
           <span key={`${sIdx}-text-end`}>{text.slice(lastIdx, end)}</span>
         );
       }
-      return <span key={sIdx}>{elements}</span>;
+      return (
+        <span
+          key={sIdx}
+          className="block mb-2 group cursor-pointer transition-all"
+          style={{
+            position: 'relative',
+            // Para hindi mag-overlap ang underline ng error at sentence
+            zIndex: 1,
+          }}
+        >
+          <span
+            className="group-hover:underline group-hover:decoration-dotted group-hover:decoration-2 group-hover:underline-offset-4 transition-all"
+            style={{
+              cursor: 'pointer',
+            }}
+          >
+            {elements}
+          </span>
+        </span>
+      );
     });
   };
 
@@ -513,8 +572,11 @@ export default function WritingPage(props: WritingPageProps) {
         setIdleWarning(true);
         const wordArray = text.trim().split(/\s+/);
         wordArray.pop();
-        setText(wordArray.join(' '));
-        setIsIdle(true);
+        const newText = wordArray.join(' ');
+        if (newText !== text) {
+          setText(newText); // Only update if changed
+          setIsIdle(true);
+        }
       } else if (currentWords >= wordCount || isTimeUp) {
         setIdleWarning(false);
       }
@@ -692,42 +754,215 @@ export default function WritingPage(props: WritingPageProps) {
       </div>
 
       {showDoneModal && (
-        <div className="fixed inset-0 flex items-center justify-center bg-gradient-to-br from-sky-100 via-white to-sky-200 z-50 p-0 overflow-hidden">
-          {/* ...modal content... */}
+        <div className="fixed inset-0 flex items-center justify-center bg-[#eaf6fb] z-50 p-0 overflow-hidden">
+          <div className="bg-white rounded-3xl shadow-2xl p-10 max-w-md w-full text-center border-4 border-sky-300 animate-fadeIn">
+            <div className="flex flex-col items-center gap-2">
+              <span className="text-5xl text-sky-500 mb-2 animate-bounce">✔️</span>
+              <h2 className="text-3xl font-extrabold mb-2 text-sky-700">You're Done Writing!</h2>
+              <p className="mb-4 text-sky-700">
+                Congratulations! You finished your writing with <span className="font-bold">{currentWords}</span> words.
+              </p>
+              <div className="w-full max-h-40 overflow-y-auto bg-white border border-sky-200 rounded p-3 mb-4 text-left text-sky-900 whitespace-pre-wrap break-words">
+                {text}
+              </div>
+              <Button
+                className="w-full bg-sky-600 hover:bg-sky-700 text-white font-bold py-2 px-4 rounded mb-2"
+                onClick={() => router.push('/homepage')}
+              >
+                Go to Homepage
+              </Button>
+              <Button
+                className="w-full bg-sky-500 hover:bg-sky-600 text-white font-bold py-2 px-4 rounded"
+                onClick={HandleSaveClick}
+                disabled={!canSave}
+              >
+                Save Work
+              </Button>
+            </div>
+          </div>
         </div>
       )}
 
-      {isTimeUp && currentWords < wordCount && (
-        <div className="fixed inset-0 flex items-center justify-center bg-gradient-to-br from-red-100 via-white to-red-200 z-50 p-0 overflow-hidden">
-          {/* ...modal content... */}
-        </div>
-      )}
+    {isTimeUp && currentWords < wordCount && (
+  <div className="fixed inset-0 flex items-center justify-center bg-red-50 z-50 p-0 overflow-hidden">
+    <div className="bg-white rounded-3xl shadow-2xl p-10 max-w-md w-full text-center border-4 border-red-400 animate-fadeIn">
+      <div className="flex flex-col items-center gap-2">
+        <span className="text-5xl text-red-500 mb-2 animate-bounce">⏰</span>
+        <h2 className="text-3xl font-extrabold mb-2 text-red-700">Time's Up!</h2>
+        <p className="mb-4 text-red-700">
+          You wrote <span className="font-bold">{currentWords}</span> words.<br />
+          You didn't finish your writing in time.<br />
+          Try again or keep practicing!
+        </p>
+       <div className="w-full max-h-40 overflow-y-auto bg-white border border-sky-200 rounded p-3 mb-4 text-left text-sky-900 whitespace-pre-wrap break-words">
+  {text}
+</div>
+        <Button
+          className="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded mb-2"
+          onClick={() => {/* handle continue with credits here */}}
+        >
+          Continue (Buy with Credits)
+        </Button>
+        <Button
+          className="w-full bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded mb-2"
+          onClick={HandleSaveClick}
+          disabled={!canSave}
+        >
+          Save Credits
+        </Button>
+        <Button
+          className="w-full bg-gray-200 hover:bg-gray-300 text-red-700 font-bold py-2 px-4 rounded"
+          onClick={() => router.push('/homepage')}
+        >
+          Delete Session
+        </Button>
+      </div>
+    </div>
+  </div>
+)}
 
       {/* --- WRITING AREA AND GRAMMAR SUGGESTION --- */}
       <div className="flex flex-col flex-grow items-center">
         <div className="w-full max-w-[1800px] flex flex-col gap-2">
-          {/* Warning if grammar errors exist */}
-          {grammarErrors.length - ignoredErrorIdxs.length > 0 && (
-            <div className="mb-2 bg-yellow-100 border-l-4 border-yellow-500 text-yellow-900 p-2 rounded flex items-center gap-2">
-              <span className="text-xl">⚠️</span>
-              <span>
-                <span className="font-semibold">Grammar issues detected.</span> Click any highlighted text below to automatically correct the error.
-              </span>
-            </div>
-          )}
-
-          {/* Highlighted text preview */}
+          {/* Highlighted text preview with blur for bad words and enhanced underline for grammar errors */}
           <div
-            className="mb-2 p-3 border border-gray-200 rounded bg-gray-50 min-h-[48px] whitespace-pre-wrap break-words"
+            className="mb-4 p-4 border border-gray-200 rounded-xl bg-gradient-to-br from-gray-50 to-white min-h-[56px] max-h-56 overflow-y-scroll shadow-inner transition-all relative"
             style={{
               fontFamily: fontStyle,
               fontSize: `${fontSize}px`,
               color: textColor,
-              lineHeight: 1.6,
-              minHeight: '48px',
+              lineHeight: 1.7,
+              minHeight: '56px',
+              letterSpacing: '0.01em',
+              width: '100%',
+              whiteSpace: 'pre-wrap',
+              wordBreak: 'break-word',
+              display: 'block',
             }}
           >
-            {renderHighlightedText()}
+            {(() => {
+              if (!text) return null;
+              const sentences = splitTextWithIndices(text);
+
+              // Render all sentences in one line, each sentence still hoverable
+              return (
+                <span style={{ width: '100%', display: 'inline' }}>
+                  {sentences.map(({ sentence, start, end }, sIdx) => {
+                    const errorsInSentence = grammarErrors
+                      .map((err, idx) => ({ ...err, idx }))
+                      .filter(
+                        (err) =>
+                          err.offset >= start &&
+                          err.offset + err.length <= end &&
+                          err.replacements &&
+                          err.replacements.length > 0 &&
+                          !ignoredErrorIdxs.includes(err.idx)
+                      )
+                      .sort((a, b) => a.offset - b.offset);
+
+                    const words = sentence.split(/\b/);
+                    let offset = start;
+                    let elements: React.ReactNode[] = [];
+                    let errorIdx = 0;
+
+                    words.forEach((word, i) => {
+                      const lowerWord = word.toLowerCase().trim();
+                      const isBad = blurredWords.includes(lowerWord) && badWords.includes(lowerWord);
+
+                      let isError = false;
+                      let error = null;
+                      if (
+                        errorIdx < errorsInSentence.length &&
+                        offset >= errorsInSentence[errorIdx].offset &&
+                        offset < errorsInSentence[errorIdx].offset + errorsInSentence[errorIdx].length
+                      ) {
+                        isError = true;
+                        error = errorsInSentence[errorIdx];
+                      }
+
+                      if (isBad) {
+                        elements.push(
+                          <span
+                            key={`blur-${sIdx}-${i}`}
+                            className="bg-gray-300 text-gray-300 rounded px-1 cursor-pointer select-none relative group transition-all"
+                            style={{ filter: 'blur(4px)' }}
+                            onClick={() => toggleBlurEffect(lowerWord)}
+                            title="Click to reveal"
+                          >
+                            {word}
+                            <span className="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 bg-black text-white text-xs rounded px-2 py-1 opacity-0 group-hover:opacity-100 pointer-events-none z-50">
+                              Click to reveal
+                            </span>
+                          </span>
+                        );
+                      } else if (!isBad && blurredWords.includes(lowerWord)) {
+                        elements.push(
+                          <span
+                            key={`unblur-${sIdx}-${i}`}
+                            className="bg-yellow-100 text-red-700 rounded px-1 cursor-pointer underline decoration-wavy decoration-red-500"
+                            onClick={() => toggleBlurEffect(lowerWord)}
+                            title="Click to blur"
+                          >
+                            {word}
+                          </span>
+                        );
+                      } else if (isError) {
+                        elements.push(
+                          <span
+                            key={`err-${sIdx}-${i}`}
+                            className="relative font-semibold text-red-700 cursor-pointer transition-all group"
+                            style={{
+                              borderBottom: '2.5px solid #ef4444',
+                              background: 'rgba(255, 237, 213, 0.7)',
+                              borderRadius: '0.25rem',
+                              padding: '0 2px',
+                              boxShadow: '0 1px 6px 0 rgba(255, 0, 0, 0.07)',
+                              zIndex: 30, // bring to front
+                            }}
+                            title={error.message}
+                            tabIndex={0}
+                            onClick={() => applySentenceCorrectionsByOffset(start, end)}
+                            onKeyDown={e => {
+                              if (e.key === 'Enter' || e.key === ' ') {
+                                applySentenceCorrectionsByOffset(start, end);
+                              }
+                            }}
+                          >
+                            {word}
+                          </span>
+                        );
+                        errorIdx++;
+                      } else {
+                        elements.push(<span key={`text-${sIdx}-${i}`}>{word}</span>);
+                      }
+                      offset += word.length;
+                    });
+
+                    return (
+                      <span
+                        key={sIdx}
+                        className="group cursor-pointer transition-all"
+                        style={{
+                          position: 'relative',
+                          display: 'inline',
+                          zIndex: 1,
+                        }}
+                      >
+                        <span
+                          className="group-hover:underline group-hover:decoration-dotted group-hover:decoration-2 group-hover:underline-offset-4 transition-all"
+                          style={{
+                            cursor: 'pointer',
+                            display: 'inline',
+                          }}
+                        >
+                          {elements}
+                        </span>
+                      </span>
+                    );
+                  })}
+                </span>
+              );
+            })()}
           </div>
 
           {/* The actual textarea for editing */}
@@ -746,7 +981,7 @@ export default function WritingPage(props: WritingPageProps) {
               height: '200px',
               maxHeight: '200px',
               resize: 'none',
-              overflowY: 'auto',
+              overflowY: 'scroll',
               overflowX: 'hidden',
               color: textColor,
               lineHeight: 1.6,
@@ -762,6 +997,7 @@ export default function WritingPage(props: WritingPageProps) {
             className="focus:outline-none"
           />
 
+          {/* --- Warnings BELOW textarea --- */}
           {repeatedWordsWarning && (
             <div className="mt-2 bg-yellow-50 border-l-4 border-yellow-400 text-yellow-900 p-2 flex items-center gap-2 rounded shadow-sm">
               <span className="text-2xl">⚠️</span>
@@ -774,7 +1010,24 @@ export default function WritingPage(props: WritingPageProps) {
             </div>
           )}
 
-          {warning && <div className="mt-2 text-red-500 text-center font-semibold">{warning}</div>}
+          {warning && (
+            <div className="mb-2 bg-yellow-100 border-l-4 border-yellow-500 text-yellow-900 p-2 rounded flex items-center gap-2">
+              <span className="text-xl">⚠️</span>
+              <span>
+                <span className="font-semibold">Warning.</span>{" "}
+                {warning.replace(/^⚠️\s*/, '').replace(/^Please avoid using inappropriate words like:/, 'Please avoid using inappropriate words like:')}
+              </span>
+            </div>
+          )}
+
+          {grammarErrors.length - ignoredErrorIdxs.length > 0 && (
+            <div className="mb-2 bg-yellow-100 border-l-4 border-yellow-500 text-yellow-900 p-2 rounded flex items-center gap-2">
+              <span className="text-xl">⚠️</span>
+              <span>
+                <span className="font-semibold">Grammar issues detected.</span> Click any highlighted text below to automatically correct the error.
+              </span>
+            </div>
+          )}
 
           {/* --- Enhanced Grammar Suggestion Box --- */}
           <div
@@ -922,47 +1175,122 @@ export default function WritingPage(props: WritingPageProps) {
                   <span className="font-mono">{selectedError.replacements?.map((r: any) => r.value).join(', ')}</span>
                 </div>
                 {selectedError.replacements && selectedError.replacements.length > 0 && (
+                  <div className="flex flex-col sm:flex-row justify-center gap-3 mt-2 w-full">
+                    <Button
+                      className="flex-1 w-full bg-gradient-to-r from-sky-600 to-sky-700 hover:from-sky-700 hover:to-sky-800 text-white font-semibold px-4 py-2 rounded-lg shadow transition-all border border-sky-700 flex items-center justify-center gap-2"
+                      onClick={() => {
+                        const idx = grammarErrors.findIndex(e => e === selectedError);
+                        applyGrammarCorrection(idx);
+                      }}
+                    >
+                      <span className="mr-2 flex items-center">
+                        {/* White check SVG */}
+                        <svg width="18" height="18" fill="white" viewBox="0 0 20 20">
+                          <path fill="white" d="M7.629 15.314a1 1 0 0 1-1.415 0l-4.243-4.243a1 1 0 1 1 1.415-1.415l3.536 3.536 7.778-7.778a1 1 0 1 1 1.415 1.415l-8.486 8.485z"/>
+                        </svg>
+                      </span>
+                      Apply Correction
+                    </Button>
+                  </div>
+                )}
+                <div className="flex flex-col sm:flex-row justify-center gap-3 mt-4">
                   <Button
-                    className="mt-2 bg-sky-600 hover:bg-sky-700 text-white px-4 py-2 rounded shadow flex items-center justify-center"
+                    className="flex-1 bg-gradient-to-r from-gray-200 to-gray-300 hover:from-gray-300 hover:to-gray-400 text-gray-800 font-semibold px-4 py-2 rounded-lg shadow transition-all border border-gray-300 flex items-center justify-center gap-2"
                     onClick={() => {
                       const idx = grammarErrors.findIndex(e => e === selectedError);
-                      applyGrammarCorrection(idx);
+                      setIgnoredErrorIdxs(prev => [...prev, idx]);
+                      setSelectedError(null);
+                      setHighlightedErrorIdx(null);
                     }}
                   >
-                    <span className="mr-2 flex items-center">
-                      {/* White check SVG */}
-                      <svg width="18" height="18" fill="white" viewBox="0 0 20 20">
-                        <path fill="white" d="M7.629 15.314a1 1 0 0 1-1.415 0l-4.243-4.243a1 1 0 1 1 1.415-1.415l3.536 3.536 7.778-7.778a1 1 0 1 1 1.415 1.415l-8.486 8.485z"/>
-                      </svg>
-                    </span>
-                    Apply Correction
+                    <span className="text-lg">🚫</span>
+                    Ignore
                   </Button>
-                )}
-                <Button
-                  className="mt-2 ml-2 bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded"
-                  onClick={() => {
-                    const idx = grammarErrors.findIndex(e => e === selectedError);
-                    setIgnoredErrorIdxs(prev => [...prev, idx]);
-                    setSelectedError(null);
-                    setHighlightedErrorIdx(null);
-                  }}
-                >
-                  Ignore
-                </Button>
-                <Button
-                  className="mt-2 ml-2 bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded"
-                  onClick={() => {
-                    setSelectedError(null);
-                    setHighlightedErrorIdx(null);
-                  }}
-                >
-                  Close
-                </Button>
+                  <Button
+                    className="flex-1 bg-gradient-to-r from-sky-100 to-sky-200 hover:from-sky-200 hover:to-sky-300 text-sky-700 font-semibold px-4 py-2 rounded-lg shadow transition-all border border-sky-200 flex items-center justify-center gap-2"
+                    onClick={() => {
+                      setSelectedError(null);
+                      setHighlightedErrorIdx(null);
+                    }}
+                  >
+                    <span className="text-lg">✖️</span>
+                    Close
+                  </Button>
+                </div>
               </div>
             </div>
           )}
         </div>
       </div>
+
+      {/* --- DONE WRITING MODAL --- */}
+      {showDoneModal && (
+        <div className="fixed inset-0 flex items-center justify-center bg-[#eaf6fb] z-50 p-0 overflow-hidden">
+          <div className="bg-white rounded-3xl shadow-2xl p-10 max-w-md w-full text-center border-4 border-sky-300 animate-fadeIn">
+            <div className="flex flex-col items-center gap-2">
+              <span className="text-5xl text-sky-500 mb-2 animate-bounce">✔️</span>
+              <h2 className="text-3xl font-extrabold mb-2 text-sky-700">You're Done Writing!</h2>
+              <p className="mb-4 text-sky-700">
+                Congratulations! You finished your writing with <span className="font-bold">{currentWords}</span> words.
+              </p>
+              <div className="w-full max-h-40 overflow-y-auto bg-white border border-sky-200 rounded p-3 mb-4 text-left text-sky-900 whitespace-pre-wrap break-words">
+                {text}
+              </div>
+              <Button
+                className="w-full bg-sky-600 hover:bg-sky-700 text-white font-bold py-2 px-4 rounded mb-2"
+                onClick={() => router.push('/homepage')}
+              >
+                Go to Homepage
+              </Button>
+              <Button
+                className="w-full bg-sky-500 hover:bg-sky-600 text-white font-bold py-2 px-4 rounded"
+                onClick={HandleSaveClick}
+                disabled={!canSave}
+              >
+                Save Work
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {isTimeUp && currentWords < wordCount && (
+        <div className="fixed inset-0 flex items-center justify-center bg-red-50 z-50 p-0 overflow-hidden">
+          <div className="bg-white rounded-3xl shadow-2xl p-10 max-w-md w-full text-center border-4 border-red-400 animate-fadeIn">
+            <div className="flex flex-col items-center gap-2">
+              <span className="text-5xl text-red-500 mb-2 animate-bounce">⏰</span>
+              <h2 className="text-3xl font-extrabold mb-2 text-red-700">Time's Up!</h2>
+              <p className="mb-4 text-red-700">
+                You wrote <span className="font-bold">{currentWords}</span> words.<br />
+                You didn't finish your writing in time.<br />
+                Try again or keep practicing!
+              </p>
+              <div className="w-full max-h-40 overflow-y-auto bg-white border border-red-200 rounded p-3 mb-4 text-left text-red-900 whitespace-pre-wrap break-words">
+                {text}
+              </div>
+              <Button
+                className="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded mb-2"
+                onClick={() => {/* handle continue with credits here */}}
+              >
+                Continue (Buy with Credits)
+              </Button>
+              <Button
+                className="w-full bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded mb-2"
+                onClick={HandleSaveClick}
+                disabled={!canSave}
+              >
+                Save Credits
+              </Button>
+              <Button
+                className="w-full bg-gray-200 hover:bg-gray-300 text-red-700 font-bold py-2 px-4 rounded"
+                onClick={() => router.push('/homepage')}
+              >
+                Delete Session
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <div className="fixed bottom-0 w-full bg-white text-center z-10 shadow-md py-4">
         <Footer

@@ -94,7 +94,7 @@ export function Header() {
               className="h-12 w-12"
             />
             <span className={`font-bold text-3xl text-white ${bebasNeue.className}`}>
-              IWrite
+              iWrite
             </span>
           </div>
         </div>

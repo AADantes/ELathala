@@ -245,9 +245,12 @@ export default function StartPrompt({ onStart }: StartPromptProps) {
               type="text"
               value={genre}
               onChange={(e) => setGenre(e.target.value)}
-              placeholder="Or type your custom genre"
+              placeholder="type your custom genre"
               className="w-full py-2 text-sm rounded-xl border-2 border-[#0077b6] mt-2"
             />
+            <p className="text-xs text-[#0077b6] mt-1">
+              You can type your own genre if not listed above.
+            </p>
           </div>
         )}
 
@@ -280,9 +283,12 @@ export default function StartPrompt({ onStart }: StartPromptProps) {
               type="text"
               value={topic}
               onChange={(e) => setTopic(e.target.value)}
-              placeholder="Or type your custom topic"
+              placeholder="type your custom topic"
               className="w-full py-2 text-sm rounded-xl border-2 border-[#0077b6] mt-2"
             />
+            <p className="text-xs text-[#0077b6] mt-1">
+              You can type your own topic if not listed above.
+            </p>
           </div>
         )}
 

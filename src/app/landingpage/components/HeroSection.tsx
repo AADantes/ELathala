@@ -152,11 +152,11 @@ export default function HeroSection({
             className="space-y-6 flex flex-col items-center justify-center text-center w-full"
           >
           <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-sky-950 whitespace-nowrap font-sans drop-shadow">
-  Write, Achieve, and Level Up with <span className="text-sky-700">IWrite</span>
+  Write, Achieve, and Level Up with <span className="text-sky-700">iWrite</span>
 </h1>
 
             <p className="mx-auto max-w-3xl text-black text-base sm:text-lg leading-relaxed text-center">
-              Transform your writing journey into an exciting adventure. Whether you're chasing a deadline or building a daily habit, IWrite keeps you motivated with gamified tools that track your growth and reward consistency.
+              Transform your writing journey into an exciting adventure. Whether you're chasing a deadline or building a daily habit, iWrite keeps you motivated with gamified tools that track your growth and reward consistency.
             </p>
             <p className="mx-auto max-w-2xl text-sky-800 text-sm sm:text-base italic text-center">
               "Your words have power — and now, they can earn you points too."

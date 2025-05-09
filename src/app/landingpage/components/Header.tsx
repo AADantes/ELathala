@@ -155,7 +155,7 @@ export default function Header() {
                 textShadow: '1px 1px 2px rgba(0, 0, 0, 0.3)',
               }}
             >
-              IWrite
+              iWrite
             </span>
           </Link>
 
@@ -180,7 +180,7 @@ export default function Header() {
             <Dialog open={isLoginOpen} onOpenChange={setIsLoginOpen}>
               <DialogContent className="sm:max-w-[425px]">
                 <DialogHeader className="flex flex-col items-center">
-                  <DialogTitle className="text-[#005A8C] text-xl text-center">Log in to IWrite</DialogTitle>
+                  <DialogTitle className="text-[#005A8C] text-xl text-center">Log in to iWrite</DialogTitle>
                   <DialogDescription className="text-center">Enter your email and password to access your account.</DialogDescription>
                 </DialogHeader>
                 <form onSubmit={handleLogin} className="space-y-4 mt-4">
@@ -215,7 +215,7 @@ export default function Header() {
               <DialogContent className="sm:max-w-[425px]">
                 <DialogHeader className="flex flex-col items-center">
                   <DialogTitle className="text-[#005A8C] text-xl text-center">Sign Up</DialogTitle>
-                  <DialogDescription className="font-bold text-center">Join IWrite by creating an account.</DialogDescription>
+                  <DialogDescription className="font-bold text-center">Join iWrite by creating an account.</DialogDescription>
                 </DialogHeader>
                 <div className="flex flex-col gap-4 mt-4">
                   <div className="space-y-2 relative">
