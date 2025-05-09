@@ -387,29 +387,70 @@ export default function WritingPage(props: WritingPageProps) {
 
     const sentences = splitTextWithIndices(text);
 
-    return sentences.map(({ sentence, start, end }, idx) => {
-      // Check if any grammar error overlaps with this sentence
-      const hasError = grammarErrors.some(
-        (err, errIdx) =>
-          err.offset >= start &&
-          err.offset + err.length <= end &&
-          err.replacements &&
-          err.replacements.length > 0 &&
-          !ignoredErrorIdxs.includes(errIdx)
-      );
-      if (!hasError) {
-        return <span key={idx}>{sentence}</span>;
+    return sentences.map(({ sentence, start, end }, sIdx) => {
+      // Find all errors in this sentence
+      const errorsInSentence = grammarErrors
+        .map((err, idx) => ({ ...err, idx }))
+        .filter(
+          (err) =>
+            err.offset >= start &&
+            err.offset + err.length <= end &&
+            err.replacements &&
+            err.replacements.length > 0 &&
+            !ignoredErrorIdxs.includes(err.idx)
+        )
+        .sort((a, b) => a.offset - b.offset);
+
+      if (errorsInSentence.length === 0) {
+        return <span key={sIdx}>{sentence}</span>;
       }
-      return (
-        <span
-          key={idx}
-          className="bg-yellow-200 text-red-800 font-bold px-1 rounded cursor-pointer underline decoration-wavy decoration-red-500 transition-shadow"
-          title="Click to fix all grammar errors in this sentence"
-          onClick={() => applySentenceCorrectionsByOffset(start, end)}
-        >
-          {sentence}
-        </span>
-      );
+
+      // Highlight only error words/phrases in the sentence
+      let elements: React.ReactNode[] = [];
+      let lastIdx = start;
+
+      errorsInSentence.forEach((err, i) => {
+        // Add normal text before the error
+        if (lastIdx < err.offset) {
+          elements.push(
+            <span key={`${sIdx}-text-${i}`}>{text.slice(lastIdx, err.offset)}</span>
+          );
+        }
+        // Highlight the error part
+        elements.push(
+          <span
+            key={`${sIdx}-err-${i}`}
+            className="bg-yellow-200 text-red-800 font-bold px-1 rounded cursor-pointer underline decoration-wavy decoration-red-500 transition-shadow relative group"
+            title={err.message}
+            tabIndex={0}
+            onClick={() => applySentenceCorrectionsByOffset(start, end)}
+            onKeyDown={e => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                applySentenceCorrectionsByOffset(start, end);
+              }
+            }}
+          >
+            {text.slice(err.offset, err.offset + err.length)}
+            <span className="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 w-64 bg-white border border-blue-300 text-blue-900 text-xs rounded shadow-lg p-2 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">
+              <span className="font-semibold">Suggestion:</span>{" "}
+              {err.replacements && err.replacements.length > 0
+                ? err.replacements.slice(0, 3).map((r: any) => r.value).join(", ")
+                : "No suggestion"}
+              <br />
+              <span className="text-gray-500">{err.message}</span>
+            </span>
+          </span>
+        );
+        lastIdx = err.offset + err.length;
+      });
+
+      // Add any remaining text after the last error
+      if (lastIdx < end) {
+        elements.push(
+          <span key={`${sIdx}-text-end`}>{text.slice(lastIdx, end)}</span>
+        );
+      }
+      return <span key={sIdx}>{elements}</span>;
     });
   };
 
