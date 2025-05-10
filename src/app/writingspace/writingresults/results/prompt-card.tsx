@@ -46,7 +46,7 @@ export default function PromptCard({ prompt }: PromptCardProps) {
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-          <MessageSquareText className="h-5 w-5" />
+          <MessageSquareText className="h-5 w-5 text-sky-500" />
           Writing Prompt
         </CardTitle>
         <CardDescription>The prompt you were given</CardDescription>

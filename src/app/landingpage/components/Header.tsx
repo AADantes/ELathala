@@ -180,7 +180,7 @@ export default function Header() {
             <Dialog open={isLoginOpen} onOpenChange={setIsLoginOpen}>
               <DialogContent className="sm:max-w-[425px]">
                 <DialogHeader className="flex flex-col items-center">
-                  <DialogTitle className="text-[#005A8C] text-xl text-center">Log in to iWrite</DialogTitle>
+                  <DialogTitle className="text-[#005A8C] text-xl text-center">Log In</DialogTitle>
                   <DialogDescription className="text-center">Enter your email and password to access your account.</DialogDescription>
                 </DialogHeader>
                 <form onSubmit={handleLogin} className="space-y-4 mt-4">

@@ -116,7 +116,7 @@ export function UserPanel() {
     <Card className="bg-white text-gray-900 shadow-md h-[600px]">
       <CardHeader className="bg-[#f9fafb] px-6 py-4">
         <CardTitle
-          className={`text-cyan-500 text-3xl font-extrabold tracking-wider leading-none text-center ${bebasNeue.className}`}
+          className={`text-cyan-400 text-3xl font-extrabold tracking-wider leading-none text-center ${bebasNeue.className}`}
         >
           {userData.username}
         </CardTitle>
@@ -134,7 +134,7 @@ export function UserPanel() {
           <div className="relative w-full h-3 bg-gray-200 rounded overflow-hidden">
             <div
               style={{ width: `${progressPercent}%` }}
-              className="h-full bg-gradient-to-r from-yellow-400 via-orange-400 to-red-400 transition-all duration-500"
+              className="h-full bg-yellow-400 transition-all duration-500"
             />
           </div>
 

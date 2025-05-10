@@ -1,7 +1,7 @@
-'use client';
+'use client'
 
 import Link from "next/link"
-import { FileText, Search, Filter } from "lucide-react"
+import { FileText, Search } from "lucide-react"
 import { Button } from "../works/components/ui/button"
 import { Input } from "../works/components/ui/input"
 import { Header } from "../homepage/components/Header"
@@ -9,13 +9,12 @@ import supabase from "../../../config/supabaseClient"
 import { useEffect, useState } from "react"
 
 export default function SavedDocuments() {
-  const [documents, setDocuments] = useState<any[]>([]) // Store documents fetched from the database
+  const [documents, setDocuments] = useState<any[]>([])
   const [loading, setLoading] = useState<boolean>(true)
 
-  // Fetch current user ID and load documents
   useEffect(() => {
     const fetchDocuments = async () => {
-      const { data: user, error: userError } = await supabase.auth.getUser() // Use getUser() instead of user()
+      const { data: user, error: userError } = await supabase.auth.getUser()
       if (userError) {
         console.error("Error fetching user:", userError)
         return
@@ -25,12 +24,12 @@ export default function SavedDocuments() {
         const { data, error } = await supabase
           .from("worksFolder")
           .select("title, fileUrl")
-          .eq("userID", user.user.id) // Accessing user ID here
+          .eq("userID", user.user.id)
 
         if (error) {
           console.error("Error fetching documents:", error)
         } else {
-          setDocuments(data) // Set the fetched documents in the state
+          setDocuments(data)
         }
       }
       setLoading(false)
@@ -40,60 +39,70 @@ export default function SavedDocuments() {
   }, [])
 
   const handleDownload = (fileUrl: string) => {
-    // Trigger file download
-    window.location.href = fileUrl
+    window.open(fileUrl, "_blank")
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white dark:from-gray-950 dark:to-gray-900 flex flex-col">
       <Header />
-      {/* Simple Header */}
-      <header className="border-b">
-        <div className="container flex h-16 items-center px-4 sm:px-6">
-          <h1 className="text-lg font-semibold">My Saved Documents</h1>
-
+      
+      {/* Enhanced Page Title */}
+      <header className="border-b bg-white dark:bg-gray-900 shadow-sm">
+        <div className="container mx-auto max-w-7xl flex h-24 items-center justify-center px-6">
+          <h1 className="text-3xl font-bold text-center text-gray-900 dark:text-white tracking-tight">
+            My Saved Documents
+          </h1>
         </div>
       </header>
 
       {/* Main Content */}
-      <main className="container px-4 py-6 sm:px-6">
-        {/* Search and Filter */}
-        <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center">
+      <main className="flex flex-1 flex-col items-center justify-start w-full px-6 py-12">
+        
+        {/* Search Input */}
+        <div className="mb-10 w-full max-w-7xl flex flex-col gap-4 sm:flex-row sm:items-center">
           <div className="relative flex-1">
-            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-            <Input type="search" placeholder="Search documents..." className="pl-8" />
+            <Search className="absolute left-3 top-3 h-5 w-5 text-muted-foreground" />
+            <Input
+              type="search"
+              placeholder="Search documents..."
+              className="pl-10 h-12 text-base rounded-md border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary"
+            />
           </div>
         </div>
 
-        {/* Documents List */}
-        <div className="rounded-lg border">
+        {/* Document List */}
+        <div className="w-full max-w-7xl rounded-xl border bg-white dark:bg-gray-800 shadow-sm overflow-hidden">
           <div className="grid grid-cols-1 divide-y">
             {loading ? (
-              <div>Loading...</div>
+              <div className="flex justify-center items-center py-16 text-lg text-muted-foreground">Loading...</div>
             ) : documents.length > 0 ? (
               documents.map((doc, index) => (
-                <div key={index} className="flex items-center p-4 transition-colors hover:bg-muted/50">
-                  <div className="mr-4 flex h-10 w-10 items-center justify-center rounded-md border bg-background">
-                    <FileText className="h-5 w-5 text-muted-foreground" />
+                <div
+                  key={index}
+                  className="flex flex-col sm:flex-row items-center p-6 gap-6 sm:gap-4 transition-all hover:bg-muted/30"
+                >
+                  <div className="flex h-14 w-14 items-center justify-center rounded-md border bg-background shadow-sm">
+                    <FileText className="h-6 w-6 text-muted-foreground" />
                   </div>
-                  <div className="flex-1 space-y-1">
-                    <p className="font-medium leading-none">{doc.title}</p>
+                  <div className="flex-1 space-y-1 text-center sm:text-left">
+                    <p className="text-lg font-medium text-gray-900 dark:text-white">{doc.title}</p>
                   </div>
                   <Button
                     variant="outline"
-                    size="sm"
-                    onClick={() => handleDownload(doc.fileUrl)} // Download button
+                    size="lg"
+                    className="text-sm px-6 py-2"
+                    onClick={() => handleDownload(doc.fileUrl)}
                   >
-                    View and Download
+                    View & Download
                   </Button>
                 </div>
               ))
             ) : (
-              <div className="mt-16 flex flex-col items-center justify-center rounded-lg border border-dashed p-8 text-center">
+              <div className="mt-20 flex flex-col items-center justify-center p-10 text-center">
                 <FileText className="mb-4 h-12 w-12 text-muted-foreground" />
-                <h3 className="mb-2 text-lg font-medium">No documents yet</h3>
-                <p className="mb-4 text-sm text-muted-foreground">
-                  You haven't saved any documents. Start Writing and gain credits to save your work!.
+                <h3 className="mb-2 text-xl font-semibold text-gray-800 dark:text-white">No documents yet</h3>
+                <p className="text-base text-muted-foreground">
+                  You haven't saved any documents. Start writing to begin saving your work!
                 </p>
               </div>
             )}

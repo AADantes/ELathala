@@ -63,7 +63,7 @@ export default function PerformanceCard({
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Award className="h-5 w-5" />
+            <Award className="h-5 w-5 text-yellow-500" />
             Your Performance
           </CardTitle>
           <CardDescription>How you did in this challenge</CardDescription>
@@ -79,16 +79,16 @@ export default function PerformanceCard({
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-          <Award className="h-5 w-5" />
+          <Award className="h-5 w-5 text-yellow-500" />
           Your Performance
         </CardTitle>
         <CardDescription>How you did in this challenge</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
-        <IconLabel icon={<BookText className="h-5 w-5" />} label="Number of Words Set" value={`${wordsSet ?? 0} words`} />
-        <IconLabel icon={<BookText className="h-5 w-5" />} label="Words Written" value={`${wordsWritten ?? 0} words`} />
-        <IconLabel icon={<Award className="h-5 w-5" />} label="Credits Gained" value={`${earnedCredits ?? '0'} credits`} />
-        <IconLabel icon={<Star className="h-5 w-5" />} label="Experience Gained" value={`${earnedExp ?? '0'} XP`} />
+        <IconLabel icon={<BookText className="h-5 w-5 text-sky-500" />} label="Number of Words Set" value={`${wordsSet ?? 0} words`} />
+        <IconLabel icon={<BookText className="h-5 w-5 text-sky-500" />} label="Words Written" value={`${wordsWritten ?? 0} words`} />
+        <IconLabel icon={<Award className="h-5 w-5 text-yellow-500" />} label="Credits Gained" value={`${earnedCredits ?? '0'} credits`} />
+        <IconLabel icon={<Star className="h-5 w-5 text-yellow-400" />} label="Experience Gained" value={`${earnedExp ?? '0'} XP`} />
       </CardContent>
     </Card>
   )

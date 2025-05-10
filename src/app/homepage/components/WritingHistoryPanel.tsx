@@ -24,13 +24,13 @@ interface WritingHistoryProps {
 
 export function WritingHistoryPanel({ works }: WritingHistoryProps) {
   return (
-    <Card className="bg-white text-gray-900 shadow transition-transform transform hover:scale-105 duration-300 min-h-[400px] max-h-[600px]">
-      <CardHeader className="bg-[#f3f4f6] px-6 py-4">
+    <Card className="bg-white text-gray-900 shadow duration-300 min-h-[400px] max-h-[600px]">
+      <CardHeader className="bg-[#f9fafb] px-6 py-4">
         <CardTitle
-          className={`text-cyan-500 text-3xl font-extrabold tracking-wider leading-none text-center ${bebasNeue.className}`}
+          className={`text-cyan-400 text-3xl font-extrabold tracking-wider leading-none text-center ${bebasNeue.className}`}
           style={{ letterSpacing: '2px' }}
         >
-          Writing History
+          WRITING HISTORY
         </CardTitle>
       </CardHeader>
       <CardContent className="p-6">
@@ -42,13 +42,13 @@ export function WritingHistoryPanel({ works }: WritingHistoryProps) {
             {works.map((work) => (
               <li
                 key={work.workID}
-                className="flex justify-between items-center bg-[#f9fafb] hover:bg-[#f3f4f6] transition-colors duration-300 px-4 py-3 shadow"
+                className="flex justify-between items-center bg-white hover:bg-gray-100 transition-colors duration-300 px-4 py-3 shadow"
               >
-                <div className="text-gray-800 font-semibold">
+                <div className="text-gray-700 font-semibold">
                   <p>Work Title: {work.workTitle}</p>
                   <p>Words Written: {work.numberofWords}</p>
                 </div>
-                <div className="text-sm text-gray-500">
+                <div className="text-sm text-gray-600">
                   <p>Target Words: {work.noOfWordsSet}</p>
                   <p>Time Limit: {work.timelimitSet} mins</p>
                 </div>

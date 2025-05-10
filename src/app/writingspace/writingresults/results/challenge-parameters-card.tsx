@@ -50,7 +50,7 @@ export default function ChallengeParametersCard() {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Tag className="h-5 w-5" />
+            <Tag className="h-5 w-5 text-green-500" />
             Challenge Parameters
           </CardTitle>
           <CardDescription>Your writing challenge settings</CardDescription>
@@ -66,20 +66,20 @@ export default function ChallengeParametersCard() {
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-          <Tag className="h-5 w-5" />
+          <Tag className="h-5 w-5 text-green-500" />
           Challenge Parameters
         </CardTitle>
         <CardDescription>Your writing challenge settings</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
-        <IconLabel icon={<Clock className="h-5 w-5" />} label="Time Set" value={timelimitSet} />
+        <IconLabel icon={<Clock className="h-5 w-5 text-yellow-500" />} label="Time Set" value={timelimitSet} />
         <IconLabel
-          icon={<Bookmark className="h-5 w-5" />}
+          icon={<Bookmark className="h-5 w-5 text-purple-500" />}
           label="Genre"
           value={<Badge variant="secondary">{workGenre}</Badge>}
         />
         <IconLabel
-          icon={<Tag className="h-5 w-5" />}
+          icon={<Tag className="h-5 w-5 text-green-500" />}
           label="Topic"
           value={<Badge variant="secondary">{workTopic}</Badge>}
         />
