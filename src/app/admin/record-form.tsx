@@ -15,6 +15,8 @@ import {
 } from "../writingspace/writingresults/ui/select"
 import ActionButtons from "@/app/admin/action-buttons"
 
+import supabase from "../../../config/supabaseClient"
+
 interface RecordFormProps {
   columns: string[]
   formValues: Record<string, string>
@@ -24,6 +26,7 @@ interface RecordFormProps {
   onAdd: () => void
   onUpdate: () => void
   onDelete: () => void
+  onGFonts: () => void
 }
 
 export default function RecordForm({
@@ -35,7 +38,13 @@ export default function RecordForm({
   onAdd,
   onUpdate,
   onDelete,
+  onGFonts,
 }: RecordFormProps) {
+
+
+
+
+
   return (
     <Card className="bg-white rounded-xl shadow-md border border-gray-200 p-6 transition-all duration-300">
       <CardHeader className="border-b border-gray-100 pb-4 mb-6">
@@ -114,7 +123,7 @@ export default function RecordForm({
           </div>
 
           <div className="mt-6 flex flex-wrap gap-4">
-            <ActionButtons onAdd={onAdd} onUpdate={onUpdate} onDelete={onDelete} />
+            <ActionButtons onAdd={onAdd} onUpdate={onUpdate} onDelete={onDelete} onGFonts={onGFonts} />
           </div>
         </div>
       </CardContent>

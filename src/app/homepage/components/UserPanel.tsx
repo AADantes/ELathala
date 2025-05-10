@@ -35,8 +35,6 @@ export function UserPanel() {
   } | null>(null)
 
   
-
-
   useEffect(() => {
     const fetchUserData = async () => {
       const {

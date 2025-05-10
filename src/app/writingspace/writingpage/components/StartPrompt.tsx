@@ -8,6 +8,7 @@ import { Checkbox } from '../../writingpage/ui/CheckBox';
 import { useRouter } from 'next/navigation';
 import { useUuid } from '../../UUIDContext';
 import { prompts, genres, genreTopics, genreTopicPrompts } from '../lib/writingpage-data';
+import { useFontContext } from "../../FontContext";
 
 interface StartPromptProps {
   onStart: (
@@ -31,9 +32,13 @@ export default function StartPrompt({ onStart }: StartPromptProps) {
   const [timeIsUp, setTimeIsUp] = useState(false);
   const [showStepMessage, setShowStepMessage] = useState(false);
   const [title, setTitle] = useState<string>(''); // Title state
-  const { workID, setWorkID, setUserID } = useUuid();
+  const { workID, userID, setWorkID, setUserID } = useUuid();
   const router = useRouter();
-  
+ const { availableFonts, setAvailableFonts } = useFontContext();
+  const [purchasedFonts, setPurchasedFonts] = useState<string[]>([]);
+
+
+ 
   useEffect(() => {
     const fetchUserUUID = async () => {
       const {
@@ -64,6 +69,50 @@ export default function StartPrompt({ onStart }: StartPromptProps) {
   
     fetchUserUUID();
   }, [setUserID]);
+
+
+  useEffect(() => {
+  const fetchPurchasedFontStyles = async () => {
+    if (!userID) return;
+
+    // Step 1: Get fontIDs from Purchases table
+    const { data: purchases, error: purchaseError } = await supabase
+      .from("FontPurchases")
+      .select("fontID")
+      .eq("userID", userID);
+
+    if (purchaseError) {
+      console.error("Failed to fetch purchases:", purchaseError.message);
+      return;
+    }
+
+    const fontIDs = purchases?.map((item) => item.fontID) || [];
+
+    if (fontIDs.length === 0) return;
+
+    // Step 2: Get font styles from google_fonts_shop
+    const { data: fonts, error: fontError } = await supabase
+      .from("google_fonts_shop")
+      .select("id, font_name")
+      .in("id", fontIDs);
+
+    if (fontError) {
+      console.error("Failed to fetch font styles:", fontError.message);
+      return;
+    }
+
+    const fontStyles = fonts.map((item) => ({
+      fontID: item.id,
+      fontName: item.font_name,
+    }));
+
+    setAvailableFonts((prev) => [...prev, ...fontStyles]);
+  };
+
+  fetchPurchasedFontStyles();
+}, [userID, setAvailableFonts]);
+   
+  
 
   const handleNext = () => {
     if (step < 6) {

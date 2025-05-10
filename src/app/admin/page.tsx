@@ -103,6 +103,65 @@ export default function AdminPage() {
     router.push("/homepage")
   }
 
+  // ✅ Replace with your actual Google Fonts API key
+const GOOGLE_FONTS_API_KEY = 'your-google-fonts-api-key'
+
+// This function can be used on a button click
+const fetchAndSyncGoogleFonts = async () => {
+  try {
+    const res = await fetch(`https://www.googleapis.com/webfonts/v1/webfonts?key=AIzaSyCwVy7mzn6uZ83nDecgD6XYDpoISAL2ADA`)
+    const data = await res.json()
+
+    if (!data.items || data.items.length === 0) {
+      console.log('No fonts returned from API.')
+      alert('No fonts fetched from Google Fonts.')
+      return
+    }
+
+    let added = 0
+    let updated = 0
+
+    for (const font of data.items) {
+      const { family, category, variants, files } = font
+
+      const { data: existing, error: fetchError } = await supabase
+        .from('google_fonts_shop')
+        .select('font_name')
+        .eq('font_name', family)
+        .single()
+
+      const { error } = await supabase.from('google_fonts_shop').upsert({
+        font_name: family,
+        category,
+        variants,
+        files,
+        price: 1000,
+        is_featured: false,
+      })
+
+      if (error) {
+        console.error(`Error upserting ${family}:`, error.message)
+        continue
+      }
+
+      if (existing) {
+        updated++
+        console.log(`Updated: ${family}`)
+      } else {
+        added++
+        console.log(`Added: ${family}`)
+      }
+    }
+
+    const message = `✅ Google Fonts sync complete!\n\nAdded: ${added}\nUpdated: ${updated}`
+    console.log(message)
+    alert(message)
+  } catch (error) {
+    console.error('❌ Failed to sync fonts:', error)
+    alert('An error occurred while syncing fonts. Check console for details.')
+  }
+}
+
   return (
     <div className="min-h-screen bg-blue-50">
       <AdminHeader onLogout={handleLogout} />
@@ -147,6 +206,7 @@ export default function AdminPage() {
                   onAdd={handleAdd}
                   onUpdate={handleUpdate}
                   onDelete={handleDelete}
+                  onGFonts={fetchAndSyncGoogleFonts}
                 />
               </CardContent>
             </Card>

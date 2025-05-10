@@ -11,6 +11,7 @@ import { jsPDF } from "jspdf";
 import { useResults } from '../../resultsContext';
 import { Home, BarChart2 } from 'lucide-react';
 import englishWords from 'an-array-of-english-words';
+import { useFontContext } from '../../FontContext';
 
 const GRAMMAR_TABS = [
   { key: 'grammar', label: 'Grammar', icon: '📝' },
@@ -86,6 +87,18 @@ export default function WritingPage(props: WritingPageProps) {
   const [activeTab, setActiveTab] = useState<'grammar' | 'style' | 'rephrase'>('grammar');
   const [aiSuggestions, setAiSuggestions] = useState<any[]>([]);
   const [loadingAi, setLoadingAi] = useState(false);
+  const { availableFonts } = useFontContext();
+
+  // Default font options
+  const defaultFonts = [
+    "Arial",
+    "Georgia",
+    "Times New Roman",
+    "Courier New",
+    "Verdana",
+  ];
+
+   const combinedFonts = Array.from(new Set([...defaultFonts, ...availableFonts.map(font => font.fontName)]));
 
   const getErrorIcon = (type: string) => {
     if (type.includes('Spelling')) return '📝';
@@ -145,7 +158,7 @@ export default function WritingPage(props: WritingPageProps) {
 
         const credits = data?.userCredits || 0;
         setUserCredits(credits);
-        setCanSave(credits >= 5000);
+        setCanSave(credits >= 2500);
       } catch (err) {
         if (err instanceof Error) {
           setError("Error fetching user credits: " + err.message);
@@ -254,6 +267,8 @@ export default function WritingPage(props: WritingPageProps) {
       console.error("Error saving work:", err);
     }
   };
+
+  
 
   const containsBadWords = (text: string): string[] => {
     const words = text.toLowerCase().split(/\s+/);
@@ -667,6 +682,9 @@ export default function WritingPage(props: WritingPageProps) {
     } catch (error) {
       console.error('Error in HandleResult:', error);
     }
+
+
+    router.push('/writingspace/writingresults');
   };
 
   useEffect(() => {
@@ -687,6 +705,10 @@ export default function WritingPage(props: WritingPageProps) {
     });
     return map;
   }
+
+
+
+
 
   return (
     <div className="container mx-auto px-6 py-8 bg-white text-black min-h-screen flex flex-col relative pb-24">
@@ -717,16 +739,16 @@ export default function WritingPage(props: WritingPageProps) {
         <div className="flex gap-4 items-center">
           <div className="relative">
             <select
-              value={fontStyle}
-              onChange={(e) => setFontStyle(e.target.value)}
-              className="p-3 border rounded-lg shadow-md bg-white text-gray-700 border-gray-300"
-            >
-              <option value="Arial">Arial</option>
-              <option value="Georgia">Georgia</option>
-              <option value="Times New Roman">Times New Roman</option>
-              <option value="Courier New">Courier New</option>
-              <option value="Verdana">Verdana</option>
-            </select>
+      value={fontStyle}
+      onChange={(e) => setFontStyle(e.target.value)}
+      className="p-3 border rounded-lg shadow-md bg-white text-gray-700 border-gray-300"
+    >
+      {combinedFonts.map((font, index) => (
+        <option key={index} value={font} style={{ fontFamily: font }}>
+          {font}
+        </option>
+      ))}
+    </select>
           </div>
           <div className="relative">
             <select
@@ -767,9 +789,10 @@ export default function WritingPage(props: WritingPageProps) {
               </div>
               <Button
                 className="w-full bg-sky-600 hover:bg-sky-700 text-white font-bold py-2 px-4 rounded mb-2"
-                onClick={() => router.push('/homepage')}
+                onClick={HandleResult}
+                
               >
-                Go to Homepage
+                View Results
               </Button>
               <Button
                 className="w-full bg-sky-500 hover:bg-sky-600 text-white font-bold py-2 px-4 rounded"
@@ -797,24 +820,19 @@ export default function WritingPage(props: WritingPageProps) {
        <div className="w-full max-h-40 overflow-y-auto bg-white border border-sky-200 rounded p-3 mb-4 text-left text-sky-900 whitespace-pre-wrap break-words">
   {text}
 </div>
-        <Button
-          className="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded mb-2"
-          onClick={() => {/* handle continue with credits here */}}
-        >
-          Continue (Buy with Credits)
-        </Button>
+
         <Button
           className="w-full bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded mb-2"
           onClick={HandleSaveClick}
           disabled={!canSave}
         >
-          Save Credits
+          Save Work using Credits
         </Button>
         <Button
           className="w-full bg-gray-200 hover:bg-gray-300 text-red-700 font-bold py-2 px-4 rounded"
-          onClick={() => router.push('/homepage')}
+          onClick={HandleResult}
         >
-          Delete Session
+          View Results
         </Button>
       </div>
     </div>
@@ -1269,23 +1287,17 @@ export default function WritingPage(props: WritingPageProps) {
                 {text}
               </div>
               <Button
-                className="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded mb-2"
-                onClick={() => {/* handle continue with credits here */}}
-              >
-                Continue (Buy with Credits)
-              </Button>
-              <Button
                 className="w-full bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded mb-2"
                 onClick={HandleSaveClick}
                 disabled={!canSave}
               >
-                Save Credits
+                Save using Credits
               </Button>
               <Button
                 className="w-full bg-gray-200 hover:bg-gray-300 text-red-700 font-bold py-2 px-4 rounded"
-                onClick={() => router.push('/homepage')}
+                onClick={HandleResult}
               >
-                Delete Session
+                View Results
               </Button>
             </div>
           </div>
