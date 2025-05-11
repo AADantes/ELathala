@@ -1,10 +1,9 @@
-'use client';
-
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/app/landingpage/ui/button';
-import { Feather, AlertTriangle } from 'lucide-react';
+import { AlertTriangle } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { Edit } from 'react-feather';  // Import Feather icon
 
 export default function HeroSection({
   openSignUpDialog,
@@ -27,188 +26,48 @@ export default function HeroSection({
   };
 
   return (
-    <section className="relative w-full min-h-screen pt-24 md:pt-32 lg:pt-40 xl:pt-56 pb-8 md:pb-16 lg:pb-24 xl:pb-40 overflow-hidden bg-white flex items-center justify-center">
-      {/* Background Feathers */}
-      <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-0">
-        {/* Central Feather Icon as Background */}
-        <Feather className="w-[180px] sm:w-[300px] md:w-[400px] lg:w-[500px] h-auto text-sky-600 opacity-10" />
-
-        {/* Floating Feathers with Animation */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{
-            y: [0, -30, 0],
-            rotate: [0, 10, -10, 0],
-          }}
-          transition={{
-            duration: 5,
-            repeat: Infinity,
-            repeatType: 'loop',
-            ease: 'easeInOut',
-          }}
-          className="absolute text-sky-800 opacity-50 w-8 h-8 top-[10%] left-[30%]"
-        >
-          <Feather className="rotate-45" />
-        </motion.div>
-
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{
-            y: [0, -40, 0],
-            rotate: [0, -15, 15, 0],
-          }}
-          transition={{
-            duration: 5,
-            repeat: Infinity,
-            repeatType: 'loop',
-            delay: 0.5,
-            ease: 'easeInOut',
-          }}
-          className="absolute text-sky-800 opacity-50 w-7 h-7 top-[20%] right-[25%]"
-        >
-          <Feather className="-rotate-12" />
-        </motion.div>
-
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{
-            y: [0, -30, 0],
-            rotate: [0, 5, -5, 0],
-          }}
-          transition={{
-            duration: 5,
-            repeat: Infinity,
-            repeatType: 'loop',
-            delay: 1,
-            ease: 'easeInOut',
-          }}
-          className="absolute text-sky-800 opacity-50 w-6 h-6 bottom-[15%] left-[20%]"
-        >
-          <Feather className="rotate-12" />
-        </motion.div>
-
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{
-            y: [0, -25, 0],
-            rotate: [0, -10, 10, 0],
-          }}
-          transition={{
-            duration: 5,
-            repeat: Infinity,
-            repeatType: 'loop',
-            delay: 1.5,
-            ease: 'easeInOut',
-          }}
-          className="absolute text-sky-800 opacity-50 w-7 h-7 bottom-[25%] right-[30%]"
-        >
-          <Feather className="rotate-6" />
-        </motion.div>
-
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{
-            y: [0, -40, 0],
-            rotate: [0, 10, -10, 0],
-          }}
-          transition={{
-            duration: 5,
-            repeat: Infinity,
-            repeatType: 'loop',
-            delay: 2,
-            ease: 'easeInOut',
-          }}
-          className="absolute text-sky-800 opacity-50 w-6 h-6 top-[30%] left-[10%]"
-        >
-          <Feather className="-rotate-6" />
-        </motion.div>
-
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{
-            y: [0, -35, 0],
-            rotate: [0, -10, 10, 0],
-          }}
-          transition={{
-            duration: 5,
-            repeat: Infinity,
-            repeatType: 'loop',
-            delay: 2.5,
-            ease: 'easeInOut',
-          }}
-          className="absolute text-sky-800 opacity-50 w-8 h-8 bottom-[10%] right-[10%]"
-        >
-          <Feather className="rotate-45" />
-        </motion.div>
-      </div>
-
-      {/* Foreground Content */}
-      <div className="container px-4 md:px-0 relative z-10 flex flex-col items-center justify-center">
-        <div className="flex flex-col items-center space-y-8 text-center w-full max-w-4xl mx-auto">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            className="space-y-6 flex flex-col items-center justify-center text-center w-full"
+    <section className="relative w-full min-h-[70vh] md:min-h-[80vh] flex items-center justify-center bg-white overflow-hidden px-6 sm:px-12 lg:px-24">
+      <div className="container mx-auto flex flex-col md:flex-row items-center justify-center z-10 mt-16 md:mt-24 gap-y-12 md:gap-y-0 md:gap-x-24">
+        {/* Left: Text Content */}
+        <div className="flex-1 flex flex-col items-start justify-center text-left space-y-8 max-w-2xl w-full">
+          <h1 className="text-4xl sm:text-5xl font-bold tracking-tight text-sky-950 font-sans drop-shadow leading-tight whitespace-nowrap">
+            Write, Achieve, and Level Up 
+          </h1>
+          <p className="text-black text-lg sm:text-xl leading-relaxed ml-2"> {/* Added margin-left here */}
+            Transform your writing journey into an exciting adventure. Whether you're chasing a deadline or building a daily habit, iWrite keeps you motivated with gamified tools that track your growth and reward consistency.
+          </p>
+          <Button
+            className="w-full bg-sky-700 hover:bg-sky-800 text-white font-bold rounded-xl shadow-lg px-8 py-4 text-lg transition-all flex items-center justify-center gap-3 ml-2" // Added margin-left here
+            onClick={handleStartWriting}
           >
-          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-sky-950 whitespace-nowrap font-sans drop-shadow">
-  Write, Achieve, and Level Up with <span className="text-sky-700">iWrite</span>
-</h1>
-
-            <p className="mx-auto max-w-3xl text-black text-base sm:text-lg leading-relaxed text-center">
-              Transform your writing journey into an exciting adventure. Whether you're chasing a deadline or building a daily habit, iWrite keeps you motivated with gamified tools that track your growth and reward consistency.
-            </p>
-            <p className="mx-auto max-w-2xl text-sky-800 text-sm sm:text-base italic text-center">
-              "Your words have power — and now, they can earn you points too."
-            </p>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-            className="w-full flex flex-col items-center justify-center"
-          >
-            <div className="relative w-full flex flex-col items-center justify-center">
-              <Button
-                className="bg-gradient-to-r from-sky-800 to-sky-900 text-white hover:bg-sky-900 font-bold rounded-xl shadow-xl transform transition-all hover:scale-105 px-8 sm:px-12 py-4 sm:py-5 text-lg sm:text-xl border-none flex items-center gap-4 mx-auto"
-                onClick={handleStartWriting}
+            <Edit className="text-white w-5 h-5" />
+            Start Writing
+          </Button>
+          <AnimatePresence>
+            {showWarning && (
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 10 }}
+                transition={{ duration: 0.4 }}
+                className="w-auto max-w-full flex items-center gap-2 bg-red-50 border border-red-300 rounded-lg px-4 py-2 shadow-lg text-center"
               >
-                Start Writing
-                <motion.div
-                  animate={{
-                    x: [0, 10, -10, 0],
-                    y: [0, -5, 5, 0],
-                    rotate: [0, 5, -5, 0],
-                  }}
-                  transition={{
-                    duration: 2,
-                    repeat: Infinity,
-                    repeatType: 'loop',
-                    ease: 'easeInOut',
-                  }}
-                >
-                  <Feather className="w-5 h-5" />
-                </motion.div>
-              </Button>
-              <AnimatePresence>
-                {showWarning && (
-                  <motion.div
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: 10 }}
-                    transition={{ duration: 0.4 }}
-                    className="absolute left-1/2 top-full -translate-x-1/2 mt-4 w-auto max-w-full flex items-center justify-center gap-2 bg-red-50 border border-red-300 rounded-lg px-4 py-2 shadow-lg z-[100] text-center"
-                  >
-                    <AlertTriangle className="text-red-500 w-5 h-5 animate-bounce shrink-0" />
-                    <span className="text-red-700 font-semibold text-sm sm:text-base text-center whitespace-nowrap">
-                      Please <span className="underline underline-offset-2">sign up</span> or <span className="underline underline-offset-2">log in</span> to start writing!
-                    </span>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
-          </motion.div>
+                <AlertTriangle className="text-red-500 w-5 h-5 animate-bounce shrink-0" />
+                <span className="text-red-700 font-semibold text-sm sm:text-base">
+                  Please <span className="underline underline-offset-2">sign up</span> or <span className="underline underline-offset-2">log in</span> to start writing!
+                </span>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+
+        {/* Right: Image */}
+        <div className="flex-1 flex items-center justify-center w-full md:w-auto md:ml-24">
+          <img
+            src="https://img.freepik.com/premium-vector/game-colors-vector-icon-illustration-game-joystick-controler-brush-pencil-magic-tool-icon-concept-white-isolated-flat-cartoon-style-suitable-web-landing-page-banner-sticker-background_1033579-129269.jpg?w=740"
+            alt="Creative Writing Illustration"
+            className="w-full max-w-xs rounded-2xl shadow-xl object-contain"
+          />
         </div>
       </div>
     </section>
