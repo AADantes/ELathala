@@ -70,80 +70,83 @@ export default function DailyStreak({ userId }: { userId: string }) {
   }, [lastCheckIn]);
 
   const handleCheckIn = async () => {
-    const today = new Date();
-    const todayDate = today.toDateString();
+  const today = new Date();
+  const todayDate = today.toDateString();
 
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return;
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return;
 
-    const { data: userData, error: userDataError } = await supabase
-      .from("User")
-      .select("userStreak, lastCheckIn, usercurrentExp, userCredits")
-      .eq("id", user.id)
-      .single();
+  const { data: userData, error: userDataError } = await supabase
+    .from("User")
+    .select("userStreak, lastCheckIn, usercurrentExp, userCredits")
+    .eq("id", user.id)
+    .single();
 
-    if (userDataError) {
-      console.error("Error fetching user data:", userDataError.message);
-      return;
-    }
+  if (userDataError) {
+    console.error("Error fetching user data:", userDataError.message);
+    return;
+  }
 
-    const lastCheckInDate = userData?.lastCheckIn
-      ? new Date(userData.lastCheckIn).toDateString()
-      : null;
+  const lastCheckInDate = userData?.lastCheckIn
+    ? new Date(userData.lastCheckIn).toDateString()
+    : null;
 
-    if (lastCheckInDate === todayDate) {
-      alert("🔥 You've already checked in today!");
-      return;
-    }
+  if (lastCheckInDate === todayDate) {
+    alert("🔥 You've already checked in today!");
+    return;
+  }
 
-    const isConsecutive =
-      lastCheckInDate &&
-      new Date(todayDate).getTime() - new Date(lastCheckInDate).getTime() ===
-        86400000;
+  const isConsecutive =
+    lastCheckInDate &&
+    new Date(todayDate).getTime() - new Date(lastCheckInDate).getTime() ===
+      86400000;
 
-    const newStreak = isConsecutive ? userData.userStreak + 1 : 1;
+  const newStreak = isConsecutive ? userData.userStreak + 1 : 1;
 
-    let bonusExp = 0;
-    let bonusCredits = 0;
-    let bonusMessage = "🎁 +10 XP!";
+  let bonusExp = 0;
+  let bonusCredits = 0;
+  let bonusMessage = "🎁 +10 XP!";
 
-    if (newStreak % 30 === 0) {
-      bonusExp = 500;
-      bonusCredits = 100;
-      bonusMessage = "🏆 Monthly Bonus: +500 XP and +100 Credits!";
-    } else if (newStreak % 7 === 0) {
-      bonusExp = 100;
-      bonusCredits = 20;
-      bonusMessage = "⭐ Weekly Bonus: +100 XP and +20 Credits!";
-    } else {
-      bonusExp = 10;
-      bonusCredits = 5;
-    }
+  if (newStreak % 30 === 0) {
+    bonusExp = 500;
+    bonusCredits = 100;
+    bonusMessage = "🏆 Monthly Bonus: +500 XP and +100 Credits!";
+  } else if (newStreak % 7 === 0) {
+    bonusExp = 100;
+    bonusCredits = 20;
+    bonusMessage = "⭐ Weekly Bonus: +100 XP and +20 Credits!";
+  } else {
+    bonusExp = 10;
+    bonusCredits = 5;
+  }
 
-    const newExp = (userData.usercurrentExp || 0) + bonusExp;
-    const newCredits = (userData.userCredits || 0) + bonusCredits;
+  const newExp = (userData.usercurrentExp || 0) + bonusExp;
+  const newCredits = (userData.userCredits || 0) + bonusCredits;
 
-    const { error: userUpdateError } = await supabase
-      .from("User")
-      .update({
-        usercurrentExp: newExp,
-        userCredits: newCredits,
-        userStreak: newStreak,
-        lastCheckIn: today,
-      })
-      .eq("id", user.id);
+  // Set the next eligible time to 16 hours from now
+  const nextEligible = new Date(today.getTime() + 16 * 60 * 60 * 1000); // 16 hours
 
-    if (userUpdateError) {
-      console.error("Error updating User in Supabase:", userUpdateError.message);
-      return;
-    }
+  const { error: userUpdateError } = await supabase
+    .from("User")
+    .update({
+      usercurrentExp: newExp,
+      userCredits: newCredits,
+      userStreak: newStreak,
+      lastCheckIn: nextEligible, // Set the next check-in to 16 hours from now
+    })
+    .eq("id", user.id);
 
-    setStreak(newStreak);
-    setLastCheckIn(today);
-    setReward(bonusMessage);
-    alert(`✅ Check-in successful! ${bonusMessage}`);
-    window.location.reload();
-  };
+  if (userUpdateError) {
+    console.error("Error updating User in Supabase:", userUpdateError.message);
+    return;
+  }
+
+  setStreak(newStreak);
+  setLastCheckIn(nextEligible);
+  setReward(bonusMessage);
+  alert(`✅ Check-in successful! ${bonusMessage}`);
+  window.location.reload();
+};
 
   return (
     <div className="bg-white p-4 w-full max-w-4xl mx-auto mt-6 text-black border border-gray-200 rounded-md shadow-md relative overflow-hidden">

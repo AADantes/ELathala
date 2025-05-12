@@ -92,6 +92,7 @@ export default function UpgradesDisplay({ onPurchase }: UpgradesDisplayProps) {
 
     // Alert for successful level-up
     alert(`Successfully leveled up! Your ${type} multiplier is now ${nextMultiplier.toFixed(2)}x.`)
+    window.location.reload();
   } else {
     console.error("Upgrade failed:", error)
   }

@@ -130,6 +130,8 @@ const rewardIcons = useMemo(() => [
       })
       .eq('id', user.id);
 
+      window.location.reload();
+
     if (updateError) {
       console.error('User update failed:', updateError);
       setClaiming(null);
