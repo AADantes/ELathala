@@ -149,6 +149,7 @@ export default function PurchaseModal({ item, onClose, onConfirm }: PurchaseModa
       onConfirm(); // Notify parent component of successful purchase
 
       console.log("Purchase successful:", purchaseData);
+      alert("Purchase successful! You have purchased the font.");
     } catch (err: any) {
       console.error("Error during purchase:", err.message);
       setError(err.message || "An error occurred during the purchase.");
