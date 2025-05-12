@@ -12,6 +12,9 @@ import { useResults } from '../../resultsContext';
 import { Home, BarChart2 } from 'lucide-react';
 import englishWords from 'an-array-of-english-words';
 import { useFontContext } from '../../FontContext';
+import SaveWrittenText from '../components/SaveWrittenText';
+import { useWritingContext } from '../../WritingContext';
+
 
 const GRAMMAR_TABS = [
   { key: 'grammar', label: 'Grammar', icon: '📝' },
@@ -88,6 +91,12 @@ export default function WritingPage(props: WritingPageProps) {
   const [aiSuggestions, setAiSuggestions] = useState<any[]>([]);
   const [loadingAi, setLoadingAi] = useState(false);
   const { availableFonts } = useFontContext();
+  const [triggerSave, setTriggerSave] = useState(false);
+  const { setWrittenText } = useWritingContext();
+
+
+
+
 
   // Default font options
   const defaultFonts = [
@@ -608,85 +617,89 @@ export default function WritingPage(props: WritingPageProps) {
     setLocalWords(currentWords);
   }, [currentWords]);
 
-  const HandleResult = async () => {
-    try {
-      const {
-        data: { user },
-        error: userFetchError,
-      } = await supabase.auth.getUser();
+const HandleResult = async () => {
+  if (textAreaRef.current) {
+    const text = textAreaRef.current.value;
+    console.log('Captured text from textArea:', text); // Log the text
+    setWrittenText(text);
+  }
 
-      if (userFetchError) {
-        console.error('Error fetching user from Supabase auth:', userFetchError.message);
-        return;
-      }
+  try {
+    const {
+      data: { user },
+      error: userFetchError,
+    } = await supabase.auth.getUser();
 
-      if (!user) {
-        console.warn('No authenticated user found.');
-        return;
-      }
-
-      const userId = user.id;
-
-      const { data: multiplierData, error: multiplierError } = await supabase
-        .from('User')
-        .select('userExpMultiplier, userCreditMultiplier, usercurrentExp, userCredits')
-        .eq('id', userId)
-        .single();
-
-      if (multiplierError) {
-        console.error('Error fetching multipliers:', multiplierError.message);
-        return;
-      }
-
-      const {
-        userExpMultiplier,
-        userCreditMultiplier,
-        usercurrentExp,
-        userCredits,
-      } = multiplierData;
-
-      const earnedExp = currentWords * userExpMultiplier;
-      const earnedCredits = currentWords * userCreditMultiplier;
-
-      const { error: updateWordsError } = await supabase
-        .from('written_works')
-        .update({ numberofWords: currentWords })
-        .eq('workID', workID);
-
-      if (updateWordsError) {
-        console.error('Error updating numberofWords in written_works:', updateWordsError.message);
-        return;
-      }
-
-      setEarnedExp(earnedExp);
-      setEarnedCredits(earnedCredits);
-      setCurrentWords(currentWords);
-
-      const newExp = (usercurrentExp || 0) + earnedExp;
-      const newCredits = (userCredits || 0) + earnedCredits;
-
-      const { error: userUpdateError } = await supabase
-        .from('User')
-        .update({
-          usercurrentExp: newExp,
-          userCredits: newCredits,
-        })
-        .eq('id', userId);
-
-      if (userUpdateError) {
-        console.error('Error updating User:', userUpdateError.message);
-        return;
-      }
-
-      console.log(`User gained ${earnedExp} EXP and ${earnedCredits} Credits.`);
-    } catch (error) {
-      console.error('Error in HandleResult:', error);
+    if (userFetchError) {
+      console.error('Error fetching user from Supabase auth:', userFetchError.message);
+      return;
     }
 
+    if (!user) {
+      console.warn('No authenticated user found.');
+      return;
+    }
 
-    router.push('/writingspace/writingresults');
-  };
+    const userId = user.id;
 
+    const { data: multiplierData, error: multiplierError } = await supabase
+      .from('User')
+      .select('userExpMultiplier, userCreditMultiplier, usercurrentExp, userCredits')
+      .eq('id', userId)
+      .single();
+
+    if (multiplierError) {
+      console.error('Error fetching multipliers:', multiplierError.message);
+      return;
+    }
+
+    const {
+      userExpMultiplier,
+      userCreditMultiplier,
+      usercurrentExp,
+      userCredits,
+    } = multiplierData;
+
+    const earnedExp = currentWords * userExpMultiplier;
+    const earnedCredits = currentWords * userCreditMultiplier;
+
+    const { error: updateWordsError } = await supabase
+      .from('written_works')
+      .update({ numberofWords: currentWords })
+      .eq('workID', workID);
+
+    if (updateWordsError) {
+      console.error('Error updating numberofWords in written_works:', updateWordsError.message);
+      return;
+    }
+
+    setEarnedExp(earnedExp);
+    setEarnedCredits(earnedCredits);
+    setCurrentWords(currentWords);
+
+    const newExp = (usercurrentExp || 0) + earnedExp;
+    const newCredits = (userCredits || 0) + earnedCredits;
+
+    const { error: userUpdateError } = await supabase
+      .from('User')
+      .update({
+        usercurrentExp: newExp,
+        userCredits: newCredits,
+      })
+      .eq('id', userId);
+
+    if (userUpdateError) {
+      console.error('Error updating User:', userUpdateError.message);
+      return;
+    }
+
+    console.log(`User gained ${earnedExp} EXP and ${earnedCredits} Credits.`);
+  } catch (error) {
+    console.error('Error in HandleResult:', error);
+  }
+
+  router.push('/writingspace/writingresults');
+};
   useEffect(() => {
     if (isTimeUp && currentWords >= wordCount) {
       setShowDoneModal(true);
@@ -1256,9 +1269,9 @@ export default function WritingPage(props: WritingPageProps) {
               </div>
               <Button
                 className="w-full bg-sky-600 hover:bg-sky-700 text-white font-bold py-2 px-4 rounded mb-2"
-                onClick={() => router.push('/homepage')}
+                onClick={HandleResult}
               >
-                Go to Homepage
+                View Results
               </Button>
               <Button
                 className="w-full bg-sky-500 hover:bg-sky-600 text-white font-bold py-2 px-4 rounded"

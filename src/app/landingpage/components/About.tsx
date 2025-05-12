@@ -2,6 +2,7 @@
 
 import React from "react";
 import { motion } from 'framer-motion';
+import Image from "next/image";
 
 const About = () => (
   <motion.section
@@ -25,7 +26,7 @@ const About = () => (
           >
             {/* Logo with white background and circular shape */}
             <div className="flex-shrink-0 mb-8 md:mb-0 md:mr-20 flex justify-center items-center bg-white p-6 rounded-full"> {/* Adjusted margin-bottom */}
-              <img
+              <Image
                 src="https://ueagmtscbdirqgbjxaqb.supabase.co/storage/v1/object/public/elathala-logo//logo.png"
                 alt="E-Lathala Logo"
                 className="w-80 h-80 object-contain"

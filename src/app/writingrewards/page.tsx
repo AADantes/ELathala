@@ -50,13 +50,14 @@ export default function LevelRewardsPage() {
     []
   );
 
-  const rewardIcons = useMemo(() => [
-    <Gift className="animate-bounce text-sky-400" />,
-    <Award className="animate-ping text-orange-400" />,
-    <Star className="animate-spin text-yellow-400" />,
-    <Trophy className="animate-bounce text-lime-400" />,
-    <Trophy className="animate-bounce text-sky-500" />,
-  ], []);
+const rewardIcons = useMemo(() => [
+  <Gift key="gift" className="animate-bounce text-sky-400" />,
+  <Award key="award" className="animate-ping text-orange-400" />,
+  <Star key="star" className="animate-spin text-yellow-400" />,
+  <Trophy key="trophy1" className="animate-bounce text-lime-400" />,
+  <Trophy key="trophy2" className="animate-bounce text-sky-500" />,
+], []);
+
 
   useEffect(() => {
     const fetchUserData = async () => {

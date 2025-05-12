@@ -8,54 +8,65 @@ import { WritingHistoryPanel } from "@/app/homepage/components/WritingHistoryPan
 import { StartWritingButton } from "@/app/homepage/components/StartWritingButton";
 import DailyStreak from "@/app/homepage/components/DailyStreak";
 import supabase from "../../../config/supabaseClient";
+import { useUserToken, useSetUserToken } from "@/app/Contexts/UserTokenContext";
 
 export default function HomePage() {
   const router = useRouter();
+
   const [userData, setUserData] = useState<any>(null);
   const [works, setWorks] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [userId, setUserId] = useState<string | null>(null);
   const [showLevelUpAlert, setShowLevelUpAlert] = useState(false);
+  const tokenFromContext = useUserToken();
+  const setToken = useSetUserToken(); // new hook to set the token
 
   useEffect(() => {
     const fetchUserData = async () => {
       setLoading(true);
-    
-      const {
-        data: { user: authUser },
-        error: authError,
-      } = await supabase.auth.getUser();
-    
-      if (authError || !authUser) {
-        console.error("Error fetching auth user:", authError);
+
+      // Use getSession() to get the current session
+      const { data, error } = await supabase.auth.getSession();
+
+      if (error || !data?.session?.user) {
+        // If there's no session or an error occurs, redirect to the login page
+        console.error("Session error:", error);
         router.push("/login");
         return;
       }
-    
+
+      const authUser = data.session.user; // Accessing the user from the session
       setUserId(authUser.id);
-    
+
+      // Extract the access_token from the session object
+      const token = data.session.access_token; // This is the access token
+      console.log("Access Token:", token); // Log the access token to the console
+
+      // Set the token in your context (for later use in the app)
+      setToken(token);
+
+      // Now fetch the user data from the database
       const { data: profile, error: profileError } = await supabase
         .from("User")
         .select("username, userLevel, usercurrentExp, targetExp, userCredits")
         .eq("id", authUser.id)
         .single();
-    
+
       if (profileError) {
         console.error("Error fetching user profile:", profileError);
         setLoading(false);
         return;
       }
-    
+
       let { userLevel, usercurrentExp, targetExp } = profile;
       let leveledUp = false;
-    
+
       if (usercurrentExp >= targetExp) {
-        // Perform level-up update
         userLevel += 1;
         usercurrentExp = 0;
         targetExp *= 2;
         leveledUp = true;
-    
+
         const { error: updateError } = await supabase
           .from("User")
           .update({
@@ -64,12 +75,12 @@ export default function HomePage() {
             targetExp,
           })
           .eq("id", authUser.id);
-    
+
         if (updateError) {
           console.error("Error updating user level data:", updateError);
         }
       }
-    
+
       setUserData({
         username: profile.username ?? "Unknown User",
         experience: usercurrentExp,
@@ -77,20 +88,21 @@ export default function HomePage() {
         totalExperience: targetExp,
         credits: profile.userCredits ?? 0,
       });
-    
+
       if (leveledUp) setShowLevelUpAlert(true);
-    
+
+      // Fetch the user's written works
       const { data: writtenWorks, error: worksError } = await supabase
         .from("written_works")
         .select("workID, workTitle, numberofWords, noOfWordsSet, timelimitSet")
         .eq("UserID", authUser.id);
-    
+
       if (worksError) {
         console.error("Error fetching written works:", worksError);
       } else {
         setWorks(writtenWorks || []);
       }
-    
+
       setLoading(false);
     };
 

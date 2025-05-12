@@ -48,7 +48,7 @@ export const useUuid = () => {
     throw new Error('useUuid must be used within a UuidProvider');
   }
 
-  console.log('useUuid context:', context); // Debugging
+  // console.log('useUuid context:', context); // Debugging
 
   return context;
 };

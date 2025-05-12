@@ -6,6 +6,7 @@ import { Button } from '../ui/Button';
 import Link from 'next/link';
 import { Bebas_Neue } from 'next/font/google';
 import supabase from '../../../../../config/supabaseClient';
+import Image from 'next/image';
 
 const bebasNeue = Bebas_Neue({
   subsets: ['latin'],
@@ -84,7 +85,7 @@ export default function Header({ onMenuClick, bgColor, setBgColor }: HeaderProps
           <Menu className="h-7 w-7 text-white" />
         </Button>
         <Link href="/" className="flex items-center space-x-1 ml-2">
-          <img src="https://ueagmtscbdirqgbjxaqb.supabase.co/storage/v1/object/public/elathala-logo//logo.png" alt="E-Lathala Logo" className="h-12 w-12" />
+          <Image src="https://ueagmtscbdirqgbjxaqb.supabase.co/storage/v1/object/public/elathala-logo//logo.png" alt="E-Lathala Logo" className="h-12 w-12" />
           <span
             className={`font-bold text-3xl text-white ${bebasNeue.className} ml-1`}
             style={{

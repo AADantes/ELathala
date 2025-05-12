@@ -4,11 +4,14 @@
 import { UuidProvider } from './UUIDContext' // adjust if path is different
 import { ResultsProvider } from './resultsContext'
 import { FontProvider } from './FontContext' // adjust if path is different
+import { WritingProvider } from './WritingContext' // adjust if path is different
 
 import { ReactNode } from 'react'
 
 export default function WritingspaceLayout({ children }: { children: ReactNode }) {
   return (
+    <WritingProvider>
+      {/* This will render the pages inside writingspace */}
     <FontProvider>
       {/* This will render the pages inside writingspace */}
     <ResultsProvider>
@@ -17,6 +20,7 @@ export default function WritingspaceLayout({ children }: { children: ReactNode }
     </UuidProvider>
     </ResultsProvider>
     </FontProvider>
+    </WritingProvider>
 
   )
 }

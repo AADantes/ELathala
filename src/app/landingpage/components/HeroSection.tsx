@@ -4,6 +4,7 @@ import { Button } from '@/app/landingpage/ui/button';
 import { AlertTriangle } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { Edit } from 'react-feather';  // Import Feather icon
+import Image from 'next/image';
 
 export default function HeroSection({
   openSignUpDialog,
@@ -63,7 +64,7 @@ export default function HeroSection({
 
         {/* Right: Image */}
         <div className="flex-1 flex items-center justify-center w-full md:w-auto md:ml-24">
-          <img
+          <Image
             src="https://img.freepik.com/premium-vector/game-colors-vector-icon-illustration-game-joystick-controler-brush-pencil-magic-tool-icon-concept-white-isolated-flat-cartoon-style-suitable-web-landing-page-banner-sticker-background_1033579-129269.jpg?w=740"
             alt="Creative Writing Illustration"
             className="w-full max-w-xs rounded-2xl shadow-xl object-contain"
