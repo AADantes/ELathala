@@ -100,7 +100,7 @@ export default function AdminPage() {
 
   const handleLogout = () => {
     alert("Logging out...")
-    router.push("/homepage")
+    router.push("/landingpage")
   }
 
   // ✅ Replace with your actual Google Fonts API key

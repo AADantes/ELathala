@@ -40,6 +40,7 @@ export function Header() {
     usercurrentExp: string;
     userCredits: number;
     avatar_url?: string;
+    isAdmin?: boolean;
   } | null>(null);
 
   const router = useRouter();
@@ -50,31 +51,41 @@ export function Header() {
     router.push('/landingpage');
   };
 
-  useEffect(() => {
-    const fetchUser = async () => {
-      const { data: { user: authUser }, error: authError } = await supabase.auth.getUser();
+useEffect(() => {
+  const fetchUser = async () => {
+    const { data: { user: authUser }, error: authError } = await supabase.auth.getUser();
 
-      if (authError || !authUser) {
-        console.error('Error fetching auth user:', authError);
-        return;
-      }
+    if (authError || !authUser) {
+      console.error('Error fetching auth user:', authError);
+      return;
+    }
 
-      const { data, error } = await supabase
+    const [{ data: userData, error: userError }, { data: adminData, error: adminError }] = await Promise.all([
+      supabase
         .from('User')
         .select('username, userLevel, usercurrentExp, userCredits, avatar_url')
         .eq('id', authUser.id)
-        .single();
+        .single(),
+      supabase
+        .from('Accounts')
+        .select('isAdmin')
+        .eq('userId', authUser.id)
+        .single()
+    ]);
 
-      if (error) {
-        console.error('Error fetching user data:', error);
-      } else {
-        setUser(data);
-      }
-    };
+    if (userError || adminError) {
+      console.error('Error fetching user or admin data:', userError || adminError);
+      return;
+    }
 
-    fetchUser();
-  }, []);
+    setUser({
+      ...userData,
+      isAdmin: adminData?.isAdmin ?? false,
+    });
+  };
 
+  fetchUser();
+}, []);
   return (
     <header className="border-b border-transparent bg-[#4F8FB7]">
       <div className="container mx-auto px-4 py-4 flex items-center justify-between">
@@ -267,6 +278,21 @@ export function Header() {
                         </span>
                       </button>
                     </li>
+
+                    {user?.isAdmin && (
+  <li>
+    <Link
+      href="/admin"
+      className={`flex items-center space-x-4 py-3 px-4 rounded-lg bg-white shadow-md shadow-black/30 transition-all duration-300 ease-in-out transform hover:scale-105 group`}
+    >
+      <User className="h-5 w-5 text-[#FF8C00] group-hover:text-[#FF8C00]" />
+      <span className="text-black font-bold group-hover:text-black">
+        Admin Dashboard
+      </span>
+    </Link>
+  </li>
+)}
+
                   </ul>
                 </nav>
               </div>
