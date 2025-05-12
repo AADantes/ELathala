@@ -31,7 +31,7 @@ export async function POST(req: NextRequest) {
     const { error: updateError } = await supabase
       .from('User')
       .update({ credits: updatedCredits })
-      .eq('uuid', user_id)
+      .eq('id', user_id)
 
     // If error updating credits
     if (updateError) {

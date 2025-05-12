@@ -167,7 +167,7 @@ export default function WritingPage(props: WritingPageProps) {
 
         const credits = data?.userCredits || 0;
         setUserCredits(credits);
-        setCanSave(credits >= 2500);
+        setCanSave(credits >= 1500);
       } catch (err) {
         if (err instanceof Error) {
           setError("Error fetching user credits: " + err.message);
@@ -265,7 +265,7 @@ export default function WritingPage(props: WritingPageProps) {
       const { data: updateData, error: updateError } = await supabase
         .from("User")
         .update({
-          userCredits: userCredits - 5000,
+          userCredits: userCredits - 1500,
         })
         .eq("id", userID);
 
@@ -839,7 +839,7 @@ const HandleResult = async () => {
           onClick={HandleSaveClick}
           disabled={!canSave}
         >
-          Save Work using Credits
+          Save Work using Credits (1500)
         </Button>
         <Button
           className="w-full bg-gray-200 hover:bg-gray-300 text-red-700 font-bold py-2 px-4 rounded"
@@ -1278,7 +1278,7 @@ const HandleResult = async () => {
                 onClick={HandleSaveClick}
                 disabled={!canSave}
               >
-                Save Work
+                Save Work using Credits (1500)
               </Button>
             </div>
           </div>
@@ -1304,7 +1304,7 @@ const HandleResult = async () => {
                 onClick={HandleSaveClick}
                 disabled={!canSave}
               >
-                Save using Credits
+                Save using Credits (1500)
               </Button>
               <Button
                 className="w-full bg-gray-200 hover:bg-gray-300 text-red-700 font-bold py-2 px-4 rounded"
