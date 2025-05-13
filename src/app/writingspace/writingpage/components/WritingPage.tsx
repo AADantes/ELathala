@@ -204,6 +204,7 @@ export default function WritingPage(props: WritingPageProps) {
       doc.setFontSize(18);
       doc.text(title || "Untitled Work", marginLeft, 20);
       doc.setFontSize(12);
+      doc.setFont(fontStyle)
       const lines = doc.splitTextToSize(writtenContent, maxLineWidth);
       let currentY = marginTop;
 
