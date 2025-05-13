@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import StartPrompt from '../writingpage/components/StartPrompt';
 import WritingPage from '../writingpage/components/WritingPage';
-import Header from '../writingpage/components/Header';
+import {Header} from '../../homepage/components/Header';
 import Sidebar from '../writingpage/components/Sidebar';
 
 export default function Writingpage() {
@@ -45,12 +45,12 @@ export default function Writingpage() {
       <div className="min-h-screen bg-white flex flex-col">
       {/* Header Component */}
       <Header
-        onMenuClick={() => setIsSidebarOpen(true)}
-        bgColor={bgColor} // Pass the current background color
-        setBgColor={setBgColor} // Pass the function to update the background color
-        title={title}
-        genre={genre}
-        topic={topic}
+        // onMenuClick={() => setIsSidebarOpen(true)}
+        // bgColor={bgColor} // Pass the current background color
+        // setBgColor={setBgColor} // Pass the function to update the background color
+        // title={title}
+        // genre={genre}
+        // topic={topic}
       />
 
       {/* Sidebar Component */}
