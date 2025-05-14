@@ -17,59 +17,61 @@ export default function DailyStreak({ userId }: { userId: string }) {
   const [reward, setReward] = useState<string | null>(null);
   const [hasCheckedInToday, setHasCheckedInToday] = useState(false);
   const [countdown, setCountdown] = useState("");
+  const [isButtonDisabled, setIsButtonDisabled] = useState(false);
+  
 
-  useEffect(() => {
-    const fetchStreakData = async () => {
-      if (!userId) return;
-  
-      const { data, error } = await supabase
-        .from("User")
-        .select("userStreak, lastCheckIn")
-        .eq("id", userId)
-        .single();
-  
-      if (error) {
-        console.error("Error fetching user data:", error.message);
-        return;
-      }
-  
-      if (data) {
-        setStreak(data.userStreak || 0);
-        const last = data.lastCheckIn ? new Date(data.lastCheckIn) : null;
-        setLastCheckIn(last);
-  
-        if (last) {
-          const diff = Date.now() - last.getTime();
-          setHasCheckedInToday(diff < 24 * 60 * 60 * 1000);
-        }
-      }
-    };
-  
-    fetchStreakData();
-  }, [userId]);
-  
-  useEffect(() => {
-    const interval = setInterval(() => {
-      if (lastCheckIn) {
-        const nextEligible = new Date(lastCheckIn.getTime() + 24 * 60 * 60 * 1000);
-        const diff = nextEligible.getTime() - Date.now();
-  
-        if (diff <= 0) {
-          setHasCheckedInToday(false);
-          setCountdown("");
-        } else {
-          const hours = Math.floor(diff / (1000 * 60 * 60));
-          const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-          const seconds = Math.floor((diff % (1000 * 60)) / 1000);
-          setCountdown(`${hours}h ${minutes}m ${seconds}s`);
-        }
-      }
-    }, 1000);
-  
-    return () => clearInterval(interval);
-  }, [lastCheckIn]);
+useEffect(() => {
+  const fetchStreakData = async () => {
+    if (!userId) return;
 
-  const handleCheckIn = async () => {
+    const { data, error } = await supabase
+      .from("User")
+      .select("userStreak, lastCheckIn")
+      .eq("id", userId)
+      .single();
+
+    if (error) {
+      console.error("Error fetching user data:", error.message);
+      return;
+    }
+
+    if (data) {
+      setStreak(data.userStreak || 0);
+      const last = data.lastCheckIn ? new Date(data.lastCheckIn) : null;
+      setLastCheckIn(last);
+
+      const today = new Date().toDateString();
+      const lastCheckInDate = last?.toDateString();
+      setHasCheckedInToday(lastCheckInDate === today);
+    }
+  };
+
+  fetchStreakData();
+}, [userId]);
+
+useEffect(() => {
+  const interval = setInterval(() => {
+    const now = new Date();
+    const tomorrowMidnight = new Date();
+    tomorrowMidnight.setHours(24, 0, 0, 0);
+
+    const diff = tomorrowMidnight.getTime() - now.getTime();
+
+    if (diff <= 0) {
+      setHasCheckedInToday(false);
+      setCountdown("");
+    } else {
+      const hours = Math.floor(diff / (1000 * 60 * 60));
+      const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+      setCountdown(`${hours}h ${minutes}m ${seconds}s`);
+    }
+  }, 1000);
+
+  return () => clearInterval(interval);
+}, []);
+
+const handleCheckIn = async () => {
   const today = new Date();
   const todayDate = today.toDateString();
 
@@ -91,20 +93,21 @@ export default function DailyStreak({ userId }: { userId: string }) {
     ? new Date(userData.lastCheckIn).toDateString()
     : null;
 
+  // Check if the user has already claimed today
   if (lastCheckInDate === todayDate) {
     alert("🔥 You've already checked in today!");
+    setIsButtonDisabled(true); // Disable the button if already checked in
     return;
   }
 
-  const isConsecutive =
-    lastCheckInDate &&
-    new Date(todayDate).getTime() - new Date(lastCheckInDate).getTime() ===
-      86400000;
+  const yesterday = new Date(today);
+  yesterday.setDate(today.getDate() - 1);
+  const isConsecutive = lastCheckInDate === yesterday.toDateString();
 
   const newStreak = isConsecutive ? userData.userStreak + 1 : 1;
 
-  let bonusExp = 0;
-  let bonusCredits = 0;
+  let bonusExp = 10;
+  let bonusCredits = 5;
   let bonusMessage = "🎁 +10 XP!";
 
   if (newStreak % 30 === 0) {
@@ -115,16 +118,12 @@ export default function DailyStreak({ userId }: { userId: string }) {
     bonusExp = 100;
     bonusCredits = 20;
     bonusMessage = "⭐ Weekly Bonus: +100 XP and +20 Credits!";
-  } else {
-    bonusExp = 10;
-    bonusCredits = 5;
   }
 
   const newExp = (userData.usercurrentExp || 0) + bonusExp;
   const newCredits = (userData.userCredits || 0) + bonusCredits;
 
-  // Set the next eligible time to 16 hours from now
-  const nextEligible = new Date(today.getTime() + 16 * 60 * 60 * 1000); // 16 hours
+  const now = new Date();
 
   const { error: userUpdateError } = await supabase
     .from("User")
@@ -132,7 +131,7 @@ export default function DailyStreak({ userId }: { userId: string }) {
       usercurrentExp: newExp,
       userCredits: newCredits,
       userStreak: newStreak,
-      lastCheckIn: nextEligible, // Set the next check-in to 16 hours from now
+      lastCheckIn: now, // Save the current timestamp, not +16h
     })
     .eq("id", user.id);
 
@@ -142,11 +141,13 @@ export default function DailyStreak({ userId }: { userId: string }) {
   }
 
   setStreak(newStreak);
-  setLastCheckIn(nextEligible);
+  setLastCheckIn(now);
   setReward(bonusMessage);
   alert(`✅ Check-in successful! ${bonusMessage}`);
-  window.location.reload();
+  setIsButtonDisabled(true); // Disable the button after claiming the reward
+  window.location.reload(); // Reload the page to reflect changes
 };
+
 
   return (
     <div className="bg-white p-4 w-full max-w-4xl mx-auto mt-6 text-black border border-gray-200 rounded-md shadow-md relative overflow-hidden">

@@ -96,6 +96,19 @@ export default function WritingPage(props: WritingPageProps) {
 
 
 
+  const loadGoogleFont = (fontName: string) => {
+  const formattedFont = fontName.replace(/\s+/g, '+');
+  const linkId = `google-font-${formattedFont}`;
+
+  if (document.getElementById(linkId)) return;
+
+  const link = document.createElement('link');
+  link.id = linkId;
+  link.href = `https://fonts.googleapis.com/css2?family=${formattedFont}&display=swap`;
+  link.rel = 'stylesheet';
+  document.head.appendChild(link);
+};
+
 
 
   // Default font options
@@ -182,103 +195,130 @@ export default function WritingPage(props: WritingPageProps) {
     }
   }, [userID]);
 
-  const HandleSaveClick = async () => {
-    if (canSave) {
-      saveWork();
+let isSaving = false;
+
+const HandleSaveClick = async () => {
+  if (canSave && !isSaving) {
+    isSaving = true;
+    await saveWork();
+    isSaving = false;
+  } else {
+    console.log("User does not have enough credits to save work.");
+  }
+};
+
+const saveWork = async () => {
+  console.log("saveWork called");
+  try {
+    const writtenContent = textAreaRef.current?.value || "";
+    const doc = new jsPDF();
+
+    // Fetch font name from Supabase
+    const { data: fontData, error: fontError } = await supabase
+      .from("google_fonts_shop")
+      .select("font_name")
+      .eq("font_name", fontStyle)
+      .single();
+
+    if (fontError) {
+      console.warn("Font not found in database. Using default font.");
+    }
+
+    if (fontData?.font_name) {
+      const fontNameWithSpaces = fontData.font_name;                  // e.g., "Nerko One"
+      const cleanFontName = fontNameWithSpaces.replace(/\s+/g, "");   // e.g., "NerkoOne"
+      const fontFileName = `${cleanFontName}-Regular.ttf`;
+      const fontPath = `/all-ttf/${fontFileName}`;
+
+      const fontResponse = await fetch(fontPath);
+      if (!fontResponse.ok) {
+        console.error(`Failed to load font: ${fontPath}`);
+      }
+
+      const fontBuffer = await fontResponse.arrayBuffer();
+      const fontBase64 = btoa(String.fromCharCode(...new Uint8Array(fontBuffer)));
+
+      doc.addFileToVFS(fontFileName, fontBase64);
+      doc.addFont(fontFileName, cleanFontName, "normal");
+      doc.setFont(cleanFontName);
     } else {
-      console.log("User does not have enough credits to save work.");
+      doc.setFont("helvetica");
     }
-  };
 
-  const saveWork = async () => {
-    try {
-      const writtenContent = textAreaRef.current?.value || "";
+    // Title and content
+    doc.setFontSize(18);
+    doc.text(title || "Untitled Work", 10, 20);
+    doc.setFontSize(12);
 
-      const doc = new jsPDF();
-      const marginLeft = 10;
-      const marginTop = 30;
-      const pageHeight = doc.internal.pageSize.height;
-      const lineHeight = 10;
-      const maxLineWidth = 180;
+    const lines = doc.splitTextToSize(writtenContent, 180);
+    let currentY = 30;
+    const lineHeight = 10;
+    const pageHeight = doc.internal.pageSize.height;
 
-      doc.setFontSize(18);
-      doc.text(title || "Untitled Work", marginLeft, 20);
-      doc.setFontSize(12);
-      doc.setFont(fontStyle)
-      const lines = doc.splitTextToSize(writtenContent, maxLineWidth);
-      let currentY = marginTop;
-
-      for (let i = 0; i < lines.length; i++) {
-        if (currentY + lineHeight > pageHeight - 10) {
-          doc.addPage();
-          currentY = 20;
-        }
-        doc.text(lines[i], marginLeft, currentY);
-        currentY += lineHeight;
+    for (let i = 0; i < lines.length; i++) {
+      if (currentY + lineHeight > pageHeight - 10) {
+        doc.addPage();
+        currentY = 20;
       }
-
-      const pdfBlob = doc.output("blob");
-      const fileName = `${title || "Untitled Work"}-${workID}-${userID}.pdf`;
-
-      const { data: uploadData, error: uploadError } = await supabase.storage
-        .from("written-works")
-        .upload(`Saved Works/${fileName}`, pdfBlob, {
-          cacheControl: "3600",
-          upsert: true,
-          contentType: "application/pdf",
-        });
-
-      if (uploadError) {
-        console.error("Upload error:", uploadError.message);
-        return;
-      }
-
-      alert("Progress saved!");
-
-      const { data: signedUrlData } = await supabase
-        .storage
-        .from("written-works")
-        .getPublicUrl(uploadData?.path || '');
-
-      const fileUrl = signedUrlData?.publicUrl || '';
-      if (!fileUrl) {
-        console.error("File URL not available.");
-        return;
-      }
-
-      const { data, error: insertError } = await supabase
-        .from("worksFolder")
-        .insert([
-          {
-            workID,
-            userID,
-            title,
-            filename: fileName,
-            fileUrl,
-          },
-        ]);
-
-      if (insertError) {
-        console.error("Insert error:", insertError.message);
-        return;
-      }
-
-      const { data: updateData, error: updateError } = await supabase
-        .from("User")
-        .update({
-          userCredits: userCredits - 1500,
-        })
-        .eq("id", userID);
-
-      if (updateError) {
-        console.error("Error updating credits:", updateError.message);
-      }
-    } catch (err) {
-      console.error("Error saving work:", err);
+      doc.text(lines[i], 10, currentY);
+      currentY += lineHeight;
     }
-  };
 
-  
+    // Create and upload PDF
+    const pdfBlob = doc.output("blob");
+    const fileName = `${title || "Untitled"}-${workID}-${userID}.pdf`;
+
+    const { data: uploadData, error: uploadError } = await supabase.storage
+      .from("written-works")
+      .upload(`Saved Works/${fileName}`, pdfBlob, {
+        cacheControl: "3600",
+        upsert: true,
+        contentType: "application/pdf",
+      });
+
+    if (uploadError) {
+      console.error("Upload error:", uploadError.message);
+      return;
+    }
+
+    alert("Progress saved!");
+
+    const { data: signedUrlData } = supabase.storage
+      .from("written-works")
+      .getPublicUrl(uploadData?.path || "");
+
+    const fileUrl = signedUrlData?.publicUrl || "";
+    if (!fileUrl) {
+      console.error("Could not get file URL.");
+      return;
+    }
+
+    const { error: insertError } = await supabase
+      .from("worksFolder")
+      .insert([{
+        workID,
+        userID,
+        title,
+        filename: fileName,
+        fileUrl,
+      }]);
+
+    if (insertError) {
+      console.error("Insert error:", insertError.message);
+    }
+
+    const { error: updateError } = await supabase
+      .from("User")
+      .update({ userCredits: userCredits - 1500 })
+      .eq("id", userID);
+
+    if (updateError) {
+      console.error("Error updating credits:", updateError.message);
+    }
+  } catch (err) {
+    console.error("Error saving work:", err);
+  }
+};
 
   const containsBadWords = (text: string): string[] => {
     const words = text.toLowerCase().split(/\s+/);

@@ -23,7 +23,7 @@ export default function SavedDocuments() {
       if (user) {
         const { data, error } = await supabase
           .from("worksFolder")
-          .select("title, fileUrl")
+          .select("title, fileUrl, date_saved")
           .eq("userID", user.user.id)
 
         if (error) {
@@ -45,8 +45,7 @@ export default function SavedDocuments() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white dark:from-gray-950 dark:to-gray-900 flex flex-col">
       <Header />
-      
-      {/* Enhanced Page Title */}
+
       <header className="border-b bg-white dark:bg-gray-900 shadow-sm">
         <div className="container mx-auto max-w-7xl flex h-24 items-center justify-center px-6">
           <h1 className="text-3xl font-bold text-center text-gray-900 dark:text-white tracking-tight">
@@ -55,10 +54,7 @@ export default function SavedDocuments() {
         </div>
       </header>
 
-      {/* Main Content */}
       <main className="flex flex-1 flex-col items-center justify-start w-full px-6 py-12">
-        
-        {/* Search Input */}
         <div className="mb-10 w-full max-w-7xl flex flex-col gap-4 sm:flex-row sm:items-center">
           <div className="relative flex-1">
             <Search className="absolute left-3 top-3 h-5 w-5 text-muted-foreground" />
@@ -70,7 +66,6 @@ export default function SavedDocuments() {
           </div>
         </div>
 
-        {/* Document List */}
         <div className="w-full max-w-7xl rounded-xl border bg-white dark:bg-gray-800 shadow-sm overflow-hidden">
           <div className="grid grid-cols-1 divide-y">
             {loading ? (
@@ -79,22 +74,36 @@ export default function SavedDocuments() {
               documents.map((doc, index) => (
                 <div
                   key={index}
-                  className="flex flex-col sm:flex-row items-center p-6 gap-6 sm:gap-4 transition-all hover:bg-muted/30"
+                  className="flex flex-col sm:flex-row items-center justify-between p-6 gap-6 sm:gap-4 transition-all hover:bg-muted/30"
                 >
-                  <div className="flex h-14 w-14 items-center justify-center rounded-md border bg-background shadow-sm">
-                    <FileText className="h-6 w-6 text-muted-foreground" />
+                  <div className="flex items-center gap-4 w-full sm:w-auto">
+                    <div className="flex h-14 w-14 items-center justify-center rounded-md border bg-background shadow-sm">
+                      <FileText className="h-6 w-6 text-muted-foreground" />
+                    </div>
+                    <div className="text-center sm:text-left">
+                      <p className="text-lg font-medium text-gray-900 dark:text-white">{doc.title}</p>
+                    </div>
                   </div>
-                  <div className="flex-1 space-y-1 text-center sm:text-left">
-                    <p className="text-lg font-medium text-gray-900 dark:text-white">{doc.title}</p>
+
+                  <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-4">
+                    {doc.date_saved && (
+                      <p className="text-sm text-muted-foreground">
+                        Saved on {new Date(doc.date_saved).toLocaleDateString(undefined, {
+                          year: "numeric",
+                          month: "long",
+                          day: "numeric",
+                        })}
+                      </p>
+                    )}
+                    <Button
+                      variant="outline"
+                      size="lg"
+                      className="text-sm px-6 py-2"
+                      onClick={() => handleDownload(doc.fileUrl)}
+                    >
+                      View & Download
+                    </Button>
                   </div>
-                  <Button
-                    variant="outline"
-                    size="lg"
-                    className="text-sm px-6 py-2"
-                    onClick={() => handleDownload(doc.fileUrl)}
-                  >
-                    View & Download
-                  </Button>
                 </div>
               ))
             ) : (
