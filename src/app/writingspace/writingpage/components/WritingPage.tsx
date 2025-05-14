@@ -14,6 +14,7 @@ import englishWords from 'an-array-of-english-words';
 import { useFontContext } from '../../FontContext';
 import SaveWrittenText from '../components/SaveWrittenText';
 import { useWritingContext } from '../../WritingContext';
+import { useDynamicLocalFont } from '../../DynamicLocalFonts';
 
 
 const GRAMMAR_TABS = [
@@ -96,31 +97,37 @@ export default function WritingPage(props: WritingPageProps) {
 
 
 
-  const loadGoogleFont = (fontName: string) => {
-  const formattedFont = fontName.replace(/\s+/g, '+');
-  const linkId = `google-font-${formattedFont}`;
+//   const loadGoogleFont = (fontName: string) => {
+//   const formattedFont = fontName.replace(/\s+/g, '+');
+//   const linkId = `google-font-${formattedFont}`;
 
-  if (document.getElementById(linkId)) return;
+//   if (document.getElementById(linkId)) return;
 
-  const link = document.createElement('link');
-  link.id = linkId;
-  link.href = `https://fonts.googleapis.com/css2?family=${formattedFont}&display=swap`;
-  link.rel = 'stylesheet';
-  document.head.appendChild(link);
-};
+//   const link = document.createElement('link');
+//   link.id = linkId;
+//   link.href = `https://fonts.googleapis.com/css2?family=${formattedFont}&display=swap`;
+//   link.rel = 'stylesheet';
+//   document.head.appendChild(link);
+// };
 
 
 
-  // Default font options
-  const defaultFonts = [
-    "Arial",
-    "Georgia",
-    "Times New Roman",
-    "Courier New",
-    "Verdana",
-  ];
+const defaultFonts = [
+  "Arial",
+  "Georgia",
+  "Times New Roman",
+  "Courier New",
+  "Verdana",
+];
 
-   const combinedFonts = Array.from(new Set([...defaultFonts, ...availableFonts.map(font => font.fontName)]));
+const combinedFonts = Array.from(new Set([
+  ...defaultFonts,
+  ...availableFonts.map(font => font.fontName)
+]));
+
+// Dynamically load the selected font if it's not a default system font
+useDynamicLocalFont(fontStyle, defaultFonts);
+ 
 
   const getErrorIcon = (type: string) => {
     if (type.includes('Spelling')) return '📝';
