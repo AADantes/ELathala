@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import AdminHeader from "@/app/admin/header"
-import TableSelector from "@/app/admin/table-selector"
 import DataTable from "@/app/admin/data-table"
 import RecordForm from "@/app/admin/record-form"
 import { Card, CardContent, CardHeader, CardTitle } from "../homepage/ui/card"
@@ -12,51 +11,59 @@ import supabase from "../../../config/supabaseClient"
 export default function AdminPage() {
   const router = useRouter()
   const [tables, setTables] = useState<string[]>([])
-  const [selectedTable, setSelectedTable] = useState<string>("")
-  const [tableData, setTableData] = useState<any[]>([])
-  const [columns, setColumns] = useState<string[]>([])
+  const [tablesData, setTablesData] = useState<{ tableName: string, columns: string[], data: any[], primaryKey: string }[]>([])
   const [selectedRow, setSelectedRow] = useState<any>(null)
-  const [columnValue, setColumnValue] = useState<any>(null)
   const [formValues, setFormValues] = useState<Record<string, string>>({})
   const [selectedColumn, setSelectedColumn] = useState<string>("")
 
-  // Fetch table list from Supabase
+  const fetchPrimaryKey = async (tableName: string) => {
+    const { data, error } = await supabase
+      .from("information_schema.columns")
+      .select("column_name")
+      .eq("table_name", tableName)
+      .eq("is_identity", true)
+
+    if (error || !data.length) return "id"
+    return data[0].column_name
+  }
+
   useEffect(() => {
     const fetchTables = async () => {
       const { data, error } = await supabase.rpc("get_tables")
 
       if (error) {
         console.error("Error fetching tables:", error)
-      } else {
-        console.log("Tables fetched successfully:", data)
-        setTables(data.map((table: { name: string }) => table.name)) // Extract names
+        return
       }
+      setTables(data.map((table: { name: string }) => table.name))
     }
     fetchTables()
   }, [])
 
-  // Fetch table data and columns
   useEffect(() => {
-    if (selectedTable) {
-      const fetchData = async () => {
-        const { data, error } = await supabase.from(selectedTable).select("*")
-        if (error) console.error(`Error fetching data from ${selectedTable}:`, error)
-        else {
-          setTableData(data)
-          const cols = data.length > 0 ? Object.keys(data[0]) : []
-          setColumns(cols)
-          setSelectedColumn(cols[0])
-          const initialValues = cols.reduce((acc, col) => ({ ...acc, [col]: "" }), {})
-          setFormValues(initialValues)
+    const fetchTablesData = async () => {
+      const tablesData = []
+
+      for (const table of tables) {
+        const { data, error } = await supabase.from(table).select("*")
+
+        if (error) {
+          console.error(`Error fetching data from ${table}:"`, error)
+          continue
         }
+
+        const columns = data.length > 0 ? Object.keys(data[0]) : []
+        const primaryKey = await fetchPrimaryKey(table)
+        tablesData.push({ tableName: table, columns, data, primaryKey })
       }
-      fetchData()
+      setTablesData(tablesData)
     }
-  }, [selectedTable])
+    if (tables.length) fetchTablesData()
+  }, [tables])
 
   const handleRowClick = (row: any) => {
     setSelectedRow(row)
-    const values = columns.reduce((acc, col) => ({ ...acc, [col]: row[col]?.toString() || "" }), {})
+    const values = Object.keys(row).reduce((acc, col) => ({ ...acc, [col]: row[col]?.toString() || "" }), {})
     setFormValues(values)
   }
 
@@ -64,36 +71,27 @@ export default function AdminPage() {
     setFormValues((prev) => ({ ...prev, [column]: value }))
   }
 
-  const handleAdd = async () => {
-    const { error } = await supabase.from(selectedTable).insert([formValues])
+  const handleAdd = async (tableName: string) => {
+    const { error } = await supabase.from(tableName).insert([formValues])
     if (error) console.error("Error adding record:", error)
     else alert("Record added successfully!")
   }
 
-  const handleUpdate = async () => {
-    if (!selectedRow) return alert("Please select a row to update");
-    if (!selectedColumn || columnValue === undefined) return alert("Please specify the column and value to match");
-  
-    const matchConditions = {
-      id: selectedRow.id,
-      [selectedColumn]: columnValue
-    };
-  
-    const { error } = await supabase
-      .from(selectedTable)
-      .update(formValues)
-      .match(matchConditions);
-  
-    if (error) {
-      console.error("Error updating record:", error);
-    } else {
-      alert("Record updated successfully!");
-    }
-  };
+  const handleUpdate = async (tableName: string) => {
+    if (!selectedRow) return alert("Please select a row to update")
+    const tableData = tablesData.find((table) => table.tableName === tableName)
+    const primaryKey = tableData?.primaryKey || "id"
+    const { [primaryKey]: _, ...updateValues } = formValues
+    const { error } = await supabase.from(tableName).update(updateValues).match({ [primaryKey]: selectedRow[primaryKey] })
+    if (error) console.error("Error updating record:", error)
+    else alert("Record updated successfully!")
+  }
 
-  const handleDelete = async () => {
+  const handleDelete = async (tableName: string) => {
     if (!selectedRow) return alert("Please select a row to delete")
-    const { error } = await supabase.from(selectedTable).delete().match({ id: selectedRow.id })
+    const tableData = tablesData.find((table) => table.tableName === tableName)
+    const primaryKey = tableData?.primaryKey || "id"
+    const { error } = await supabase.from(tableName).delete().match({ [primaryKey]: selectedRow[primaryKey] })
     if (error) console.error("Error deleting record:", error)
     else alert("Record deleted successfully!")
   }
@@ -103,116 +101,41 @@ export default function AdminPage() {
     router.push("/landingpage")
   }
 
-  // ✅ Replace with your actual Google Fonts API key
-const GOOGLE_FONTS_API_KEY = 'your-google-fonts-api-key'
-
-// This function can be used on a button click
-const fetchAndSyncGoogleFonts = async () => {
-  try {
-    const res = await fetch(`https://www.googleapis.com/webfonts/v1/webfonts?key=AIzaSyCwVy7mzn6uZ83nDecgD6XYDpoISAL2ADA`)
-    const data = await res.json()
-
-    if (!data.items || data.items.length === 0) {
-      console.log('No fonts returned from API.')
-      alert('No fonts fetched from Google Fonts.')
-      return
-    }
-
-    let added = 0
-    let updated = 0
-
-    for (const font of data.items) {
-      const { family, category, variants, files } = font
-
-      const { data: existing, error: fetchError } = await supabase
-        .from('google_fonts_shop')
-        .select('font_name')
-        .eq('font_name', family)
-        .single()
-
-      const { error } = await supabase.from('google_fonts_shop').upsert({
-        font_name: family,
-        category,
-        variants,
-        files,
-        price: 1000,
-        is_featured: false,
-      })
-
-      if (error) {
-        console.error(`Error upserting ${family}:`, error.message)
-        continue
-      }
-
-      if (existing) {
-        updated++
-        console.log(`Updated: ${family}`)
-      } else {
-        added++
-        console.log(`Added: ${family}`)
-      }
-    }
-
-    const message = `✅ Google Fonts sync complete!\n\nAdded: ${added}\nUpdated: ${updated}`
-    console.log(message)
-    alert(message)
-  } catch (error) {
-    console.error('❌ Failed to sync fonts:', error)
-    alert('An error occurred while syncing fonts. Check console for details.')
-  }
-}
-
   return (
     <div className="min-h-screen bg-blue-50">
       <AdminHeader onLogout={handleLogout} />
-  
       <main className="pt-6 pb-6 px-2 sm:px-4 md:px-6">
         <div className="grid gap-6">
-          <div>
-            <Card className="bg-white w-full">
+          {tablesData.map(({ tableName, columns, data, primaryKey }) => (
+            <Card key={tableName} className="bg-white w-full mb-4">
               <CardHeader>
-                <CardTitle>Database Management</CardTitle>
+                <CardTitle>{tableName} Management</CardTitle>
               </CardHeader>
               <CardContent>
-                <TableSelector
-                  tables={tables}
-                  selectedTable={selectedTable}
-                  onSelectTable={setSelectedTable}
+                <DataTable
+                  columns={columns}
+                  data={data}
+                  selectedRow={selectedRow}
+                  onRowClick={handleRowClick}
                 />
-                <div className="mt-6 overflow-auto">
-                  <DataTable
-                    columns={columns}
-                    data={tableData}
-                    selectedRow={selectedRow}
-                    onRowClick={handleRowClick}
-                  />
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-  
-          <div>
-            <Card className="bg-white w-full">
-              <CardHeader>
-                <CardTitle>Edit Record</CardTitle>
-              </CardHeader>
-              <CardContent>
                 <RecordForm
                   columns={columns}
                   formValues={formValues}
                   selectedColumn={selectedColumn}
                   onInputChange={handleInputChange}
                   onSelectColumn={setSelectedColumn}
-                  onAdd={handleAdd}
-                  onUpdate={handleUpdate}
-                  onDelete={handleDelete}
-                  onGFonts={fetchAndSyncGoogleFonts}
+                  onAdd={() => handleAdd(tableName)}
+                  onUpdate={() => handleUpdate(tableName)}
+                  onDelete={() => handleDelete(tableName)}
+                  onGFonts={() => {}}
+                  disabledColumns={[primaryKey]}
                 />
               </CardContent>
             </Card>
-          </div>
+          ))}
         </div>
       </main>
     </div>
   )
 }
+

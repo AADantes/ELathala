@@ -27,6 +27,7 @@ interface RecordFormProps {
   onUpdate: () => void
   onDelete: () => void
   onGFonts: () => void
+  disabledColumns: string[] // Add this prop to handle disabled columns
 }
 
 export default function RecordForm({
@@ -39,12 +40,8 @@ export default function RecordForm({
   onUpdate,
   onDelete,
   onGFonts,
+  disabledColumns, // Receive the disabledColumns array
 }: RecordFormProps) {
-
-
-
-
-
   return (
     <Card className="bg-white rounded-xl shadow-md border border-gray-200 p-6 transition-all duration-300">
       <CardHeader className="border-b border-gray-100 pb-4 mb-6">
@@ -72,7 +69,7 @@ export default function RecordForm({
                   id={column}
                   value={formValues[column] || ""}
                   onChange={(e) => onInputChange(column, e.target.value)}
-                  disabled={column === "id"}
+                  disabled={disabledColumns.includes(column)} // Disable based on the disabledColumns array
                   className="w-full pr-10 px-3 py-2 text-sm rounded-md border border-gray-300 bg-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
                 />
                 {column !== "id" && formValues[column]?.trim() && (

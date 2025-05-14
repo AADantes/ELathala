@@ -22,8 +22,11 @@ export default function DataTable({
   selectedRow,
   onRowClick,
 }: DataTableProps) {
+  // Limit the number of rows to 15
+  const limitedData = data.slice(0, 15)
+
   return (
-    <div className="overflow-x-auto rounded-md border border-gray-200 shadow-sm bg-white">
+    <div className="overflow-y-auto max-h-96 rounded-md border border-gray-200 shadow-sm bg-white">
       <Table className="min-w-full">
         <TableHeader>
           <TableRow className="bg-gray-100 border-b border-gray-200">
@@ -38,7 +41,7 @@ export default function DataTable({
           </TableRow>
         </TableHeader>
         <TableBody>
-          {data.map((row, index) => (
+          {limitedData.map((row, index) => (
             <TableRow
               key={index}
               onClick={() => onRowClick(row)}
