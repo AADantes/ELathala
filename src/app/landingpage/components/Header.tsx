@@ -85,7 +85,6 @@ export default function Header() {
           isVerified: data.user?.email_confirmed_at ? true : false,
           isAdmin: false,
           dateRegistered: new Date(),
-          lastLoggedIn: null,
           created_at: new Date(),
         },
       ]);
@@ -102,7 +101,6 @@ export default function Header() {
         {
           id: userId,
           username,
-          highestNumOfWords: 0,
           userLevel: 1,
           usercurrentExp: 0,
           userCredits: 0,
